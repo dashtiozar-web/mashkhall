@@ -1,0 +1,376 @@
+@import "tailwindcss";
+
+/* Dark mode is class-based so the header toggle can control it. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * 17 Shubat design tokens
+ *
+ * A formal institutional identity: deep navy for the organisation itself
+ * (header, page headings, footer, primary actions), dark crimson for what
+ * matters most, fire orange and restrained amber for emphasis and activity,
+ * charcoal and slate for text, and warm ivory only where reading needs it.
+ * Every colour is a CSS variable so the same classes work in light and dark
+ * mode. (Older screens' class names map onto these tokens.)
+ */
+@theme inline {
+  /* Fonts come from variables so administrators can choose them (Administration › Appearance; src/lib/appearance.ts). */
+  --font-serif: var(--f-serif);
+  --font-sans: var(--f-sans);
+  --font-kurdish: var(--f-kurdish);
+  --font-arabic-ui: var(--f-arabic-ui);
+  /* Legacy aliases so older screens pick up the new typefaces */
+  --font-display: var(--f-serif);
+  --font-mono: var(--f-sans);
+
+  --color-paper: var(--c-paper);
+  --color-surface: var(--c-surface);
+  --color-stone: var(--c-stone);
+  --color-stone-deep: var(--c-stone-deep);
+  --color-line: var(--c-line);
+  --color-ink: var(--c-ink);
+  --color-ink-soft: var(--c-ink-soft);
+  --color-muted: var(--c-muted);
+  --color-navy: var(--c-navy);
+  --color-navy-deep: var(--c-navy-deep);
+  --color-navy-tint: var(--c-navy-tint);
+  --color-crimson: var(--c-crimson);
+  --color-ember: var(--c-ember);
+  --color-amber: var(--c-amber);
+  --color-amber-tint: var(--c-amber-tint);
+  --color-band: var(--c-band);
+  --color-band-soft: var(--c-band-soft);
+}
+
+:root {
+  --f-serif: 'Source Serif 4 Variable', 'Iowan Old Style', Georgia, serif;
+  --f-sans: 'Source Sans 3 Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --f-kurdish: 'Noto Naskh Arabic Variable', 'Noto Naskh Arabic', serif;
+  --f-arabic-ui: 'Noto Sans Arabic Variable', 'Noto Sans Arabic', 'Noto Naskh Arabic Variable', sans-serif;
+  --text-scale: 1;
+  --reading-leading: 1.65;
+  --reading-leading-rtl: 1.8;
+  --c-paper: #ECEAE5;        /* page: warm slate-ivory, never stark white */
+  --c-surface: #FBFAF7;      /* cards and forms: warm ivory */
+  --c-stone: #E2E0DA;
+  --c-stone-deep: #D6D3CB;
+  --c-line: #CFCBC2;
+  --c-ink: #161D2B;          /* charcoal-navy text */
+  --c-ink-soft: #364052;
+  --c-muted: #5A6273;
+  --c-navy: #14284B;         /* institutional colour */
+  --c-navy-deep: #0C1B36;
+  --c-navy-tint: #DDE3EE;
+  --c-crimson: #A3172C;      /* important accents */
+  --c-ember: #C4511F;        /* fire orange: activity and emphasis */
+  --c-amber: #D99A2B;        /* restrained amber */
+  --c-amber-tint: #F3E6CC;
+  --c-band: #0B1830;         /* header, page heads and footer */
+  --c-band-soft: #13264A;
+  --c-link: #1C4A8C;
+  --c-on-band: #E9EDF5;
+  color-scheme: light;
+}
+
+.dark {
+  --c-paper: #0A111F;
+  --c-surface: #111A2C;
+  --c-stone: #16213A;
+  --c-stone-deep: #1D2A46;
+  --c-line: #26344F;
+  --c-ink: #E7EAF0;
+  --c-ink-soft: #C3C9D5;
+  --c-muted: #929AAB;
+  --c-navy: #2D5193;
+  --c-navy-deep: #3A62A8;
+  --c-navy-tint: #18284A;
+  --c-crimson: #E2566A;
+  --c-ember: #EE8250;
+  --c-amber: #E9B455;
+  --c-amber-tint: #2C2414;
+  --c-band: #070D19;
+  --c-band-soft: #0E1830;
+  --c-link: #9EB9EA;
+  --c-on-band: #E9EDF5;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    /* Percentage, not pixels, so each visitor's own browser text size is respected. */
+    font-size: calc(100% * var(--text-scale));
+  }
+
+  :root {
+    font-family: var(--f-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--c-paper);
+    color: var(--c-ink);
+    font-size: 1.09375rem;
+    line-height: var(--reading-leading);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--f-serif);
+    font-optical-sizing: auto;
+    color: var(--c-ink);
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--c-navy);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c-amber);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  a {
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+  }
+
+  input, select, textarea {
+    color: var(--c-ink);
+    background-color: var(--c-surface);
+  }
+
+  .font-kurdish {
+    font-family: var(--f-kurdish);
+  }
+
+  /* Kurdish and Arabic interface: a clear sans-serif for the interface,
+     Naskh for headings and long reading. */
+  html[dir='rtl'] body {
+    font-family: var(--f-arabic-ui);
+    font-size: 1.0625rem;
+    line-height: var(--reading-leading-rtl);
+  }
+  html[dir='rtl'] h1, html[dir='rtl'] h2, html[dir='rtl'] h3, html[dir='rtl'] h4 {
+    font-family: var(--f-kurdish);
+    letter-spacing: 0;
+    line-height: 1.45;
+  }
+  /* Email addresses, links, numbers and codes keep their own direction. */
+  html[dir='rtl'] input[type='email'], html[dir='rtl'] input[type='url'], html[dir='rtl'] input[type='tel'],
+  html[dir='rtl'] input[type='number'], html[dir='rtl'] .ltr-value {
+    direction: ltr;
+    text-align: right;
+  }
+  html[dir='rtl'] .tabular-nums { unicode-bidi: isolate; }
+  /* Arrows and chevrons point the way the reader moves. */
+  html[dir='rtl'] .lucide-arrow-right, html[dir='rtl'] .lucide-arrow-left,
+  html[dir='rtl'] .lucide-chevron-right, html[dir='rtl'] .lucide-chevron-left,
+  html[dir='rtl'] .lucide-arrow-up-right, html[dir='rtl'] .lucide-external-link,
+  html[dir='rtl'] .lucide-log-out, html[dir='rtl'] .lucide-log-in, html[dir='rtl'] .lucide-send {
+    transform: scaleX(-1);
+  }
+  /* Maps and drawings are not mirrored. */
+  svg { direction: ltr; }
+}
+
+/* Links and navy text need a lighter shade on dark backgrounds */
+.text-navy { color: var(--c-link); }
+.hover\:text-navy:hover { color: var(--c-link); }
+
+/* Long-form reading: articles and statements */
+.prose-article {
+  font-family: var(--f-serif);
+  font-size: 1.1875rem;
+  line-height: 1.75;
+  color: var(--c-ink);
+}
+.prose-article p { margin: 0 0 1.25em; }
+.prose-article h2 { font-weight: 600; font-size: 1.55rem; line-height: 1.25; margin: 1.8em 0 0.6em; }
+.prose-article h3 { font-weight: 600; font-size: 1.28rem; line-height: 1.3; margin: 1.6em 0 0.5em; }
+.prose-article ul, .prose-article ol { margin: 0 0 1.25em 1.25em; }
+.prose-article li { margin: 0.3em 0; }
+.prose-article blockquote {
+  border-left: 3px solid var(--c-crimson);
+  padding-left: 1.1em;
+  margin: 1.5em 0;
+  color: var(--c-ink-soft);
+  font-style: italic;
+}
+.prose-article a { color: var(--c-link); text-decoration: underline; }
+
+/* The date mark */
+.date-leaf {
+  font-family: var(--f-serif);
+  font-optical-sizing: auto;
+  font-variant-numeric: lining-nums;
+}
+
+/*
+ * Section rule: a thin line from crimson through fire orange to amber, used
+ * sparingly under the header bands and above the footer.
+ */
+.rule-fire {
+  height: 3px;
+  background: linear-gradient(90deg, var(--c-crimson) 0%, var(--c-ember) 55%, var(--c-amber) 100%);
+}
+html[dir='rtl'] .rule-fire {
+  background: linear-gradient(270deg, var(--c-crimson) 0%, var(--c-ember) 55%, var(--c-amber) 100%);
+}
+
+/* Institutional band: deep navy with a faint woven grid, for page heads. */
+.band-texture {
+  background-color: var(--c-band);
+  background-image:
+    radial-gradient(120% 140% at 100% 0%, rgba(196, 81, 31, 0.16) 0%, rgba(196, 81, 31, 0) 55%),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: auto, 32px 32px, 32px 32px;
+  color: var(--c-on-band);
+}
+.band-texture h1, .band-texture h2, .band-texture h3 { color: #fff; }
+
+/*
+ * Dark mode for the coloured status styles used in the account and admin
+ * screens (approved, pending, warnings).
+ */
+.dark .bg-emerald-50, .dark .bg-emerald-100 { background-color: #17301F; }
+.dark .text-emerald-700, .dark .text-emerald-800, .dark .text-emerald-900, .dark .text-emerald-600 { color: #7FD3A3; }
+.dark .border-emerald-200, .dark .border-emerald-300 { border-color: #2C5A3E; }
+.dark .bg-amber-50, .dark .bg-amber-100 { background-color: #2E2614; }
+.dark .text-amber-700, .dark .text-amber-800, .dark .text-amber-900, .dark .text-amber-600 { color: #F0C674; }
+.dark .border-amber-200, .dark .border-amber-300 { border-color: #5C4A1E; }
+.dark .bg-red-50, .dark .bg-red-100, .dark .bg-rose-50 { background-color: #34181C; }
+.dark .text-red-700, .dark .text-red-800, .dark .text-rose-700 { color: #F38D99; }
+.dark .bg-indigo-50, .dark .bg-indigo-100, .dark .bg-purple-100, .dark .bg-blue-50 { background-color: #1F2238; }
+.dark .text-indigo-600, .dark .text-indigo-700, .dark .text-purple-700, .dark .text-purple-800, .dark .text-blue-700 { color: #AEB6F5; }
+.dark .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Notification banner drops in from under the header (the one entrance animation) */
+@keyframes notification-drop {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.notification-drop { animation: notification-drop 0.35s ease-out; }
+
+/* Printing the membership card: only the card, at real size, in colour. */
+@media print {
+  @page { size: A4; margin: 15mm; }
+  body * { visibility: hidden !important; }
+  #member-card-print, #member-card-print * { visibility: visible !important; }
+  #member-card-print { position: absolute; left: 0; top: 0; display: flex !important; }
+  html, body { background: #fff !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+
+/* Breaking News banner: the message moves from right to left and repeats. */
+@keyframes breaking-news-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.breaking-news-track {
+  display: inline-flex;
+  padding-left: 1rem;
+  animation-name: breaking-news-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.breaking-news:hover .breaking-news-track,
+.breaking-news:focus-within .breaking-news-track { animation-play-state: paused; }
+@keyframes breaking-news-pulse { 50% { opacity: 0.35; } }
+.breaking-news-dot { animation: breaking-news-pulse 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .breaking-news-track { animation: none; transform: none; }
+  .breaking-news-track .bn-item ~ .bn-item, .breaking-news-track .bn-sep { display: none; }
+  .breaking-news-dot { animation: none; }
+}
+
+/* Kurdish (Sorani) and Arabic articles read right to left. */
+.prose-article[dir='rtl'] {
+  font-family: var(--f-kurdish);
+  font-size: 1.25rem;
+  line-height: 2;
+  text-align: right;
+}
+.prose-article[dir='rtl'] ul, .prose-article[dir='rtl'] ol { margin: 0 1.25em 1.25em 0; }
+.prose-article[dir='rtl'] blockquote {
+  border-left: 0;
+  border-right: 3px solid var(--c-crimson);
+  padding-left: 0;
+  padding-right: 1.1em;
+  font-style: normal;
+}
+[dir='rtl'] h1, [dir='rtl'] h2, [dir='rtl'] h3 { font-family: var(--f-kurdish); line-height: 1.5; }
+
+/* Homepage cover: a slow camera movement across each city photo. */
+@keyframes cover-drift {
+  from { transform: scale(1.04) translate3d(1.5%, 0.5%, 0); }
+  to { transform: scale(1.16) translate3d(-1.5%, -1%, 0); }
+}
+.cover-drift {
+  animation: cover-drift 21s ease-out forwards;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-drift { animation: none; }
+}
+
+/* UK council map: lines gently flow between councils. */
+:root { --map-land: #F4F2EE; --map-halo: #ffffff; --map-empty: #D9D6CF; }
+:root.dark { --map-land: #1B2742; --map-halo: #0A111F; --map-empty: #1B2742; }
+.map-flow { stroke-dasharray: 8 7; animation: map-flow 2.4s linear infinite; }
+@keyframes map-flow { to { stroke-dashoffset: -30; } }
+@media (prefers-reduced-motion: reduce) { .map-flow { animation: none; } }
+
+/* The bleeding calendar leaf, for the martyrs of 17 February 2011. It runs
+   continuously and for everyone, as a memorial: slow, small movement. */
+.bleed-stem {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: bleed-stem 8s ease-in-out infinite;
+}
+@keyframes bleed-stem {
+  0% { transform: scaleY(0.86); }
+  34% { transform: scaleY(1.18); }
+  40% { transform: scaleY(0.9); }
+  100% { transform: scaleY(0.86); }
+}
+.bleed-drop {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: bleed-drop 8s infinite;
+}
+@keyframes bleed-drop {
+  0% { transform: translateY(0) scale(0.2); opacity: 0; animation-timing-function: ease-out; }
+  12% { opacity: 1; }
+  34% { transform: translateY(6px) scale(1.15, 1.25); opacity: 1; animation-timing-function: cubic-bezier(0.42, 0, 0.7, 0.95); }
+  97% { transform: translateY(var(--fall, 200px)) scale(0.85, 1.35); opacity: 0.9; }
+  100% { transform: translateY(var(--fall, 200px)) scale(0.85, 1.35); opacity: 0; }
+}
+
+/* 17 Shubat 2011 memorial: slides are stacked and cross-fade slowly. */
+.memorial-slideshow > div:first-child { display: grid; }
+.memorial-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 1.4s; }
+.memorial-slide.is-current { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) {
+  .memorial-slide { transition: none; }
+}
+.memorial ::selection { background: #A3172C; color: #fff; }
+.memorial .font-kurdish .font-serif, .memorial .font-kurdish h1, .memorial .font-kurdish h2, .memorial .font-kurdish h3, .memorial .font-kurdish h4 { font-family: var(--f-kurdish); }

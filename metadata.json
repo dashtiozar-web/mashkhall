@@ -1,0 +1,8 @@
+{
+  "name": "Remix 17 Shubat Organization",
+  "description": "Freedom, Truth \u0026 Awareness - Official platform and membership portal for 17 Shubat Organization, advocating for human rights, transparency, and peaceful community awareness.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

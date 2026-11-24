@@ -1,0 +1,70 @@
+name: Website monitoring
+
+# Every 3 hours: is the site up, protected, still pointing to Cloudflare, and
+# is its certificate valid? Twice a day it also tests access from Iraq and
+# Iran. Problems open a GitHub issue (GitHub emails the repository owner);
+# the issue is closed automatically when everything works again.
+
+on:
+  schedule:
+    - cron: '11 */3 * * *'
+  workflow_dispatch:
+    inputs:
+      regional:
+        description: 'Also test access from Iraq and Iran'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check the website
+        id: check
+        continue-on-error: true
+        run: |
+          hour=$(date -u +%H)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then regional="${{ inputs.regional && '1' || '0' }}"; elif [ "$hour" = "00" ] || [ "$hour" = "12" ]; then regional=1; else regional=0; fi
+          REGIONAL=$regional node scripts/monitor.mjs
+        env:
+          MONITOR_DOMAIN: 17shubat.org.uk
+
+      - name: Summary
+        if: always()
+        run: cat monitor-report.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Open, update or close the alert
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OUTCOME: ${{ steps.check.outcome }}
+        run: |
+          gh label create monitoring --color D93F0B --description "Website monitoring alerts" --force >/dev/null 2>&1 || true
+          open=$(gh issue list --label monitoring --state open --json number --jq '.[0].number' || true)
+          run="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ "$OUTCOME" = "failure" ]; then
+            if [ -n "$open" ]; then
+              gh issue comment "$open" --body-file monitor-report.md
+            else
+              { echo "The website monitor found a problem. Details: $run"; echo; cat monitor-report.md; } > body.md
+              gh issue create --label monitoring --title "Website problem detected ($(date -u '+%Y-%m-%d %H:%M UTC'))" --body-file body.md
+            fi
+          elif [ -n "$open" ]; then
+            gh issue comment "$open" --body "Everything works again ($(date -u '+%Y-%m-%d %H:%M UTC')). $run"
+            gh issue close "$open"
+          fi

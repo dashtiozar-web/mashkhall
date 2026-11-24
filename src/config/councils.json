@@ -1,0 +1,35 @@
+{
+  "_comment": "The six councils built into the website. They exist even before an administrator saves them in the database; saved settings (name, order, archived) override these. Must match INITIAL_CHAPTERS in src/data/initialData.ts (checked by tests/councils.test.ts).",
+  "councils": [
+    {
+      "id": "london",
+      "name": "London",
+      "displayOrder": 1
+    },
+    {
+      "id": "birmingham",
+      "name": "Birmingham",
+      "displayOrder": 2
+    },
+    {
+      "id": "manchester",
+      "name": "Manchester",
+      "displayOrder": 3
+    },
+    {
+      "id": "newcastle",
+      "name": "Newcastle",
+      "displayOrder": 4
+    },
+    {
+      "id": "glasgow",
+      "name": "Glasgow",
+      "displayOrder": 5
+    },
+    {
+      "id": "cardiff",
+      "name": "Cardiff",
+      "displayOrder": 6
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "_comment": "The one place publication fees are set. The Publish with Us fee table, the fee shown to contributors, the fee set when the editors approve work, and the database rules (scripts/sync-pricing.ts) all read these numbers. Amounts are in pence.",
+  "currency": "GBP",
+  "fees": {
+    "article": { "standard": 1500, "discounted": 1125 },
+    "video": { "standard": 2500, "discounted": 1875 }
+  },
+  "discountAfter": 5,
+  "freeAfter": 20
+}

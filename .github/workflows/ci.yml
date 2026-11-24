@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The Firestore emulator runs on Java.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Type-check
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Firestore security rules tests
+        run: npm run test:rules
+
+  # Deploys the database rules and indexes after the tests pass on main.
+  # Optional: it only runs once a FIREBASE_SERVICE_ACCOUNT secret exists
+  # (Settings > Secrets and variables > Actions in this repository).
+  deploy-firestore-rules:
+    needs: build-and-test-rules
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+    steps:
+      - name: Skip when no Firebase key is configured
+        if: env.HAS_KEY != 'true'
+        run: echo "No FIREBASE_SERVICE_ACCOUNT secret; deploy the rules manually (see DEPLOYMENT.md)."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_KEY == 'true'
+
+      - uses: google-github-actions/auth@v2
+        if: env.HAS_KEY == 'true'
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - uses: actions/setup-node@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          node-version: 22
+
+      - name: Deploy Firestore rules and indexes
+        if: env.HAS_KEY == 'true'
+        run: npx -y firebase-tools@15 deploy --only firestore:rules,firestore:indexes --project shubat-ac738 --non-interactive

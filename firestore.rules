@@ -1,0 +1,1504 @@
+rules_version = '2';
+// VERSION 2026-10-30b: translation corrections (translations/*), Videos (tags on visitor submissions); member records, positions and cards written by the website server (position history, Website Administration); online meetings, Appreciation; 17 Shubat 2011 memorial; Publish with Us.
+
+// 17 Shubat Organisation — Firestore security rules
+//
+// Principles
+// 1. Private by default. Personal data (legal name, email, phone, application
+//    answers, activity history) lives in private collections that only the
+//    person themselves and authorised staff can read.
+// 2. Public data is opt-in. `public_profiles` is the ONLY public view of a
+//    member, and a member can only publish one if their member record says
+//    they consented.
+// 3. Authority comes from data users cannot edit. Admin status comes from the
+//    `admins` collection (or a verified bootstrap owner email); staff roles come
+//    from `users/{uid}.roles`, which users can no longer change themselves.
+// 4. Every self-service update is limited to an explicit list of fields, and
+//    ownership is checked against the EXISTING document, not just the new one.
+// 5. Counters can only move by exactly one step, and a like is tied to a
+//    per-user like document so it cannot be repeated.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------
+
+    // A signed-in account. Visitors who comment without an account get a
+    // temporary anonymous sign-in; they are NOT "signed in" for anything else.
+    function signedIn() {
+      return request.auth != null
+        && request.auth.token.get('firebase', {}).get('sign_in_provider', '') != 'anonymous';
+    }
+
+    function isVisitor() {
+      return request.auth != null
+        && request.auth.token.get('firebase', {}).get('sign_in_provider', '') == 'anonymous';
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function docPath(collectionName, id) {
+      return /databases/$(database)/documents/$(collectionName)/$(id);
+    }
+
+    // The bootstrap owner must have a VERIFIED email. Without this check anyone
+    // could register this address with a password and become owner. Every
+    // other administrator is granted through the /admins collection.
+    function isBootstrapOwner() {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'dashtiozar@gmail.com';
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && (isBootstrapOwner() || exists(docPath('admins', uid())));
+    }
+
+    function hasAnyRole(roles) {
+      return signedIn()
+        && exists(docPath('users', uid()))
+        && get(docPath('users', uid())).data.get('roles', []).hasAny(roles);
+    }
+
+    function isMembershipStaff() {
+      return isAdmin() || hasAnyRole(['membership_reviewer']);
+    }
+
+    function isContentStaff() {
+      return isAdmin() || hasAnyRole(['content_reviewer', 'publisher']);
+    }
+
+    function isPublisher() {
+      return isAdmin() || hasAnyRole(['publisher']);
+    }
+
+    function hasPermission(permission) {
+      return signedIn()
+        && exists(docPath('users', uid()))
+        && get(docPath('users', uid())).data.get('permissions', []).hasAny([permission]);
+    }
+
+    function canManageNotifications() {
+      return isAdmin() || hasPermission('manage_notifications');
+    }
+
+    // The official positions (src/config/structure.json).
+    // BEGIN GENERATED STRUCTURE — from src/config/structure.json by scripts/sync-pricing.ts. Do not edit by hand.
+    function boardPositions() { return ['president', 'deputy_president', 'head_of_media', 'research_manager', 'head_of_public_relations', 'councils_representative', 'administrator', 'head_of_finance']; }
+    function councilPositions() { return ['council_leader', 'head_of_security', 'head_of_online_meetings', 'media_supervisor', 'security', 'council_photographer', 'council_reporter', 'printer']; }
+    function productionPositions() { return ['head_of_production', 'graphic_designer', 'reporter', 'photographer', 'video_editor', 'content_creator']; }
+    function webadminPositions() { return ['web_admin', 'web_deputy', 'web_security', 'web_content', 'web_support']; }
+    // Older position and department names remain valid on records made before the structure changed.
+    function positionIds() { return ['president', 'deputy_president', 'head_of_media', 'research_manager', 'head_of_public_relations', 'councils_representative', 'administrator', 'head_of_finance', 'council_leader', 'head_of_security', 'head_of_online_meetings', 'media_supervisor', 'security', 'council_photographer', 'council_reporter', 'printer', 'head_of_production', 'graphic_designer', 'reporter', 'photographer', 'video_editor', 'content_creator', 'web_admin', 'web_deputy', 'web_security', 'web_content', 'web_support', 'member', 'head_of_activities']; }
+    function departmentIds() { return ['board', 'council', 'production', 'webadmin', 'membership', 'executive', 'councils', 'security', 'activities', 'finance', 'public_relations', 'media', 'research']; }
+    // END GENERATED STRUCTURE
+
+    // ------------------------------------------------------------------
+    // Comments (articles, videos and activities), from members and visitors
+    // ------------------------------------------------------------------
+
+    // One comment per person every 20 seconds (members) or 60 seconds
+    // (visitors): the comment and the person's limit document are written
+    // together, and the limit can only move to "now".
+    function commentThrottleOk() {
+      let limitPath = docPath('comment_limits', request.auth.uid);
+      let gap = signedIn() ? 20 : 60;
+      return existsAfter(limitPath)
+        && getAfter(limitPath).data.lastAt == request.time
+        && (!exists(limitPath) || request.time > get(limitPath).data.lastAt + duration.value(gap, 's'));
+    }
+
+    function commentCreateOk(parentPublished, parentType, parentId, commentId) {
+      let d = request.resource.data;
+      return request.auth != null
+        && parentPublished
+        && settingIs('interactions', 'commentsEnabled', true, true)
+        && d.keys().hasOnly(['id', 'parentType', 'parentId', 'authorUid', 'authorName', 'visitor', 'text', 'replyTo', 'status', 'createdAt'])
+        && d.id == commentId && d.parentType == parentType && d.parentId == parentId
+        && d.authorUid == request.auth.uid
+        && nonEmptyStr(d.authorName, 120)
+        && nonEmptyStr(d.text, 2000)
+        && d.status == 'visible'
+        && d.createdAt is string
+        && optStr('replyTo', 100)
+        && (
+          (signedIn() && d.visitor == false)
+          // Visitors: when allowed, short plain text without links or markup.
+          || (isVisitor() && d.visitor == true
+              && settingIs('interactions', 'commentsMembersOnly', false, false)
+              && d.authorName.size() >= 2 && d.authorName.size() <= 60
+              && d.text.size() <= 1000
+              && !d.text.matches('(?s).*([Hh][Tt][Tt][Pp][Ss]?:|[Ww][Ww][Ww][.]|<|>).*')
+              && !d.authorName.matches('(?s).*([Hh][Tt][Tt][Pp][Ss]?:|[Ww][Ww][Ww][.]|<|>).*'))
+        )
+        && commentThrottleOk();
+    }
+
+    function commentReadOk(parentPublished) {
+      return (parentPublished && resource.data.status == 'visible')
+        || isContentStaff()
+        || (request.auth != null && resource.data.authorUid == request.auth.uid);
+    }
+
+    function commentUpdateOk() {
+      return (isContentStaff() && onlyChanges(['status'])
+          && request.resource.data.status in ['visible', 'hidden'])
+        || (signedIn() && resource.data.authorUid == uid()
+          && onlyChanges(['text', 'editedAt'])
+          && nonEmptyStr(request.resource.data.text, 2000));
+    }
+
+    function commentDeleteOk() {
+      return isContentStaff() || (request.auth != null && resource.data.authorUid == request.auth.uid);
+    }
+
+    // A position, if given, must be one of the official ones (one position only:
+    // it is a single string, never a list).
+    function positionOk(d) {
+      return (!('positionId' in d) || d.positionId in positionIds())
+        && (!('department' in d) || d.department in departmentIds());
+    }
+
+    function canManageEvents() {
+      return isAdmin() || hasPermission('manage_events');
+    }
+
+    // Finance administrators confirm publication-fee payments.
+    function canVerifyPayments() {
+      return isAdmin() || hasPermission('manage_donations');
+    }
+
+    function canManageBanners() {
+      return isAdmin() || hasPermission('publish_content');
+    }
+
+    function isStaff() {
+      return isMembershipStaff() || isContentStaff();
+    }
+
+    // Interaction settings chosen by administrators (site_settings/default).
+    // A setting "is" a value when the settings document is missing (defaults)
+    // or when it holds that value.
+    function settingIs(group, key, fallback, expected) {
+      return (!exists(docPath('site_settings', 'default')) && fallback == expected)
+        || (exists(docPath('site_settings', 'default'))
+            && get(docPath('site_settings', 'default')).data.get(group, {}).get(key, fallback) == expected);
+    }
+
+    function isMember() {
+      return isAdmin() || hasAnyRole(['member']) || exists(docPath('members', uid()));
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function onlyChanges(keys) {
+      return changedKeys().hasOnly(keys);
+    }
+
+    function isStr(value, maxLen) {
+      return value is string && value.size() <= maxLen;
+    }
+
+    function nonEmptyStr(value, maxLen) {
+      return isStr(value, maxLen) && value.size() > 0;
+    }
+
+    // Optional string field on the incoming document.
+    function optStr(field, maxLen) {
+      return !(field in request.resource.data)
+        || isStr(request.resource.data[field], maxLen);
+    }
+
+    // Photos are stored as downsampled data URLs (~30–60 KB). Cap well below
+    // Firestore's 1 MB document limit.
+    function photoOk() {
+      return optStr('photoUrl', 400000);
+    }
+
+    // Publication fees in pence (articles and videos counted separately).
+    // BEGIN GENERATED PRICING — from src/config/pricing.json by scripts/sync-pricing.ts. Do not edit by hand.
+    function feeStandard(cat) { return cat == 'video' ? 2500 : 1500; }
+    function feeDiscounted(cat) { return cat == 'video' ? 1875 : 1125; }
+    function feeDiscountAfter() { return 5; }
+    function feeFreeAfter() { return 20; }
+    // END GENERATED PRICING
+
+    // ------------------------------------------------------------------
+    // Deny everything not matched below
+    // ------------------------------------------------------------------
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // Admin registry
+    // ------------------------------------------------------------------
+
+    match /admins/{userId} {
+      allow get: if signedIn() && (uid() == userId || isAdmin());
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Users — PRIVATE account documents (email, roles, permissions, score)
+    // ------------------------------------------------------------------
+
+    match /users/{userId} {
+      allow get: if signedIn() && (uid() == userId || isMembershipStaff());
+      allow list: if isAdmin();
+
+      // First sign-in creates a plain visitor account. Nobody can create
+      // themselves with elevated roles, permissions or points.
+      allow create: if signedIn() && uid() == userId && (
+        isAdmin() || (
+          request.resource.data.uid == userId
+          && request.resource.data.roles == ['visitor']
+          && request.resource.data.get('permissions', []).size() == 0
+          && request.resource.data.get('activityScore', 0) <= 15
+          && optStr('displayName', 120)
+          && photoOk()
+        )
+      );
+
+      allow update: if isAdmin()
+        // Membership reviewers may only ADD the 'member' role on approval.
+        || (isMembershipStaff()
+            && onlyChanges(['roles', 'updatedAt'])
+            && request.resource.data.roles.hasAll(resource.data.get('roles', []))
+            && request.resource.data.roles.toSet()
+                 .difference(resource.data.get('roles', []).toSet())
+                 .hasOnly(['member']))
+        // Staff award points (activity score) when they approve contributions.
+        || (isStaff()
+            && onlyChanges(['activityScore', 'activityTier', 'updatedAt'])
+            && request.resource.data.activityScore is number)
+        // Users may edit their own cosmetic fields — never roles,
+        // permissions, activity score/tier or email.
+        || (signedIn() && uid() == userId
+            && onlyChanges(['displayName', 'photoUrl', 'chapterId', 'updatedAt'])
+            && optStr('displayName', 120)
+            && optStr('chapterId', 100)
+            && photoOk());
+
+      allow delete: if isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Membership applications — PRIVATE
+    // Document id is always 'app-' + applicant uid.
+    // ------------------------------------------------------------------
+
+    match /applications/{applicationId} {
+      function isOwnApp() {
+        return signedIn() && applicationId == 'app-' + uid();
+      }
+
+      function validApplication() {
+        let d = request.resource.data;
+        return d.userId == uid()
+          && nonEmptyStr(d.fullName, 200)
+          && nonEmptyStr(d.displayName, 120)
+          && nonEmptyStr(d.email, 254)
+          && isStr(d.country, 100)
+          && nonEmptyStr(d.chapterId, 100)
+          && isStr(d.reason, 5000) && d.reason.size() >= 10
+          && optStr('phone', 40)
+          && optStr('skills', 1000)
+          && photoOk()
+          && positionOk(d)
+          && d.agreedToPolicies == true
+          && d.consentToDirectory is bool
+          && (!('involvement' in d)
+              || (d.involvement is map
+                  && d.involvement.get('period', '') in ['new', 'lt6m', '6to12m', '1to3y', 'gt3y', 'specific']
+                  && isStr(d.involvement.get('since', ''), 40)
+                  && isStr(d.involvement.get('note', ''), 1000)));
+      }
+
+      // Reading by id is allowed for the applicant even before the document
+      // exists, so the client can check "do I have an application yet?".
+      allow get: if isOwnApp() || isMembershipStaff();
+      allow list: if isMembershipStaff();
+
+      allow create: if isMembershipStaff() || (
+        isOwnApp()
+        && validApplication()
+        && request.resource.data.status == 'submitted'
+        && !request.resource.data.keys().hasAny(['staffNotes', 'applicantFeedback', 'reviewerUid'])
+      );
+
+      allow update: if isMembershipStaff() || (
+        isOwnApp()
+        && resource.data.userId == uid()
+        && validApplication()
+        // Reviewer-only fields stay reviewer-only.
+        && !changedKeys().hasAny(['staffNotes', 'applicantFeedback', 'reviewerUid', 'userId', 'id'])
+        // Applicants can resubmit or withdraw, never approve themselves.
+        && (
+          !changedKeys().hasAny(['status'])
+          || (request.resource.data.status in ['submitted', 'withdrawn']
+              && resource.data.status in ['draft', 'submitted', 'changes_requested', 'withdrawn', 'rejected'])
+        )
+      );
+
+      // Applicants can delete their own application (right to erasure).
+      allow delete: if isAdmin() || (isOwnApp() && resource.data.userId == uid());
+    }
+
+    // ------------------------------------------------------------------
+    // Members — PRIVATE internal records (legal name, email, phone)
+    // ------------------------------------------------------------------
+
+    match /members/{memberId} {
+      allow get: if signedIn() && (memberId == uid() || isMembershipStaff());
+      allow list: if isMembershipStaff();
+      allow create: if isMembershipStaff() && positionOk(request.resource.data);
+
+      // Only membership staff and administrators change official details
+      // (position, department, dates, status). Members edit their own profile text.
+      allow update: if (isMembershipStaff() && positionOk(request.resource.data)) || (
+        signedIn() && memberId == uid()
+        // Every approved member is listed publicly (organisation policy), so
+        // members cannot switch their listing off themselves.
+        && onlyChanges(['displayName', 'bio', 'expertise', 'photoUrl', 'updatedAt'])
+        && optStr('displayName', 120)
+        && optStr('bio', 2000)
+        && optStr('expertise', 1000)
+        && photoOk()
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Public profiles — the ONLY public view of a member (opt-in)
+    // ------------------------------------------------------------------
+
+    match /public_profiles/{profileId} {
+      function selfFieldsOk() {
+        return optStr('displayName', 120)
+          && optStr('bio', 2000)
+          && optStr('expertise', 1000)
+          && photoOk();
+      }
+
+      // Official facts (joining date, member number, designation) can be shown
+      // by the member, but only exactly as recorded by the committee.
+      function copiedFromMemberRecord() {
+        let d = request.resource.data;
+        let m = get(docPath('members', uid())).data;
+        return (!('memberSince' in d) || d.memberSince == m.get('joinedAt', null))
+          && (!('memberNumber' in d) || d.memberNumber == m.get('memberNumber', null))
+          && (!('designation' in d) || d.designation == m.get('designation', null))
+          && (!('positionId' in d) || d.positionId == m.get('positionId', null))
+          && (!('department' in d) || d.department == m.get('department', null));
+      }
+
+      function validSelfAward() {
+        let id = request.resource.data.lastAward;
+        let entry = /databases/$(database)/documents/points_ledger/$(id);
+        let e = getAfter(entry).data;
+        let before = resource.data.get('points', {});
+        let after = request.resource.data.points;
+        return id is string
+          && !exists(entry) && existsAfter(entry)
+          && e.userId == uid() && e.type == 'article_reaction'
+          && after.diff(before).affectedKeys().hasOnly(['all', e.periodMonth, e.periodQuarter])
+          && after.all == before.get('all', 0) + e.points
+          && after.get(e.periodMonth, 0) == before.get(e.periodMonth, 0) + e.points
+          && after.get(e.periodQuarter, 0) == before.get(e.periodQuarter, 0) + e.points;
+      }
+
+      allow read: if true;
+
+      // A member can publish their own profile only if their private member
+      // record records consent, and only with self-service fields. Rank,
+      // board status and points are set by staff.
+      allow create: if isMembershipStaff() || (
+        signedIn() && profileId == uid()
+        && exists(docPath('members', uid()))
+        && get(docPath('members', uid())).data.get('consentToDirectory', false) == true
+        && request.resource.data.userId == uid()
+        && request.resource.data.chapterId == get(docPath('members', uid())).data.chapterId
+        && request.resource.data.keys().hasOnly([
+             'id', 'userId', 'displayName', 'photoUrl', 'chapterId',
+             'chapterName', 'bio', 'expertise', 'updatedAt',
+             'memberSince', 'memberNumber', 'designation', 'positionId', 'department'
+           ])
+        && selfFieldsOk()
+        && copiedFromMemberRecord()
+      );
+
+      allow update: if isMembershipStaff()
+        // Staff who approve contributions update the public points.
+        || ((isContentStaff() || canManageBanners()) && onlyChanges(['activityScore', 'activityTier', 'points', 'updatedAt']))
+        // A member's own reaction award: the totals rise by exactly the
+        // points of a new ledger entry created in the same write.
+        || (signedIn() && profileId == uid() && resource.data.userId == uid()
+            && onlyChanges(['points', 'activityTier', 'lastAward', 'updatedAt'])
+            && validSelfAward())
+        || (
+          signedIn() && profileId == uid()
+          && resource.data.userId == uid()
+          && onlyChanges(['displayName', 'photoUrl', 'bio', 'expertise', 'updatedAt', 'memberSince', 'memberNumber', 'designation', 'positionId', 'department'])
+          && selfFieldsOk()
+          && copiedFromMemberRecord()
+        );
+
+      // Withdrawing consent must always work immediately.
+      // Only membership staff remove a public listing (for example on revocation).
+      allow delete: if isMembershipStaff();
+    }
+
+    // ------------------------------------------------------------------
+    // Articles
+    // ------------------------------------------------------------------
+
+    match /articles/{articleId} {
+      function isAuthor() {
+        return signedIn() && resource.data.authorUid == uid();
+      }
+
+      function validArticle() {
+        let d = request.resource.data;
+        return nonEmptyStr(d.title, 300)
+          && isStr(d.slug, 300)
+          && isStr(d.excerpt, 2000)
+          && isStr(d.content, 300000)
+          && isStr(d.category, 100)
+          && d.tags is list && d.tags.size() <= 20
+          && optStr('coverImageUrl', 400000)
+          && optStr('coverImageAlt', 300)
+          && optStr('chapterId', 100)
+          && optStr('sourceLinks', 5000)
+          && optStr('videoUrl', 500)
+          && (!('direction' in d) || d.direction in ['ltr', 'rtl'])
+          && optStr('language', 10);
+      }
+
+      function authorEditableFields() {
+        return [
+          'title', 'slug', 'excerpt', 'content', 'coverImageUrl', 'coverImageAlt',
+          'category', 'tags', 'chapterId', 'contentType', 'sourceLinks',
+          'status', 'readingTimeMinutes', 'authorDisplayName', 'updatedAt', 'videoUrl',
+          'direction', 'language'
+        ];
+      }
+
+      function likePath() {
+        return /databases/$(database)/documents/articles/$(articleId)/likes/$(uid());
+      }
+
+      function paymentPath() {
+        return /databases/$(database)/documents/submission_payments/$(articleId);
+      }
+
+      // Visitors' publication fee in pence, from their published count
+      // (prices from src/config/pricing.json; see the generated block).
+      function visitorFee(cat) {
+        let st = docPath('contributor_stats', uid());
+        let n = !exists(st) ? 0 : (cat == 'video' ? get(st).data.get('videos', 0) : get(st).data.get('articles', 0));
+        return n >= feeFreeAfter() ? 0 : (n >= feeDiscountAfter() ? feeDiscounted(cat) : feeStandard(cat));
+      }
+
+      // A video submission is a video report and pays the video fee.
+      function visitorCategoryOk(d) {
+        return d.get('feeCategory', '') in ['article', 'video']
+          && ((d.feeCategory == 'video') == (d.get('contentType', 'article') == 'video_speech'));
+      }
+
+      // How a visitor's submission may move: never out of "waiting for payment"
+      // and never back from "not accepted" without the editors.
+      function visitorStatusOk() {
+        let was = resource.data.status;
+        let now = request.resource.data.status;
+        return now == was || now == 'archived' || (was == 'changes_requested' && now == 'submitted');
+      }
+
+      // A like moves the count by exactly one AND creates/deletes this
+      // user's like document in the same batch, so likes cannot be repeated.
+      function validLikeChange() {
+        let before = resource.data.get('likesCount', 0);
+        let after = request.resource.data.likesCount;
+        return (after == before + 1 && !exists(likePath()) && existsAfter(likePath()))
+          || (after == before - 1 && exists(likePath()) && !existsAfter(likePath()));
+      }
+
+      // Drafts and articles under review are visible only to their author and
+      // the editorial team. Queries must filter on status or authorUid.
+      allow read: if resource.data.status == 'published'
+        || isAuthor()
+        || isContentStaff();
+
+      allow create: if isPublisher() || (
+        signedIn()
+        && isMember()
+        && request.resource.data.authorUid == uid()
+        && validArticle()
+        && request.resource.data.get('contributorType', 'member') == 'member'
+        && request.resource.data.status in ['draft', 'submitted']
+        && request.resource.data.get('isOfficialNews', false) == false
+        && request.resource.data.get('viewsCount', 0) == 0
+        && request.resource.data.get('likesCount', 0) == 0
+        && request.resource.data.get('sharesCount', 0) == 0
+      );
+      // Visitors no longer submit through contributor accounts: new work
+      // arrives through Publish with Us (guest_submissions below). Earlier
+      // account-based submissions still move through payment and review.
+
+      allow update: if isPublisher()
+        // Content reviewers can move articles through review but not publish.
+        || (isContentStaff()
+            && (!changedKeys().hasAny(['status']) || request.resource.data.status != 'published')
+            // Unpaid submissions only leave "waiting for payment" when paid.
+            && (resource.data.status != 'awaiting_payment' || request.resource.data.status in ['awaiting_payment', 'archived']))
+        // Finance administrators send a paid submission to editorial review.
+        || (canVerifyPayments()
+            && resource.data.status == 'awaiting_payment'
+            && onlyChanges(['status', 'updatedAt'])
+            && request.resource.data.status == 'submitted'
+            && getAfter(paymentPath()).data.status == 'verified')
+        // Authors edit their own work; any edit goes back through review.
+        || (isAuthor()
+            && request.resource.data.authorUid == uid()
+            && onlyChanges(authorEditableFields())
+            && validArticle()
+            && (request.resource.data.status in ['draft', 'submitted', 'archived']
+                || (request.resource.data.status == 'awaiting_payment' && resource.data.status == 'awaiting_payment'))
+            && (resource.data.get('contributorType', 'member') != 'visitor'
+                || (visitorStatusOk() && visitorCategoryOk(request.resource.data))))
+        // Public engagement counters on published articles, one step at a time.
+        || (resource.data.status == 'published' && (
+             (onlyChanges(['viewsCount'])
+               && request.resource.data.viewsCount == resource.data.get('viewsCount', 0) + 1)
+          || (onlyChanges(['sharesCount'])
+               && request.resource.data.sharesCount == resource.data.get('sharesCount', 0) + 1)
+          || (signedIn() && onlyChanges(['likesCount']) && validLikeChange())
+        ));
+
+      allow delete: if isAdmin() || isAuthor();
+
+      // One document per (article, user) like. Only the liker can see it.
+      match /likes/{userId} {
+        function articleDoc() {
+          return /databases/$(database)/documents/articles/$(articleId);
+        }
+
+        allow get: if signedIn() && userId == uid();
+        allow list: if isAdmin();
+        allow create: if signedIn() && userId == uid()
+          && get(articleDoc()).data.status == 'published'
+          && request.resource.data.keys().hasOnly(['createdAt'])
+          && getAfter(articleDoc()).data.get('likesCount', 0)
+               == get(articleDoc()).data.get('likesCount', 0) + 1;
+        allow delete: if (signedIn() && userId == uid()
+          && getAfter(articleDoc()).data.get('likesCount', 0)
+               == get(articleDoc()).data.get('likesCount', 0) - 1)
+          || isAdmin();
+        allow update: if false;
+      }
+
+      function articlePath() {
+        return /databases/$(database)/documents/articles/$(articleId);
+      }
+
+      // One reaction per (article, person). Counts are worked out by counting
+      // these documents, so they cannot be inflated.
+      match /reactions/{userId} {
+        allow read: if get(articlePath()).data.status == 'published' || isContentStaff();
+        allow create, update: if signedIn() && userId == uid()
+          && get(articlePath()).data.status == 'published'
+          && settingIs('interactions', 'reactionsEnabled', true, true)
+          && request.resource.data.keys().hasOnly(['type', 'createdAt'])
+          && request.resource.data.type in ['like', 'solidarity', 'important', 'sad'];
+        allow delete: if (signedIn() && userId == uid()) || isAdmin();
+      }
+
+      // Comments and one level of replies. Hidden comments are visible only
+      // to their author and the moderators.
+      match /comments/{commentId} {
+        allow read: if commentReadOk(get(articlePath()).data.status == 'published');
+        allow create: if commentCreateOk(get(articlePath()).data.status == 'published', 'article', articleId, commentId);
+        allow update: if commentUpdateOk();
+        allow delete: if commentDeleteOk();
+      }
+
+      match /revisions/{revisionId} {
+        function parentAuthor() {
+          return get(/databases/$(database)/documents/articles/$(articleId)).data.authorUid;
+        }
+
+        allow read: if isContentStaff() || (signedIn() && parentAuthor() == uid());
+        allow create: if isContentStaff() || (
+          signedIn() && parentAuthor() == uid()
+          && request.resource.data.authorUid == uid()
+        );
+        allow update, delete: if isContentStaff();
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // Activity / points history — PRIVATE to the member and admins.
+    // Points are awarded by staff only (bonuses, publication approval).
+    // ------------------------------------------------------------------
+
+    match /user_activities/{activityId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == uid());
+      allow create: if isMembershipStaff() || isContentStaff();
+      allow update, delete: if isAdmin();
+    }
+
+    // Sequential member numbers, allocated in a transaction on approval.
+    match /counters/{counterId} {
+      allow read, write: if isMembershipStaff();
+    }
+
+    // ------------------------------------------------------------------
+    // Notifications — broadcast by people with the manage_notifications
+    // permission. Published ones are public (or members-only by audience).
+    // ------------------------------------------------------------------
+
+    match /notifications/{notificationId} {
+      function validNotification() {
+        let d = request.resource.data;
+        return nonEmptyStr(d.title, 200)
+          && isStr(d.body, 2000)
+          && d.level in ['info', 'important', 'urgent']
+          && d.audience in ['everyone', 'members']
+          && d.status in ['draft', 'published', 'archived']
+          && optStr('linkLabel', 80)
+          && optStr('linkUrl', 500)
+          && optStr('startAt', 40)
+          && optStr('endAt', 40);
+      }
+
+      // Announcements are for signed-in users only ("everyone" means every
+      // signed-in account; "members" means approved members).
+      allow read: if canManageNotifications()
+        || (signedIn() && resource.data.status == 'published'
+            && (resource.data.audience == 'everyone' || isMember()));
+      allow create: if (canManageNotifications() || canManageEvents())
+        && validNotification()
+        && request.resource.data.createdBy == uid();
+      allow update: if canManageNotifications() && validNotification();
+      allow delete: if canManageNotifications();
+    }
+
+    // ------------------------------------------------------------------
+    // Personal notifications — one document per user per event.
+    // Created by staff when they act on something of yours (application,
+    // article, card, role), or by you for your own reminders.
+    // ------------------------------------------------------------------
+
+    match /user_notifications/{notificationId} {
+      allow read: if signedIn() && resource.data.userId == uid();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['id', 'userId', 'type', 'title', 'body', 'link', 'read', 'createdAt', 'createdBy'])
+        && request.resource.data.type in ['application', 'article', 'membership', 'card', 'event', 'announcement', 'system']
+        && nonEmptyStr(request.resource.data.title, 200)
+        && optStr('body', 2000)
+        && optStr('link', 500)
+        && request.resource.data.read == false
+        && (!('createdBy' in request.resource.data) || request.resource.data.createdBy == uid())
+        && (request.resource.data.userId == uid() || isStaff() || canManageEvents() || canManageNotifications());
+      allow update: if signedIn() && resource.data.userId == uid()
+        && onlyChanges(['read'])
+        && request.resource.data.read is bool;
+      allow delete: if (signedIn() && resource.data.userId == uid()) || isAdmin();
+    }
+
+    // Which announcements a user has read (announcements are shared, so the
+    // read state is kept per user).
+    match /notification_state/{userId} {
+      allow read: if signedIn() && userId == uid();
+      allow delete: if isAdmin();
+      allow write: if signedIn() && userId == uid()
+        && request.resource.data.keys().hasOnly(['readIds', 'updatedAt'])
+        && request.resource.data.readIds is list
+        && request.resource.data.readIds.size() <= 500;
+    }
+
+    // ------------------------------------------------------------------
+    // Points ledger: one document per award. Automatic awards have a fixed
+    // id (member__type__target), so the same action can never pay twice.
+    // ------------------------------------------------------------------
+
+    function validPeriods(d) {
+      return d.periodMonth is string && d.periodMonth.matches('^m[0-9]{6}$')
+        && d.periodQuarter is string && d.periodQuarter.matches('^q[0-9]{5}$');
+    }
+
+    function ledgerKeysOk(d) {
+      return d.keys().hasOnly(['id', 'userId', 'userName', 'type', 'points', 'targetId', 'targetTitle', 'note', 'periodMonth', 'periodQuarter', 'createdAt', 'awardedBy'])
+        && d.userId is string && d.type is string && d.points is int
+        && optStr('targetTitle', 300) && optStr('note', 500) && optStr('userName', 200)
+        && validPeriods(d);
+    }
+
+    match /points_ledger/{entryId} {
+      // Members can read their own entries (ids start with their uid).
+      allow get: if signedIn() && (entryId.matches('^' + uid() + '__.*') || isStaff() || canManageBanners());
+      allow list: if isStaff() || canManageBanners() || (signedIn() && resource.data.userId == uid());
+
+      // Staff awards and corrections.
+      allow create: if (isStaff() || canManageBanners())
+        && ledgerKeysOk(request.resource.data)
+        && request.resource.data.points >= -1000 && request.resource.data.points <= 1000
+        && request.resource.data.awardedBy == uid();
+
+      // A member's own award for reacting to a published article: 10 points,
+      // once per article, only together with their reaction and their totals.
+      allow create: if signedIn() && isMember()
+        && ledgerKeysOk(request.resource.data)
+        && request.resource.data.userId == uid()
+        && request.resource.data.awardedBy == uid()
+        && request.resource.data.type == 'article_reaction'
+        && request.resource.data.points == 10
+        && request.resource.data.targetId is string
+        && entryId == uid() + '__article_reaction__' + request.resource.data.targetId
+        && get(/databases/$(database)/documents/articles/$(request.resource.data.targetId)).data.status == 'published'
+        && get(/databases/$(database)/documents/articles/$(request.resource.data.targetId)).data.authorUid != uid()
+        && existsAfter(/databases/$(database)/documents/articles/$(request.resource.data.targetId)/likes/$(uid()))
+        && getAfter(/databases/$(database)/documents/public_profiles/$(uid())).data.get('lastAward', '') == entryId;
+
+      allow update: if false;
+      allow delete: if isStaff() || canManageBanners();
+    }
+
+    // Claims for sharing our content elsewhere. A member submits the link to
+    // their post; an administrator checks it and, if genuine, awards points.
+    match /share_claims/{claimId} {
+      allow get: if signedIn() && (claimId.matches('^' + uid() + '__.*') || isStaff());
+      allow list: if isStaff() || (signedIn() && resource.data.userId == uid());
+      allow create: if signedIn() && isMember()
+        && claimId == uid() + '__' + request.resource.data.targetType + '_' + request.resource.data.targetId
+        && request.resource.data.keys().hasOnly(['id', 'userId', 'userName', 'targetType', 'targetId', 'targetTitle', 'platform', 'url', 'status', 'createdAt'])
+        && request.resource.data.userId == uid()
+        && request.resource.data.status == 'pending'
+        && request.resource.data.targetType in ['article', 'activity']
+        && nonEmptyStr(request.resource.data.targetId, 120)
+        && request.resource.data.platform in ['facebook', 'x', 'whatsapp', 'telegram', 'instagram', 'tiktok', 'linkedin', 'other']
+        && nonEmptyStr(request.resource.data.url, 500)
+        && request.resource.data.url.matches('^https://.*')
+        && optStr('targetTitle', 300) && optStr('userName', 200);
+      allow update: if isStaff()
+        && onlyChanges(['status', 'reviewedBy', 'reviewedAt', 'reviewNote'])
+        && request.resource.data.status in ['pending', 'approved', 'rejected'];
+      // After a rejection the member may send a new link.
+      allow update: if signedIn() && resource.data.userId == uid()
+        && resource.data.status == 'rejected'
+        && onlyChanges(['url', 'platform', 'status', 'createdAt'])
+        && request.resource.data.status == 'pending'
+        && nonEmptyStr(request.resource.data.url, 500)
+        && request.resource.data.url.matches('^https://.*')
+        && request.resource.data.platform in ['facebook', 'x', 'whatsapp', 'telegram', 'instagram', 'tiktok', 'linkedin', 'other'];
+      allow delete: if isStaff() || (signedIn() && resource.data.userId == uid() && resource.data.status == 'pending');
+    }
+
+    // Members who were permanently deleted. Their login account removes
+    // itself the next time anyone signs in with it.
+    match /deleted_accounts/{userId} {
+      allow get: if (signedIn() && userId == uid()) || isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['deletedAt', 'deletedBy']);
+      allow delete: if isAdmin() || (signedIn() && userId == uid());
+      allow update, list: if false;
+    }
+
+    // Lets administrators find a member's likes and registrations everywhere
+    // when deleting the member.
+    match /{path=**}/likes/{likeUserId} {
+      allow list: if isAdmin();
+    }
+    match /{path=**}/reactions/{reactionUserId} {
+      allow list: if isAdmin();
+    }
+    match /{path=**}/comments/{anyCommentId} {
+      allow list: if isContentStaff();
+    }
+    // Activity answers are public, also when searched across activities.
+    match /{path=**}/registrations/{registrationUserId} {
+      allow read: if true;
+    }
+
+    // ------------------------------------------------------------------
+    // Membership verification — what a QR code on a membership card shows.
+    // Readable by member number only; never listable, so the register of
+    // members cannot be harvested.
+    // ------------------------------------------------------------------
+
+    match /verifications/{memberNumber} {
+      allow get: if true;
+      allow list: if isMembershipStaff();
+      // Written only by the website server (worker/members.js), together with
+      // the member record, so a card never shows different details.
+      allow create, update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Uploaded images, compressed in the browser before upload.
+    // Fetched by id (ids are unguessable); listing is limited.
+    // ------------------------------------------------------------------
+
+    match /media/{mediaId} {
+      allow get: if true;
+      allow list: if isContentStaff() || (signedIn() && resource.data.ownerUid == uid());
+      // Members, editors and contributors with a verified email (for their submissions).
+      allow create: if signedIn() && (isMember() || isContentStaff() || request.auth.token.email_verified == true)
+        && request.resource.data.keys().hasOnly(['id', 'dataUrl', 'width', 'height', 'bytes', 'alt', 'ownerUid', 'ownerName', 'createdAt'])
+        && request.resource.data.ownerUid == uid()
+        && nonEmptyStr(request.resource.data.dataUrl, 950000)
+        && request.resource.data.dataUrl.matches('^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$')
+        && optStr('alt', 300);
+      allow update: if isContentStaff()
+        || (signedIn() && resource.data.ownerUid == uid() && onlyChanges(['alt']));
+      allow delete: if isContentStaff() || (signedIn() && resource.data.ownerUid == uid());
+    }
+
+    // ------------------------------------------------------------------
+    // Reports of comments or articles, for the editors to review.
+    // ------------------------------------------------------------------
+
+    // ------------------------------------------------------------------
+    // Publication fees for visitors' submissions (private: the contributor
+    // and finance administrators only). Records are never deleted.
+    // ------------------------------------------------------------------
+
+    match /submission_payments/{paymentId} {
+      function articleAfter() {
+        return getAfter(/databases/$(database)/documents/articles/$(paymentId)).data;
+      }
+      allow read: if canVerifyPayments() || (signedIn() && resource.data.uid == uid());
+      // New payment records come with guest submissions now (guest_submissions).
+      allow create: if false;
+      allow update: if
+        // The contributor says they have paid (or pays again after a query).
+        (signedIn() && resource.data.uid == uid()
+          && onlyChanges(['status', 'claimedAt', 'payerNote', 'updatedAt'])
+          && resource.data.status in ['awaiting', 'claimed', 'rejected']
+          && request.resource.data.status == 'claimed'
+          && optStr('payerNote', 500))
+        // Finance administrators record what happened; amounts and references never change.
+        || (canVerifyPayments()
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.amountPence == resource.data.amountPence
+          && request.resource.data.reference == resource.data.reference
+          && request.resource.data.articleId == resource.data.articleId
+          && request.resource.data.status in ['awaiting', 'claimed', 'verified', 'rejected', 'refunded', 'disputed', 'waived']);
+      allow delete: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // Publish with Us: work sent by visitors WITHOUT an account.
+    //
+    // A visitor gets a temporary anonymous sign-in (never an account, never a
+    // member). Each submission's id is a long random code that is also the
+    // visitor's private tracking link, so whoever holds the link can see its
+    // status, pay, make requested changes or withdraw it. The editors review
+    // it first; the fee (from the central pricing) is set when it is
+    // approved; it is published only after payment is confirmed (or no fee
+    // is due). Contributors are never added to the membership register.
+    // ------------------------------------------------------------------
+
+    match /guest_submissions/{subId} {
+      function contentOk(d) {
+        return nonEmptyStr(d.title, 300) && d.title.size() >= 5
+          && isStr(d.excerpt, 600)
+          && isStr(d.content, 100000)
+          && d.kind in ['article', 'video', 'report', 'news', 'statement', 'other']
+          && d.feeCategory == (d.kind == 'video' ? 'video' : 'article')
+          && isStr(d.topic, 60)
+          && (!('videoUrl' in d) || isStr(d.videoUrl, 500))
+          && (!('sourceLinks' in d) || isStr(d.sourceLinks, 5000))
+          && (!('tags' in d) || (d.tags is list && d.tags.size() <= 12))
+          && d.direction in ['ltr', 'rtl']
+          && isStr(d.language, 10)
+          && d.images is list && d.images.size() <= 4;
+      }
+      function contactOk(d) {
+        return d.contact is map
+          && d.contact.keys().hasOnly(['name', 'email', 'phone', 'country'])
+          && nonEmptyStr(d.contact.name, 120)
+          && d.contact.email is string && d.contact.email.size() <= 254
+          && d.contact.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+          && (!('phone' in d.contact) || isStr(d.contact.phone, 40))
+          && (!('country' in d.contact) || isStr(d.contact.country, 80));
+      }
+      function limitPath() {
+        return docPath('submission_limits', request.auth.uid);
+      }
+      function historyAppended() {
+        let before = resource.data.history;
+        let after = request.resource.data.history;
+        return after is list && after.size() == before.size() + 1 && after.size() <= 300
+          && after[0:before.size()] == before;
+      }
+      // The contributor's published count for this kind of work, kept under
+      // a one-way code (SHA-256) of their email address.
+      function guestKey(d) {
+        return 'guest-' + hashing.sha256(d.contact.email.lower()).toHexString().lower();
+      }
+      function publishedCount(d) {
+        let st = docPath('contributor_stats', guestKey(d));
+        let field = d.feeCategory == 'video' ? 'videos' : 'articles';
+        return exists(st) ? get(st).data.get(field, 0) : 0;
+      }
+      // The fee set when work is sent: from the central pricing and the
+      // published count. Paid work waits for payment; free work goes
+      // straight to review.
+      function sentWithFee(d) {
+        let p = d.payment;
+        let n = publishedCount(d);
+        let cat = d.feeCategory;
+        return d.contributorKey == guestKey(d)
+          && d.priorCount == n
+          && p.keys().hasOnly(['status', 'amountPence', 'standardPence', 'tier', 'reference'])
+          && p.standardPence == feeStandard(cat)
+          && p.reference.matches('^17S-[A-Z2-9]{6}$')
+          && ((n < feeDiscountAfter() && p.tier == 'standard' && p.amountPence == feeStandard(cat)
+                && p.status == 'awaiting' && d.status == 'awaiting_payment')
+            || (n >= feeDiscountAfter() && n < feeFreeAfter() && p.tier == 'discount' && p.amountPence == feeDiscounted(cat)
+                && p.status == 'awaiting' && d.status == 'awaiting_payment')
+            || (n >= feeFreeAfter() && p.tier == 'free' && p.amountPence == 0
+                && p.status == 'waived' && d.status == 'submitted'));
+      }
+      function feeOk(p, cat) {
+        return p.keys().hasOnly(['status', 'amountPence', 'standardPence', 'tier', 'reference'])
+          && p.standardPence == feeStandard(cat)
+          && p.reference.matches('^17S-[A-Z2-9]{6}$')
+          && ((p.tier == 'standard' && p.amountPence == feeStandard(cat) && p.status == 'awaiting')
+            || (p.tier == 'discount' && p.amountPence == feeDiscounted(cat) && p.status == 'awaiting')
+            || (p.tier == 'free' && p.amountPence == 0 && p.status == 'waived'));
+      }
+      // Role checks are worked out once per request and passed in, so each
+      // update stays well inside the rules' expression limit.
+      function paymentChangeOk(staff, fin) {
+        let before = resource.data.payment;
+        let after = request.resource.data.payment;
+        return !changedKeys().hasAny(['payment'])
+          // Older work without a fee: editors set it when they approve.
+          || (staff && before.status == 'not_due'
+              && request.resource.data.status == 'approved'
+              && feeOk(after, resource.data.feeCategory))
+          // Finance records what happened; amount, tier and reference never change.
+          || (fin && before.status != 'not_due'
+              && after.amountPence == before.amountPence
+              && after.reference == before.reference
+              && after.tier == before.tier
+              && after.status in ['awaiting', 'claimed', 'verified', 'rejected', 'refunded', 'disputed', 'waived']
+              && (after.status != 'waived' || before.status == 'waived'));
+      }
+      function staffStatusOk(staff, fin, pub) {
+        let was = resource.data.status;
+        let now = request.resource.data.status;
+        let paid = request.resource.data.payment.status;
+        return was == now
+          // Finance confirms the fee: the work then enters editorial review.
+          || (was == 'awaiting_payment' && (
+                (fin && now == 'submitted' && paid == 'verified')
+                // Unpaid work can be turned away (for example spam).
+                || ((staff || fin) && now == 'rejected' && paid in ['awaiting', 'rejected'])))
+          || (staff
+              && was in ['submitted', 'under_review', 'changes_requested']
+              && now in ['under_review', 'changes_requested', 'rejected', 'approved'])
+          || (staff && was == 'approved' && now == 'rejected'
+              && paid in ['awaiting', 'rejected', 'refunded', 'waived'])
+          // Published only when approved AND paid (or no fee due).
+          || (pub && was == 'approved' && now == 'published'
+              && paid in ['verified', 'waived']
+              && request.resource.data.get('articleId', '') is string
+              && request.resource.data.get('articleId', '').size() > 0)
+          || (pub && was == 'published' && now == 'unpublished');
+      }
+      function staffUpdates(staff, fin, pub) {
+        return (staff || fin)
+          && !changedKeys().hasAny(['id', 'ownerUid', 'createdAt', 'contact', 'terms', 'kind', 'feeCategory'])
+          && staffStatusOk(staff, fin, pub)
+          && paymentChangeOk(staff, fin)
+          && historyAppended()
+          && optStr('editorNote', 2000)
+          && (request.resource.data.status != 'approved' || resource.data.status == 'approved'
+              || request.resource.data.payment.status in ['awaiting', 'waived', 'verified']);
+      }
+      function staffUpdate(admin) {
+        return staffUpdates(
+          admin || hasAnyRole(['content_reviewer', 'publisher']),
+          admin || hasPermission('manage_donations'),
+          admin || hasAnyRole(['publisher']));
+      }
+      function contributorClaimsPayment() {
+        let before = resource.data.payment;
+        let after = request.resource.data.payment;
+        return onlyChanges(['payment', 'updatedAt', 'history'])
+          && before.status in ['awaiting', 'rejected']
+          && after.status == 'claimed'
+          && after.diff(before).affectedKeys().hasOnly(['status', 'claimedAt', 'payerNote'])
+          && (!('payerNote' in after) || isStr(after.payerNote, 500))
+          && historyAppended();
+      }
+      function contributorResubmits() {
+        return resource.data.status == 'changes_requested'
+          && request.resource.data.status == 'submitted'
+          && onlyChanges(['title', 'excerpt', 'content', 'videoUrl', 'sourceLinks', 'images', 'status', 'updatedAt', 'history'])
+          && contentOk(request.resource.data)
+          && historyAppended();
+      }
+      function contributorWithdraws() {
+        return resource.data.status in ['awaiting_payment', 'submitted', 'under_review', 'changes_requested', 'approved']
+          && resource.data.payment.status in ['not_due', 'awaiting', 'rejected', 'waived']
+          && request.resource.data.status == 'withdrawn'
+          && onlyChanges(['status', 'updatedAt', 'history'])
+          && historyAppended();
+      }
+
+      // Whoever holds the tracking link (the id is a long random secret).
+      allow get: if true;
+      allow list: if isContentStaff() || canVerifyPayments();
+      allow create: if request.auth != null
+        && subId.matches('^gs_[a-z2-7]{24}$')
+        && request.resource.data.keys().hasOnly(['id', 'kind', 'feeCategory', 'title', 'excerpt', 'content', 'topic', 'videoUrl', 'sourceLinks', 'direction', 'language', 'images', 'contact', 'terms', 'status', 'payment', 'contributorKey', 'priorCount', 'ownerUid', 'createdAt', 'updatedAt', 'history'])
+        && request.resource.data.id == subId
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.terms.keys().hasOnly(['accepted', 'privacy', 'version'])
+        && request.resource.data.terms.accepted == true
+        && request.resource.data.terms.privacy == true
+        && isStr(request.resource.data.terms.version, 20)
+        && contentOk(request.resource.data)
+        && contactOk(request.resource.data)
+        && sentWithFee(request.resource.data)
+        && request.resource.data.history is list && request.resource.data.history.size() == 1
+        // At most one submission a minute from each browser.
+        && existsAfter(limitPath())
+        && getAfter(limitPath()).data.lastSubmissionAt == request.time;
+      allow update: if request.auth != null && (
+        contributorClaimsPayment()
+        || contributorResubmits()
+        || contributorWithdraws()
+        || staffUpdate(isAdmin())
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Photos sent with a Publish with Us submission. Only the sender's
+    // browser and the editors can see them until the work is published.
+    match /guest_media/{mediaId} {
+      allow get: if isContentStaff() || (request.auth != null && resource.data.ownerUid == request.auth.uid);
+      allow list: if isContentStaff();
+      allow create: if request.auth != null
+        && mediaId.matches('^gm_[a-z0-9]{8,40}$')
+        && request.resource.data.keys().hasOnly(['id', 'dataUrl', 'width', 'height', 'bytes', 'ownerUid', 'createdAt'])
+        && request.resource.data.id == mediaId
+        && request.resource.data.ownerUid == request.auth.uid
+        && nonEmptyStr(request.resource.data.dataUrl, 950000)
+        && request.resource.data.dataUrl.matches('^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$')
+        && existsAfter(docPath('submission_limits', request.auth.uid))
+        && getAfter(docPath('submission_limits', request.auth.uid)).data.lastImageAt == request.time;
+      allow update: if false;
+      allow delete: if isContentStaff() || (request.auth != null && resource.data.ownerUid == request.auth.uid);
+    }
+
+    // Rate limits for Publish with Us, one document per browser sign-in:
+    // one submission a minute and one photo every few seconds.
+    match /submission_limits/{personId} {
+      allow read: if request.auth != null && request.auth.uid == personId;
+      allow create, update: if request.auth != null && request.auth.uid == personId
+        && request.resource.data.keys().hasOnly(['lastSubmissionAt', 'lastImageAt'])
+        && (
+          (request.resource.data.get('lastSubmissionAt', null) == request.time
+            && (resource == null || resource.data.get('lastSubmissionAt', null) == null
+                || request.time > resource.data.lastSubmissionAt + duration.value(60, 's'))
+            && (resource == null || request.resource.data.get('lastImageAt', null) == resource.data.get('lastImageAt', null)))
+          || (request.resource.data.get('lastImageAt', null) == request.time
+            && (resource == null || resource.data.get('lastImageAt', null) == null
+                || request.time > resource.data.lastImageAt + duration.value(3, 's'))
+            && (resource == null || request.resource.data.get('lastSubmissionAt', null) == resource.data.get('lastSubmissionAt', null)))
+        );
+      allow delete: if isAdmin();
+    }
+
+    // Published submissions per contributor (articles and videos separately),
+    // for discounts. Kept by the editors; the contributor can see their own.
+    match /contributor_stats/{contributorId} {
+      allow read: if isContentStaff() || canVerifyPayments() || (signedIn() && contributorId == uid());
+      // Anyone sending work can see the published count for their own email
+      // code (needed to show and check the fee). It holds only two numbers.
+      allow get: if contributorId.matches('^guest-[0-9a-f]{64}$');
+      allow create, update: if (isPublisher() || canVerifyPayments())
+        && request.resource.data.articles is int && request.resource.data.articles >= 0
+        && request.resource.data.videos is int && request.resource.data.videos >= 0;
+      allow delete: if false;
+    }
+
+    // One record per counted submission, so nothing is counted twice.
+    match /contribution_records/{recordId} {
+      allow read: if isContentStaff() || canVerifyPayments() || (signedIn() && resource.data.uid == uid());
+      allow create: if isPublisher() || canVerifyPayments();
+      allow update, delete: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // 17 Shubat 2011 memorial: additions made from the website.
+    // The sourced record lives in the website's code. Administrators (and
+    // people with the site-text permission) add corrections, evidence,
+    // entries, sources and authorised photographs here. Nothing is ever
+    // deleted: records can only be hidden, and every save also writes a
+    // copy to memorial_revisions, which can never be changed.
+    // ------------------------------------------------------------------
+
+    function canMemorial() {
+      return isAdmin() || hasPermission('manage_settings');
+    }
+
+    // ------------------------------------------------------------------
+    // Online meetings, attendance, activity participation and appreciation.
+    // Meeting rooms, meetings, attendance, the audit record, participation
+    // lists and pending posts are written and read only by the website
+    // server (worker/meetings.js), which checks every permission itself;
+    // no browser can read or change them directly (they fall under the
+    // "deny everything" rule above).
+    // ------------------------------------------------------------------
+
+    // Public activity posts after a meeting, published by an administrator
+    // through the server: title, purpose, date, group and a photo collage.
+    match /activity_posts/{postId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if false;
+    }
+
+    // Letters of Appreciation. Anyone may check one letter by its address
+    // (including revoked ones, so the verification page can say so); only
+    // current letters can be listed. Issued and revoked by the server only.
+    // Drafts and letters waiting for approval are private to administrators;
+    // issued, revoked and replaced letters can be checked by anyone with the
+    // (unguessable) address on the letter.
+    match /appreciation_awards/{awardId} {
+      allow get: if resource.data.status in ['published', 'revoked', 'superseded'] || isAdmin();
+      allow list: if resource.data.status == 'published' || isAdmin();
+      allow write: if false;
+    }
+
+    match /memorial_records/{recordId} {
+      allow get, list: if resource.data.published == true || canMemorial();
+      allow create, update: if canMemorial()
+        && recordId.matches('^mr_[a-z0-9]{8,40}$')
+        && request.resource.data.keys().hasOnly(['id', 'kind', 'data', 'published', 'createdAt', 'createdBy', 'updatedAt', 'lastRevision'])
+        && request.resource.data.id == recordId
+        && request.resource.data.kind in ['note', 'event', 'person', 'source', 'media']
+        && request.resource.data.data is map
+        && request.resource.data.published is bool
+        && request.resource.data.lastRevision is string
+        && existsAfter(docPath('memorial_revisions', request.resource.data.lastRevision))
+        && getAfter(docPath('memorial_revisions', request.resource.data.lastRevision)).data.recordId == recordId
+        && (resource == null || (
+          request.resource.data.kind == resource.data.kind
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.lastRevision != resource.data.lastRevision));
+      allow delete: if false;
+    }
+
+    match /memorial_revisions/{revisionId} {
+      allow read: if canMemorial();
+      allow create: if canMemorial()
+        && revisionId.matches('^rv_[a-z0-9]{8,40}$')
+        && request.resource.data.keys().hasOnly(['id', 'recordId', 'snapshot', 'at', 'by'])
+        && request.resource.data.id == revisionId
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.snapshot is map;
+      allow update, delete: if false;
+    }
+
+    // Security reports for administrators.
+    match /security_events/{eventId} {
+      allow read, update: if isAdmin();
+      allow create: if isAdmin() || isContentStaff() || canVerifyPayments();
+      allow delete: if false;
+    }
+
+    match /reports/{reportId} {
+      // Anyone, including visitors, can report a comment once.
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['id', 'targetType', 'parentType', 'articleId', 'commentId', 'commentText', 'commentAuthor', 'reason', 'reporterUid', 'status', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.id == reportId
+        && request.resource.data.status == 'open'
+        && request.resource.data.targetType in ['comment', 'article']
+        && (!('parentType' in request.resource.data) || request.resource.data.parentType in ['article', 'activity'])
+        && nonEmptyStr(request.resource.data.reason, 500)
+        && nonEmptyStr(request.resource.data.articleId, 100)
+        && optStr('commentId', 100) && optStr('commentText', 2000) && optStr('commentAuthor', 120)
+        && (!('commentId' in request.resource.data) || reportId == request.resource.data.commentId + '__' + request.auth.uid);
+      allow read, update, delete: if isContentStaff();
+    }
+
+    // Comment rate limits, one document per person (see commentThrottleOk).
+    match /comment_limits/{personId} {
+      allow read: if request.auth != null && personId == request.auth.uid;
+      allow create, update: if request.auth != null && personId == request.auth.uid
+        && request.resource.data.keys().hasOnly(['lastAt'])
+        && request.resource.data.lastAt == request.time
+        && (resource == null || request.time > resource.data.lastAt + duration.value(signedIn() ? 20 : 60, 's'));
+      allow delete: if isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Organisation structure: one document per seat (see orgStructure.ts).
+    // Public; only administrators (or membership managers) appoint.
+    // ------------------------------------------------------------------
+
+    match /org_assignments/{seatId} {
+      // Appointments are made only by the website server (worker/members.js),
+      // which updates the member's record, card and profile in the same step
+      // and records the change in position_history.
+      allow read: if true;
+      allow create, update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // History of appointments, promotions and transfers (server-written).
+    match /position_history/{entryId} {
+      allow get: if isMembershipStaff() || (signedIn() && resource.data.memberId == uid());
+      allow list: if isMembershipStaff() || (signedIn() && resource.data.memberId == uid());
+      allow write: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // Workshops, meetings and other activities.
+    // ------------------------------------------------------------------
+
+    match /events/{eventId} {
+      function validEvent() {
+        let d = request.resource.data;
+        return nonEmptyStr(d.title, 200)
+          && isStr(d.description, 5000)
+          && d.type in ['workshop', 'meeting', 'demonstration', 'conference', 'campaign', 'commemoration', 'other']
+          && nonEmptyStr(d.startAt, 40)
+          && optStr('endAt', 40)
+          && optStr('location', 300)
+          && optStr('councilId', 100)
+          && d.status in ['draft', 'published', 'cancelled'];
+      }
+      allow read: if resource.data.status in ['published', 'cancelled'] || canManageEvents();
+      allow create, update: if canManageEvents() && validEvent();
+      allow delete: if canManageEvents();
+    }
+
+    // ------------------------------------------------------------------
+    // Breaking news banner
+    // ------------------------------------------------------------------
+
+    match /news_banners/{bannerId} {
+      function registrationPath() {
+        return /databases/$(database)/documents/news_banners/$(bannerId)/registrations/$(uid());
+      }
+
+      // Registrations made before responses existed count as attending.
+      function attendingBefore() {
+        return exists(registrationPath()) && get(registrationPath()).data.get('status', 'attending') == 'attending';
+      }
+      function attendingAfter() {
+        return existsAfter(registrationPath()) && getAfter(registrationPath()).data.get('status', 'attending') == 'attending';
+      }
+
+      // The "attending" count follows the member's own response exactly.
+      function validAttendeeChange() {
+        let before = resource.data.get('attendeeCount', 0);
+        let after = request.resource.data.attendeeCount;
+        return after == before + (attendingAfter() ? 1 : 0) - (attendingBefore() ? 1 : 0)
+          && attendingBefore() != attendingAfter();
+      }
+
+      allow read: if resource.data.status == 'published' || canManageBanners();
+      allow create, update: if canManageBanners()
+        && request.resource.data.mode in ['default', 'announcement', 'breaking']
+        && nonEmptyStr(request.resource.data.message, 300)
+        && request.resource.data.status in ['draft', 'published', 'archived']
+        && optStr('linkUrl', 500)
+        && optStr('startAt', 40)
+        && optStr('endAt', 40)
+        && optStr('eventAt', 40)
+        && optStr('location', 200)
+        && optStr('details', 3000)
+        && optStr('videoUrl', 500)
+        && optStr('councilId', 100)
+        && request.resource.data.keys().hasOnly(['id', 'mode', 'message', 'linkUrl', 'eventAt', 'location', 'details', 'videoUrl', 'councilId', 'registrationOpen', 'attendeeCount', 'status', 'startAt', 'endAt', 'createdBy', 'createdAt', 'updatedAt']);
+      // Members registering or cancelling change only the count.
+      allow update: if signedIn() && isMember()
+        && resource.data.status == 'published'
+        && resource.data.mode == 'announcement'
+        && onlyChanges(['attendeeCount'])
+        && validAttendeeChange();
+      allow delete: if canManageBanners();
+
+      // One response per member per activity: "attending" or "not_attending".
+      // Responses are public (members are listed publicly); organisers
+      // confirm actual attendance separately.
+      match /registrations/{userId} {
+        function banner() {
+          return get(/databases/$(database)/documents/news_banners/$(bannerId)).data;
+        }
+        function bannerAfter() {
+          return getAfter(/databases/$(database)/documents/news_banners/$(bannerId)).data;
+        }
+        function wasAttending() {
+          return resource != null && resource.data.get('status', 'attending') == 'attending';
+        }
+        function isAttending() {
+          return request.resource.data.get('status', 'attending') == 'attending';
+        }
+        function countChange(before, after) {
+          return bannerAfter().get('attendeeCount', 0) == banner().get('attendeeCount', 0) + (after ? 1 : 0) - (before ? 1 : 0);
+        }
+        function selfFieldsOk() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['userId', 'name', 'photoUrl', 'memberNumber', 'positionId', 'chapterId', 'note', 'status', 'createdAt', 'updatedAt', 'attended', 'attendedAt', 'attendedBy'])
+            && d.userId == uid()
+            && nonEmptyStr(d.name, 120)
+            && d.status in ['attending', 'not_attending']
+            && optStr('memberNumber', 20) && optStr('positionId', 60) && optStr('chapterId', 100)
+            && optStr('note', 300) && optStr('photoUrl', 400000);
+        }
+        function canRespond() {
+          return signedIn() && userId == uid() && isMember()
+            && banner().status == 'published'
+            && banner().mode == 'announcement'
+            && banner().get('registrationOpen', true) == true;
+        }
+
+        allow read: if true;
+        allow create: if canRespond() && selfFieldsOk()
+          && !('attended' in request.resource.data)
+          && countChange(false, isAttending());
+        // Members change their response; they can never confirm their own attendance.
+        allow update: if (canRespond() && selfFieldsOk()
+            && request.resource.data.get('attended', false) == resource.data.get('attended', false)
+            && request.resource.data.get('attendedAt', null) == resource.data.get('attendedAt', null)
+            && countChange(wasAttending(), isAttending()))
+          // Organisers confirm or undo actual attendance.
+          || ((canManageBanners() || isMembershipStaff())
+            && onlyChanges(['attended', 'attendedAt', 'attendedBy'])
+            && request.resource.data.attended is bool);
+        allow delete: if (signedIn() && userId == uid() && countChange(wasAttending(), false))
+          || canManageBanners() || isAdmin();
+      }
+
+      match /comments/{commentId} {
+        function bannerPublished() {
+          return get(/databases/$(database)/documents/news_banners/$(bannerId)).data.status == 'published';
+        }
+        allow read: if commentReadOk(bannerPublished());
+        allow create: if commentCreateOk(bannerPublished(), 'activity', bannerId, commentId);
+        allow update: if commentUpdateOk();
+        allow delete: if commentDeleteOk();
+      }
+
+      // Who has looked at the activity: one document per person or device.
+      // Anyone may add one; only organisers can count them.
+      match /views/{viewerId} {
+        allow create: if viewerId.size() <= 64
+          && request.resource.data.keys().hasOnly(['at', 'member'])
+          && request.resource.data.member is bool
+          && (request.resource.data.member == false || (signedIn() && viewerId == uid()))
+          && get(/databases/$(database)/documents/news_banners/$(bannerId)).data.status == 'published';
+        allow read: if canManageBanners() || isMembershipStaff();
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // Site content managed by admins
+    // ------------------------------------------------------------------
+
+    match /chapters/{chapterId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Corrections to the Kurdish and Arabic interface translations, made
+    // by administrators and by people given the manage_translations
+    // permission. Read by every visitor; each change is recorded.
+    match /translations/{lang} {
+      function canTranslate() {
+        return isAdmin() || hasPermission('manage_translations');
+      }
+      allow read: if true;
+      allow create, update: if canTranslate()
+        && lang in ['ckb', 'ar']
+        && request.resource.data.keys().hasOnly(['entries', 'updatedAt', 'updatedBy', 'updatedByName'])
+        && request.resource.data.entries is map
+        && request.resource.data.entries.size() <= 4000
+        && request.resource.data.updatedBy == uid();
+      allow delete: if false;
+
+      match /changes/{changeId} {
+        allow read: if canTranslate();
+        allow create: if canTranslate()
+          && request.resource.data.keys().hasOnly(['id', 'lang', 'key', 'before', 'after', 'by', 'byName', 'at'])
+          && request.resource.data.by == uid()
+          && request.resource.data.lang == lang
+          && isStr(request.resource.data.key, 2000)
+          && isStr(request.resource.data.after, 4000)
+          && isStr(request.resource.data.before, 4000);
+        allow update, delete: if false;
+      }
+    }
+
+    match /site_settings/{settingsId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /donation_config/{configId} {
+      allow read: if isAdmin() || resource.data.isPublished == true;
+      allow write: if isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Contact form — anyone may send, only admins may read
+    // ------------------------------------------------------------------
+
+    match /contact_enquiries/{enquiryId} {
+      allow create: if request.resource.data.keys().hasOnly([
+            'id', 'name', 'email', 'phone', 'subject', 'message',
+            'privacyAgreed', 'status', 'createdAt'
+          ])
+        && nonEmptyStr(request.resource.data.name, 200)
+        && nonEmptyStr(request.resource.data.email, 254)
+        && optStr('phone', 40)
+        && isStr(request.resource.data.subject, 300)
+        && nonEmptyStr(request.resource.data.message, 10000)
+        && request.resource.data.privacyAgreed == true
+        && request.resource.data.status == 'new';
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Audit log — append-only, entries tied to the signed-in actor
+    // ------------------------------------------------------------------
+
+    match /audit_logs/{logId} {
+      allow create: if signedIn()
+        && request.resource.data.actorUid == uid()
+        && isStr(request.resource.data.action, 100)
+        && isStr(request.resource.data.details, 4000);
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+  }
+}

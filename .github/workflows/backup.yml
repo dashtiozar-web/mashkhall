@@ -1,0 +1,101 @@
+name: Database backup
+
+# Every night: a full, encrypted copy of the website database, kept here in
+# GitHub (separate from the website and from Firebase, so website
+# administrators cannot change or delete it), then a test that it restores
+# completely into an empty database. Copies are kept for 30 days.
+#
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   FIREBASE_SERVICE_ACCOUNT  a service-account key; a read-only one is best
+#                             (role "Cloud Datastore Viewer")
+#   BACKUP_PASSPHRASE         a long passphrase, kept offline as well; without
+#                             it the backups cannot be opened
+# To restore: download the artifact, then see scripts/backup/restore.mjs.
+
+on:
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      HAS_KEYS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' && secrets.BACKUP_PASSPHRASE != '' }}
+    steps:
+      - name: Skip when the backup secrets are missing
+        if: env.HAS_KEYS != 'true'
+        run: echo "::warning::Backups are off. Add the FIREBASE_SERVICE_ACCOUNT and BACKUP_PASSPHRASE repository secrets."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_KEYS == 'true'
+
+      - uses: actions/setup-node@v4
+        if: env.HAS_KEYS == 'true'
+        with:
+          node-version: 22
+
+      - name: Export the database
+        if: env.HAS_KEYS == 'true'
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/backup/export.mjs backup-out
+
+      - name: Encrypt (AES-256, passphrase never stored with the backup)
+        if: env.HAS_KEYS == 'true'
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          name="17shubat-db-$(date -u +%Y%m%d-%H%M).tar.gz.enc"
+          tar -C backup-out -czf - . | openssl enc -aes-256-cbc -pbkdf2 -iter 250000 -salt -pass env:BACKUP_PASSPHRASE -out "$name"
+          sha256sum "$name" > "$name.sha256"
+          cp backup-out/manifest.json manifest.json
+          rm -rf backup-out
+          echo "BACKUP_FILE=$name" >> "$GITHUB_ENV"
+          echo "### Backup" >> "$GITHUB_STEP_SUMMARY"
+          node -e "const m=require('./manifest.json');console.log('- '+m.total+' documents in '+Object.keys(m.counts).length+' collections, '+m.createdAt)" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEYS == 'true'
+        with:
+          name: ${{ env.BACKUP_FILE }}
+          path: |
+            ${{ env.BACKUP_FILE }}
+            ${{ env.BACKUP_FILE }}.sha256
+          retention-days: 30
+          if-no-files-found: error
+
+      # Restore test: decrypt the file just uploaded and load it into an empty
+      # local database, then check every document is there.
+      - uses: actions/setup-java@v4
+        if: env.HAS_KEYS == 'true'
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Restore test
+        if: env.HAS_KEYS == 'true'
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          mkdir restore-test
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 250000 -pass env:BACKUP_PASSPHRASE -in "$BACKUP_FILE" | tar -C restore-test -xzf -
+          npx --yes firebase-tools@15.34.0 emulators:exec --only firestore --project demo-restore \
+            "FIREBASE_PROJECT=demo-restore node scripts/backup/restore.mjs restore-test" | tee restore.log
+          echo "### Restore test" >> "$GITHUB_STEP_SUMMARY"
+          grep "Restore check" restore.log >> "$GITHUB_STEP_SUMMARY"
+          rm -rf restore-test
+
+      - name: Report a failed backup
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create backup --color B60205 --description "Database backup problems" --force || true
+          gh issue create --label backup --title "Database backup failed ($(date -u +%Y-%m-%d))" \
+            --body "Tonight's database backup or its restore test failed. See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

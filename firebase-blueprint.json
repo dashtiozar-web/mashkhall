@@ -1,0 +1,326 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with roles and private user metadata",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "photoUrl": { "type": "string", "maxLength": 1024 },
+        "roles": { "type": "array" },
+        "chapterId": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email"]
+    },
+    "AdminDoc": {
+      "title": "AdminDoc",
+      "description": "Admin or privileged user reference for security rules validation",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "role": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email"]
+    },
+    "MemberApplication": {
+      "title": "MemberApplication",
+      "description": "Membership application submission and status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "fullName": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "phone": { "type": "string", "maxLength": 64 },
+        "country": { "type": "string", "maxLength": 64 },
+        "chapterId": { "type": "string", "maxLength": 64 },
+        "reason": { "type": "string", "maxLength": 2000 },
+        "skills": { "type": "string", "maxLength": 1000 },
+        "photoUrl": { "type": "string", "maxLength": 1024 },
+        "agreedToPolicies": { "type": "boolean" },
+        "consentToDirectory": { "type": "boolean" },
+        "status": { "type": "string", "maxLength": 32, "enum": ["draft", "submitted", "under_review", "changes_requested", "approved", "rejected", "withdrawn"] },
+        "staffNotes": { "type": "string", "maxLength": 2000 },
+        "applicantFeedback": { "type": "string", "maxLength": 2000 },
+        "reviewerUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "email", "status"]
+    },
+    "MemberRecord": {
+      "title": "MemberRecord",
+      "description": "Internal record of an approved or invited member",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "memberNumber": { "type": "string", "maxLength": 32 },
+        "fullName": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "phone": { "type": "string", "maxLength": 64 },
+        "chapterId": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "maxLength": 32, "enum": ["active", "suspended", "archived"] },
+        "roles": { "type": "array" },
+        "isBoardMember": { "type": "boolean" },
+        "boardTitle": { "type": "string", "maxLength": 128 },
+        "consentToDirectory": { "type": "boolean" },
+        "photoUrl": { "type": "string", "maxLength": 1024 },
+        "bio": { "type": "string", "maxLength": 2000 },
+        "expertise": { "type": "string", "maxLength": 500 },
+        "joinedAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "email", "status", "chapterId"]
+    },
+    "PublicProfile": {
+      "title": "PublicProfile",
+      "description": "Publicly viewable directory profile with explicit consent",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "photoUrl": { "type": "string", "maxLength": 1024 },
+        "chapterId": { "type": "string", "maxLength": 64 },
+        "chapterName": { "type": "string", "maxLength": 128 },
+        "boardTitle": { "type": "string", "maxLength": 128 },
+        "isBoardMember": { "type": "boolean" },
+        "bio": { "type": "string", "maxLength": 2000 },
+        "expertise": { "type": "string", "maxLength": 500 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "displayName", "chapterId"]
+    },
+    "CityChapter": {
+      "title": "CityChapter",
+      "description": "City chapter organisation and public directory hub",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 128 },
+        "slug": { "type": "string", "maxLength": 64 },
+        "country": { "type": "string", "maxLength": 64 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "imageUrl": { "type": "string", "maxLength": 1024 },
+        "coordinatorName": { "type": "string", "maxLength": 128 },
+        "coordinatorUid": { "type": "string", "maxLength": 128 },
+        "displayOrder": { "type": "number" },
+        "isArchived": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "name", "slug", "country"]
+    },
+    "Article": {
+      "title": "Article",
+      "description": "Official news, resources, and member stories",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "slug": { "type": "string", "maxLength": 256 },
+        "excerpt": { "type": "string", "maxLength": 1000 },
+        "content": { "type": "string", "maxLength": 50000 },
+        "coverImageUrl": { "type": "string", "maxLength": 1024 },
+        "coverImageAlt": { "type": "string", "maxLength": 256 },
+        "category": { "type": "string", "maxLength": 64 },
+        "tags": { "type": "array" },
+        "chapterId": { "type": "string", "maxLength": 64 },
+        "authorUid": { "type": "string", "maxLength": 128 },
+        "authorDisplayName": { "type": "string", "maxLength": 128 },
+        "isOfficialNews": { "type": "boolean" },
+        "contentType": { "type": "string", "maxLength": 32, "enum": ["article", "video_speech", "monitoring_report", "archive"] },
+        "status": { "type": "string", "maxLength": 32, "enum": ["draft", "submitted", "under_review", "changes_requested", "approved", "published", "archived"] },
+        "currentRevisionId": { "type": "string", "maxLength": 128 },
+        "publishedRevisionId": { "type": "string", "maxLength": 128 },
+        "sourceLinks": { "type": "string", "maxLength": 1000 },
+        "publishedAt": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "title", "slug", "authorUid", "status"]
+    },
+    "ArticleRevision": {
+      "title": "ArticleRevision",
+      "description": "Immutable revisions for article submissions and reviews",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "articleId": { "type": "string", "maxLength": 128 },
+        "revisionNumber": { "type": "number" },
+        "title": { "type": "string", "maxLength": 256 },
+        "excerpt": { "type": "string", "maxLength": 1000 },
+        "content": { "type": "string", "maxLength": 50000 },
+        "coverImageUrl": { "type": "string", "maxLength": 1024 },
+        "coverImageAlt": { "type": "string", "maxLength": 256 },
+        "category": { "type": "string", "maxLength": 64 },
+        "tags": { "type": "array" },
+        "authorUid": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "maxLength": 32 },
+        "reviewFeedback": { "type": "string", "maxLength": 2000 },
+        "reviewerUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "articleId", "title", "content", "authorUid"]
+    },
+    "Banner": {
+      "title": "Banner",
+      "description": "Scheduled site announcements and alert banners",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "supportingText": { "type": "string", "maxLength": 1000 },
+        "imageUrl": { "type": "string", "maxLength": 1024 },
+        "imageAlt": { "type": "string", "maxLength": 256 },
+        "actionLabel": { "type": "string", "maxLength": 64 },
+        "actionUrl": { "type": "string", "maxLength": 512 },
+        "placement": { "type": "string", "maxLength": 32, "enum": ["announcement_bar", "homepage_feature"] },
+        "priority": { "type": "number" },
+        "status": { "type": "string", "maxLength": 32, "enum": ["draft", "published", "archived"] },
+        "startAt": { "type": "string", "maxLength": 64 },
+        "endAt": { "type": "string", "maxLength": 64 },
+        "allowDismissal": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "title", "placement", "status"]
+    },
+    "DonationConfig": {
+      "title": "DonationConfig",
+      "description": "Configurable bank transfer details for donations with draft/publish workflow",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "accountHolder": { "type": "string", "maxLength": 128 },
+        "bankName": { "type": "string", "maxLength": 128 },
+        "accountNumber": { "type": "string", "maxLength": 64 },
+        "sortCode": { "type": "string", "maxLength": 32 },
+        "iban": { "type": "string", "maxLength": 64 },
+        "swiftBic": { "type": "string", "maxLength": 32 },
+        "currency": { "type": "string", "maxLength": 16 },
+        "referenceInstructions": { "type": "string", "maxLength": 500 },
+        "guidance": { "type": "string", "maxLength": 1000 },
+        "isPublished": { "type": "boolean" },
+        "hideInstructions": { "type": "boolean" },
+        "updatedBy": { "type": "string", "maxLength": 128 },
+        "publishedAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "isPublished", "hideInstructions"]
+    },
+    "ContactEnquiry": {
+      "title": "ContactEnquiry",
+      "description": "General enquiries submitted by visitors",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "phone": { "type": "string", "maxLength": 64 },
+        "subject": { "type": "string", "maxLength": 256 },
+        "message": { "type": "string", "maxLength": 5000 },
+        "privacyAgreed": { "type": "boolean" },
+        "status": { "type": "string", "maxLength": 32, "enum": ["new", "in_progress", "resolved"] },
+        "staffNotes": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "name", "email", "subject", "message", "privacyAgreed"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable security and moderation audit log entries",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "actorUid": { "type": "string", "maxLength": 128 },
+        "actorEmail": { "type": "string", "maxLength": 256 },
+        "action": { "type": "string", "maxLength": 128 },
+        "targetType": { "type": "string", "maxLength": 64 },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 2000 },
+        "timestamp": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "actorUid", "action", "timestamp"]
+    },
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Organisation core information, FAQs, timeline and editable pages",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "mission": { "type": "string", "maxLength": 2000 },
+        "background": { "type": "string", "maxLength": 5000 },
+        "history": { "type": "array" },
+        "faqs": { "type": "array" },
+        "areasOfWork": { "type": "array" },
+        "updatedAt": { "type": "string", "maxLength": 64 },
+        "updatedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "User profile records containing roles and preferences"
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "AdminDoc" },
+      "description": "Admin authorization reference documents"
+    },
+    "/applications/{applicationId}": {
+      "schema": { "$ref": "MemberApplication" },
+      "description": "Membership applications"
+    },
+    "/members/{memberId}": {
+      "schema": { "$ref": "MemberRecord" },
+      "description": "Internal member registry"
+    },
+    "/public_profiles/{profileId}": {
+      "schema": { "$ref": "PublicProfile" },
+      "description": "Public member directory profiles (only approved with explicit consent)"
+    },
+    "/chapters/{chapterId}": {
+      "schema": { "$ref": "CityChapter" },
+      "description": "City chapters list and information"
+    },
+    "/articles/{articleId}": {
+      "schema": { "$ref": "Article" },
+      "description": "Articles, resources, monitoring reports and news"
+    },
+    "/articles/{articleId}/revisions/{revisionId}": {
+      "schema": { "$ref": "ArticleRevision" },
+      "description": "Revision history for editorial reviews"
+    },
+    "/banners/{bannerId}": {
+      "schema": { "$ref": "Banner" },
+      "description": "Site announcements and banners"
+    },
+    "/donation_config/{configId}": {
+      "schema": { "$ref": "DonationConfig" },
+      "description": "Donation settings (draft and published bank transfer details)"
+    },
+    "/contact_enquiries/{enquiryId}": {
+      "schema": { "$ref": "ContactEnquiry" },
+      "description": "Contact form submissions"
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "AuditLog" },
+      "description": "Immutable security and admin action log"
+    },
+    "/site_settings/{settingsId}": {
+      "schema": { "$ref": "SiteSettings" },
+      "description": "Editable organization copy, timeline and FAQs"
+    }
+  }
+}
