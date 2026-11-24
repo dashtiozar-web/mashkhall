@@ -58,8 +58,8 @@ export const documentTitle = (a: Pick<Award, 'kind' | 'source'>) =>
 
 const W = 2480; // A4 at 300 dots per inch
 const H = 3508;
-const NAVY = '#0C1B36';
-const CRIMSON = '#A3172C';
+const NAVY = '#3A140C';
+const CRIMSON = '#B3261E';
 const INK = '#1F2622';
 const SOFT = '#55606B';
 
@@ -237,7 +237,7 @@ export const drawLetter = async (a: Award): Promise<HTMLCanvasElement> => {
     ctx.save();
     ctx.translate(W / 2, H / 2);
     ctx.rotate(-Math.PI / 6);
-    ctx.fillStyle = stamp === 'DRAFT' ? 'rgba(12, 27, 54, 0.14)' : 'rgba(163, 23, 44, 0.28)';
+    ctx.fillStyle = stamp === 'DRAFT' ? 'rgba(58, 20, 12, 0.14)' : 'rgba(163, 23, 44, 0.28)';
     ctx.font = `700 300px ${SANS}`;
     ctx.textAlign = 'center';
     ctx.fillText(stamp, 0, 0);

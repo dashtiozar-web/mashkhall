@@ -14,11 +14,11 @@ import { MemberRecord } from '../types';
  * container, so it stays sharp on phones, tablets and when printed.
  */
 
-const RED = '#B3203C';
+const RED = '#B3261E';
 const RED_DARK = '#8E1730';
-const NAVY = '#232A6E';
-const INK = '#1C2140';
-const DATE_RED = '#B92A3F';
+const NAVY = '#5A1A0E';
+const INK = '#26160F';
+const DATE_RED = '#B3261E';
 const CARD_FONT = 'Arial, Helvetica, "Liberation Sans", sans-serif';
 
 /** Background waves, drawn to match the printed card (viewBox = card in 0.1 mm). */
@@ -64,8 +64,8 @@ const Logo: React.FC<{ size: string; faded?: boolean }> = ({ size, faded }) => {
         style={{
           ...style,
           background: faded ? 'transparent' : '#fff',
-          border: `${faded ? '0.1em' : '0.25em'} solid ${faded ? '#D3D6DE' : RED}`,
-          color: faded ? '#D3D6DE' : RED,
+          border: `${faded ? '0.1em' : '0.25em'} solid ${faded ? '#DCCFBE' : RED}`,
+          color: faded ? '#DCCFBE' : RED,
           fontSize: `calc(${size} * 0.32)`,
           fontFamily: CARD_FONT,
         }}
@@ -218,7 +218,7 @@ export const MemberQr: React.FC<{ url: string; size?: string }> = ({ url, size =
     <div className="relative bg-white" style={{ width: size, height: size }}>
       <div className="h-full w-full [&>svg]:h-full [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
       <img
-        src="/logo.svg"
+        src="/logo-512.png"
         alt=""
         aria-hidden="true"
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-[0.6cqw] border-white bg-white"

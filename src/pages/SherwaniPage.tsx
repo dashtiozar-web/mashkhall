@@ -60,7 +60,7 @@ const Refs: React.FC<{ ids: string[]; cl: CL }> = ({ ids, cl }) => (
 
 const Flags: React.FC<{ flags?: Bi[]; cl: CL }> = ({ flags, cl }) => flags?.length ? (
   <div className="mt-3 rounded-md border border-amber/40 bg-amber/10 p-3 text-[0.9063rem]">
-    <p className="flex items-center gap-1.5 font-semibold text-[#F0C779]"><AlertTriangle className="h-4 w-4" aria-hidden="true" /> {T[cl].verify}</p>
+    <p className="flex items-center gap-1.5 font-semibold text-[#F2C14E]"><AlertTriangle className="h-4 w-4" aria-hidden="true" /> {T[cl].verify}</p>
     <ul className="mt-1 list-disc space-y-0.5 ps-5 text-white/85">{flags.map((f, i) => <li key={i}>{f[cl]}</li>)}</ul>
   </div>
 ) : null;
@@ -68,7 +68,7 @@ const Flags: React.FC<{ flags?: Bi[]; cl: CL }> = ({ flags, cl }) => flags?.leng
 const Slide: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <article className="mx-auto max-w-[820px]">
     <h3 className="text-center font-serif text-[1.625rem] leading-tight font-semibold text-white sm:text-[2.125rem]">{title}</h3>
-    <span className="mx-auto mt-4 block h-[2px] w-16 bg-[#A3172C]" aria-hidden="true" />
+    <span className="mx-auto mt-4 block h-[2px] w-16 bg-[#B3261E]" aria-hidden="true" />
     <div className="mt-5 text-[1.0625rem] leading-relaxed text-white/85">{children}</div>
   </article>
 );
@@ -97,8 +97,8 @@ export const SherwaniPage: React.FC = () => {
 
   const slides = [
     { key: 's1', label: t.s[0], node: <Slide title={t.s[0]}><p>{S_PROFILE.intro[cl]}</p><p className="mt-3">{S_PROFILE.membership[cl]}</p><div className="mt-3"><Refs ids={[...S_PROFILE.introSources]} cl={cl} /></div></Slide> },
-    { key: 's2', label: t.s[1], node: <Slide title={t.s[1]}><ul className="space-y-2">{arrests.map((e) => <li key={e.id}><span className="font-semibold text-[#F0C779]">{dateOf(e, cl)}</span> — {e.title[cl]}</li>)}</ul></Slide> },
-    { key: 's3', label: t.s[2], node: <Slide title={t.s[2]}>{ev('ss-2020-allegations').accounts!.map((a, i) => <p key={i} className="mt-2"><span className="font-semibold text-[#F0C779]">{t.who[a.who]}: </span>{a.text[cl]}</p>)}</Slide> },
+    { key: 's2', label: t.s[1], node: <Slide title={t.s[1]}><ul className="space-y-2">{arrests.map((e) => <li key={e.id}><span className="font-semibold text-[#F2C14E]">{dateOf(e, cl)}</span> — {e.title[cl]}</li>)}</ul></Slide> },
+    { key: 's3', label: t.s[2], node: <Slide title={t.s[2]}>{ev('ss-2020-allegations').accounts!.map((a, i) => <p key={i} className="mt-2"><span className="font-semibold text-[#F2C14E]">{t.who[a.who]}: </span>{a.text[cl]}</p>)}</Slide> },
     { key: 's4', label: t.s[3], node: <Slide title={t.s[3]}><p>{ev('ss-2025-09').body[cl]}</p><p className="mt-3">{ev('ss-2025').body[cl]}</p><div className="mt-3"><Refs ids={['cpj-2025-09', 'rsf-2025', 'amnesty-2025']} cl={cl} /></div></Slide> },
     { key: 's5', label: t.s[4], node: <Slide title={t.s[4]}><p>{ev('ss-2026-hunger').body[cl]}</p>{ev('ss-2026-hunger').accounts!.slice(0, 1).map((a, i) => <p key={i} className="mt-2">{a.text[cl]}</p>)}<p className="mt-2">{ev('ss-2026-05-03').accounts![0].text[cl]}</p><div className="mt-3"><Refs ids={['ch8-2026-04', 'rudaw-2026']} cl={cl} /></div></Slide> },
     { key: 's6', label: t.s[5], node: <Slide title={t.s[5]}><p>{statusText}</p><p className="mt-2 text-[0.9375rem] text-white/65">{t.checked} {memorialDate(statusDate, cl)}</p></Slide> },
@@ -106,22 +106,22 @@ export const SherwaniPage: React.FC = () => {
   ];
 
   return (
-    <div className="memorial bg-[#090F1C] text-white">
+    <div className="memorial bg-[#120A07] text-white">
       <header className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(163,23,44,0.18),transparent_60%)]" aria-hidden="true" />
         <Container className="relative py-10 sm:py-14">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <a href="/memorial" className="text-[0.875rem] font-semibold tracking-[0.12em] text-[#F0C779] uppercase no-underline hover:underline">{t.memorial}</a>
+            <a href="/memorial" className="text-[0.875rem] font-semibold tracking-[0.12em] text-[#F2C14E] uppercase no-underline hover:underline">{t.memorial}</a>
             <div role="group" aria-label={t.language} className="flex overflow-hidden rounded-lg border border-white/25 text-[0.9375rem]" data-i18n-skip="">
-              <button type="button" lang="ckb" onClick={() => setCl('ckb')} aria-pressed={cl === 'ckb'} className={`cursor-pointer px-3.5 py-1.5 font-kurdish ${cl === 'ckb' ? 'bg-white text-[#0C1B36]' : 'text-white hover:bg-white/10'}`}>کوردی</button>
-              <button type="button" lang="en" onClick={() => setCl('en')} aria-pressed={cl === 'en'} className={`cursor-pointer px-3.5 py-1.5 ${cl === 'en' ? 'bg-white text-[#0C1B36]' : 'text-white hover:bg-white/10'}`}>English</button>
+              <button type="button" lang="ckb" onClick={() => setCl('ckb')} aria-pressed={cl === 'ckb'} className={`cursor-pointer px-3.5 py-1.5 font-kurdish ${cl === 'ckb' ? 'bg-white text-[#3A140C]' : 'text-white hover:bg-white/10'}`}>کوردی</button>
+              <button type="button" lang="en" onClick={() => setCl('en')} aria-pressed={cl === 'en'} className={`cursor-pointer px-3.5 py-1.5 ${cl === 'en' ? 'bg-white text-[#3A140C]' : 'text-white hover:bg-white/10'}`}>English</button>
             </div>
           </div>
           <div data-i18n-skip="" lang={cl} dir={dir} className={`mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start ${cl === 'ckb' ? 'font-kurdish' : ''}`}>
             <div>
               <h1 className="max-w-[24ch] font-serif text-[2.125rem] leading-[1.12] font-semibold text-white sm:text-[3rem]">{S_TITLE[cl]}</h1>
-              <p className="mt-4 text-[1.125rem] text-[#F0C779]">{S_SUBTITLE[cl]}</p>
-              <span className="mt-6 block h-[3px] w-20 bg-[#A3172C]" aria-hidden="true" />
+              <p className="mt-4 text-[1.125rem] text-[#F2C14E]">{S_SUBTITLE[cl]}</p>
+              <span className="mt-6 block h-[3px] w-20 bg-[#B3261E]" aria-hidden="true" />
               <p className="mt-6 max-w-[68ch] text-[1.0938rem] leading-relaxed text-white/85">{S_PROFILE.intro[cl]}</p>
               <div className="mt-2"><Refs ids={[...S_PROFILE.introSources]} cl={cl} /></div>
             </div>
@@ -140,7 +140,7 @@ export const SherwaniPage: React.FC = () => {
               <p className="mt-4 font-serif text-[1.375rem] font-semibold text-white">{cl === 'ckb' ? S_PROFILE.nameKu : S_PROFILE.nameEn}</p>
               <p className="text-white/65"><bdi dir={cl === 'ckb' ? 'ltr' : 'rtl'} className={cl === 'ckb' ? '' : 'font-kurdish'}>{cl === 'ckb' ? S_PROFILE.nameEn : S_PROFILE.nameKu}</bdi></p>
               <p className="mt-1 text-[0.875rem] text-white/60">{t.also}: <bdi dir="ltr">{S_PROFILE.altNames.map((a) => a.name).join(', ')}</bdi></p>
-              <p className="mt-3 inline-block rounded-full border border-[#F0C779]/50 px-3 py-1 text-[0.875rem] font-semibold text-[#F0C779]">{t.formerMember}</p>
+              <p className="mt-3 inline-block rounded-full border border-[#F2C14E]/50 px-3 py-1 text-[0.875rem] font-semibold text-[#F2C14E]">{t.formerMember}</p>
               <p className="mt-3 text-[0.9375rem] text-white/80">{S_PROFILE.membership[cl]}</p>
               <div className="mt-2"><Refs ids={[...S_PROFILE.membershipSources]} cl={cl} /></div>
             </aside>
@@ -152,7 +152,7 @@ export const SherwaniPage: React.FC = () => {
         {/* Status */}
         <section aria-labelledby="ss-status" className="border-b border-white/10 py-10">
           <Container>
-            <div className="rounded-xl border-s-4 border-[#A3172C] bg-white/[0.04] p-5 sm:p-6">
+            <div className="rounded-xl border-s-4 border-[#B3261E] bg-white/[0.04] p-5 sm:p-6">
               <h2 id="ss-status" className="text-[1.25rem] font-semibold text-white">{t.status}</h2>
               <p className="mt-2 text-[1.0625rem] text-white/90">{statusText}</p>
               <p className="mt-2 text-[0.9375rem] text-white/65">
@@ -175,19 +175,19 @@ export const SherwaniPage: React.FC = () => {
         <section id="ss-timeline" aria-labelledby="ss-tl" className="border-b border-white/10 py-12 sm:py-16">
           <Container>
             <h2 id="ss-tl" className="font-serif text-[1.875rem] font-semibold text-white sm:text-[2.25rem]">{t.timeline}</h2>
-            <span className="mt-3 block h-[3px] w-12 bg-[#A3172C]" aria-hidden="true" />
+            <span className="mt-3 block h-[3px] w-12 bg-[#B3261E]" aria-hidden="true" />
             <ol className="mt-8 space-y-5 border-s border-white/15 ps-5 sm:ps-7">
               {S_EVENTS.map((e) => (
                 <li key={e.id} id={e.id} className="relative scroll-mt-24">
-                  <span className="absolute top-2 -start-[1.6rem] h-3 w-3 rounded-full border-2 border-[#A3172C] bg-[#090F1C] sm:-start-[2.1rem]" aria-hidden="true" />
+                  <span className="absolute top-2 -start-[1.6rem] h-3 w-3 rounded-full border-2 border-[#B3261E] bg-[#120A07] sm:-start-[2.1rem]" aria-hidden="true" />
                   <article className="rounded-xl border border-white/12 bg-white/[0.035] p-5">
                     <p className="font-semibold text-white tabular-nums">{dateOf(e, cl)}</p>
-                    {e.place && <p className="text-[0.9375rem] text-[#F0C779]">{e.place[cl]}</p>}
+                    {e.place && <p className="text-[0.9375rem] text-[#F2C14E]">{e.place[cl]}</p>}
                     <h3 className="mt-2 text-[1.25rem] leading-snug font-semibold text-white">{e.title[cl]}</h3>
                     <p className="mt-2 leading-relaxed text-white/85">{e.body[cl]}</p>
                     {e.accounts?.map((a, i) => (
                       <div key={i} className="mt-3 rounded-md border-s-4 border-white/25 bg-white/[0.03] p-3">
-                        <p className="text-[0.8125rem] font-semibold tracking-wide text-[#F0C779] uppercase">{t.who[a.who]}</p>
+                        <p className="text-[0.8125rem] font-semibold tracking-wide text-[#F2C14E] uppercase">{t.who[a.who]}</p>
                         <p className="mt-1 text-white/90">{a.text[cl]}</p>
                         <p className="mt-1 text-[0.8125rem] text-white/60">{t.source}: <Ref id={a.source} /></p>
                       </div>
@@ -195,7 +195,7 @@ export const SherwaniPage: React.FC = () => {
                     <div className="mt-3"><Refs ids={e.sources} cl={cl} /></div>
                     <Flags flags={e.flags} cl={cl} />
                     {(m.notes[e.id] || []).map((n, i) => (
-                      <p key={i} className="mt-3 rounded-md border-s-4 border-[#C4511F] bg-white/5 p-3 text-[0.9375rem]">{n.text[cl] || n.text.en}{n.citation?.title ? ` — ${n.citation.title}` : ''}</p>
+                      <p key={i} className="mt-3 rounded-md border-s-4 border-[#DB5F1C] bg-white/5 p-3 text-[0.9375rem]">{n.text[cl] || n.text.en}{n.citation?.title ? ` — ${n.citation.title}` : ''}</p>
                     ))}
                   </article>
                 </li>
@@ -225,7 +225,7 @@ export const SherwaniPage: React.FC = () => {
         <section aria-labelledby="ss-so" className="py-12 sm:py-16">
           <Container>
             <h2 id="ss-so" className="font-serif text-[1.875rem] font-semibold text-white">{t.sources}</h2>
-            <span className="mt-3 block h-[3px] w-12 bg-[#A3172C]" aria-hidden="true" />
+            <span className="mt-3 block h-[3px] w-12 bg-[#B3261E]" aria-hidden="true" />
             <ol className="mt-6 space-y-3">
               {S_SOURCES.map((s) => (
                 <li key={s.id} id={`ss-source-${s.id}`} className="scroll-mt-24 rounded-xl border border-white/12 bg-white/[0.035] p-4">

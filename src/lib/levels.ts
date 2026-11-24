@@ -63,5 +63,5 @@ export const LEVEL_COLOURS: Record<LevelGroup, { bg: string; fg: string; ring: s
   Gold: { bg: '#FBEFC8', fg: '#7A5A00', ring: '#D9A520' },
   Platinum: { bg: '#E1F1F0', fg: '#1F5E5B', ring: '#5FB3AE' },
   Diamond: { bg: '#E3ECFB', fg: '#203F7A', ring: '#5B8DEF' },
-  Ace: { bg: '#F6E0E4', fg: '#7E1022', ring: '#C8102E' },
+  Ace: { bg: '#F6E0E4', fg: '#7E1022', ring: '#C2361A' },
 };

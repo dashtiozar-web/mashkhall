@@ -36,12 +36,12 @@ export const BleedingEdge: React.FC<{ className?: string; animate?: boolean }> =
   <svg viewBox={`0 0 340 ${HEIGHT}`} className={`pointer-events-none ${className}`} aria-hidden="true" focusable="false">
     <defs>
       <linearGradient id="blood" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#C8102E" />
+        <stop offset="0" stopColor="#C2361A" />
         <stop offset="1" stopColor="#8E0B20" />
       </linearGradient>
     </defs>
     {/* A thin, uneven seam where the band meets the page. */}
-    <path d="M0,0 H340 V2.2 C300,3.4 270,1.6 240,2.8 C200,4 170,1.8 130,3.2 C90,4.2 60,1.6 0,2.6 Z" fill="#C8102E" />
+    <path d="M0,0 H340 V2.2 C300,3.4 270,1.6 240,2.8 C200,4 170,1.8 130,3.2 C90,4.2 60,1.6 0,2.6 Z" fill="#C2361A" />
     {DRIPS.map((d, i) => {
       const t = CYCLE[i % CYCLE.length];
       // Start part-way through each cycle so blood is already running when the page opens.
@@ -51,13 +51,13 @@ export const BleedingEdge: React.FC<{ className?: string; animate?: boolean }> =
         <g key={i}>
           <g className={animate ? 'bleed-stem' : ''} style={{ animationDuration: `${t}s`, animationDelay: delay }}>
             <path d={dripPath(d)} fill="url(#blood)" />
-            <circle cx={d.x} cy={d.len} r={d.w * 1.12} fill="#9E0C24" />
+            <circle cx={d.x} cy={d.len} r={d.w * 1.12} fill="#8E1C14" />
           </g>
           {animate && (
             <g className="bleed-drop" style={{ animationDuration: `${t}s`, animationDelay: delay, ['--fall' as string]: `${fall}px` }}>
               <path
                 d={`M${d.x},${d.len - d.w * 1.6} C${d.x + d.w * 0.6},${d.len - d.w * 0.4} ${d.x + d.w * 1.15},${d.len + d.w * 0.4} ${d.x},${d.len + d.w * 1.3} C${d.x - d.w * 1.15},${d.len + d.w * 0.4} ${d.x - d.w * 0.6},${d.len - d.w * 0.4} ${d.x},${d.len - d.w * 1.6} Z`}
-                fill="#9E0C24"
+                fill="#8E1C14"
               />
               <ellipse cx={d.x - d.w * 0.3} cy={d.len - d.w * 0.1} rx={d.w * 0.22} ry={d.w * 0.38} fill="#ffffff" fillOpacity="0.4" />
             </g>

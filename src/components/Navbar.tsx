@@ -58,7 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
   return (
     <>
     {/* Top bar: language and a short statement of who we are. */}
-    <div className="border-b border-white/10 bg-[#070F20] text-white">
+    <div className="border-b border-white/10 bg-[#120906] text-white">
       <Container className="flex h-10 items-center justify-between gap-3">
         <p className="hidden truncate text-[0.8125rem] text-white/65 sm:block">Independent · Non-violent · Founded 17 February 2015</p>
         <LanguageSwitcher className="ms-auto" />

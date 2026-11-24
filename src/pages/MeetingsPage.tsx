@@ -615,7 +615,7 @@ const MeetingView: React.FC<{ id: string; onNavigate: Props['onNavigate'] }> = (
         </aside>
       </Container>
       {seat && (
-        <Suspense fallback={<div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#0B1220] text-white"><Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" /></div>}>
+        <Suspense fallback={<div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#160C09] text-white"><Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" /></div>}>
           <MeetingCall meetingId={m.id} seat={seat} title={m.title} canLock={data.me.can.lock} canEnd={data.me.can.start} canRemove={data.me.can.remove} onLeave={left} />
         </Suspense>
       )}

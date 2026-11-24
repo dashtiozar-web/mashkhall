@@ -66,7 +66,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => (
         <nav aria-label="Footer" className="grid grid-cols-2 gap-10 sm:grid-cols-3">
           {COLUMNS.map((col) => (
             <div key={col.heading}>
-              <h2 className="font-sans text-[0.8125rem] font-semibold tracking-[0.08em] text-[#F0C779] uppercase">{col.heading}</h2>
+              <h2 className="font-sans text-[0.8125rem] font-semibold tracking-[0.08em] text-[#F2C14E] uppercase">{col.heading}</h2>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.id}>

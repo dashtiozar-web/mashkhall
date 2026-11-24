@@ -86,7 +86,7 @@ const SourceList: React.FC<{ ids: string[]; m: MergedMemorial; cl: CL; light?: b
 const Flags: React.FC<{ flags?: Bi[]; cl: CL }> = ({ flags, cl }) =>
   flags?.length ? (
     <div className="mt-3 rounded-md border border-amber/40 bg-amber/10 p-3 text-[0.9063rem]">
-      <p className="flex items-center gap-1.5 font-semibold text-[#F0C779]"><AlertTriangle className="h-4 w-4" aria-hidden="true" /> {T[cl].verify}</p>
+      <p className="flex items-center gap-1.5 font-semibold text-[#F2C14E]"><AlertTriangle className="h-4 w-4" aria-hidden="true" /> {T[cl].verify}</p>
       <ul className="mt-1 list-disc space-y-0.5 ps-5 text-white/85">{flags.map((f, i) => <li key={i}>{f[cl]}</li>)}</ul>
     </div>
   ) : null;
@@ -97,8 +97,8 @@ const Notes: React.FC<{ id: string; m: MergedMemorial; cl: CL }> = ({ id, m, cl 
   return (
     <ul className="mt-3 space-y-2">
       {list.map((n, i) => (
-        <li key={i} className="rounded-md border-s-4 border-[#C4511F] bg-white/5 p-3 text-[0.9375rem]">
-          <p className="text-[0.8125rem] font-semibold tracking-wide text-[#F0C779] uppercase">
+        <li key={i} className="rounded-md border-s-4 border-[#DB5F1C] bg-white/5 p-3 text-[0.9375rem]">
+          <p className="text-[0.8125rem] font-semibold tracking-wide text-[#F2C14E] uppercase">
             {NOTE_LABEL(cl, n.noteType)}{n.verified ? ` · ${T[cl].verified}` : ''} · {T[cl].addedOn} {memorialDate(n.at.slice(0, 10), cl)}
           </p>
           <p className="mt-1 text-white/90">{n.text[cl] || n.text.en || n.text.ckb}</p>
@@ -125,8 +125,8 @@ const personName = (p: MemorialPerson, cl: CL) => (cl === 'ckb' && p.nameKu ? p.
 const EventSlide: React.FC<{ e: MemorialEvent; m: MergedMemorial; cl: CL }> = ({ e, m, cl }) => (
   <article className="mx-auto max-w-[820px] text-center">
     <p className="font-serif text-[2.25rem] leading-none font-semibold text-white tabular-nums sm:text-[3.25rem]">{memorialDate(e.date, cl)}</p>
-    <span className="mx-auto mt-4 block h-[2px] w-16 bg-[#A3172C]" aria-hidden="true" />
-    <p className="mt-4 text-[1.0625rem] text-[#F0C779]">{e.place[cl]}{e.time ? ` · ${e.time[cl]}` : ''}</p>
+    <span className="mx-auto mt-4 block h-[2px] w-16 bg-[#B3261E]" aria-hidden="true" />
+    <p className="mt-4 text-[1.0625rem] text-[#F2C14E]">{e.place[cl]}{e.time ? ` · ${e.time[cl]}` : ''}</p>
     <h3 className="mt-3 text-[1.5rem] leading-snug font-semibold text-white sm:text-[1.875rem]">{e.title[cl]}</h3>
     <p className="mx-auto mt-4 max-w-[64ch] text-[1.0938rem] leading-relaxed text-white/85">{e.summary[cl]}</p>
     <div className="mt-4"><SourceList ids={e.sources} m={m} cl={cl} citations={(e as { citations?: { title: string; url?: string }[] }).citations} /></div>
@@ -144,7 +144,7 @@ const Portrait: React.FC<{ p: MemorialPerson; m: MergedMemorial; cl: CL; size?: 
     </figure>
   ) : (
     <div className={`${dim} flex shrink-0 items-center justify-center rounded-md border border-white/15 bg-white/[0.04]`} aria-hidden="true">
-      <Flame className="h-8 w-8 text-[#C4511F]/80" strokeWidth={1.25} />
+      <Flame className="h-8 w-8 text-[#DB5F1C]/80" strokeWidth={1.25} />
     </div>
   );
 };
@@ -161,8 +161,8 @@ const MartyrSlide: React.FC<{ p: MemorialPerson; m: MergedMemorial; cl: CL }> = 
         {(p.death?.date || p.incident?.date) && <span> · {memorialDate(p.death?.date || p.incident?.date, cl)}</span>}
         {(p.death?.place || p.incident?.place || p.place?.value) && <span> · {(p.incident?.place || p.death?.place || p.place?.value)![cl]}</span>}
       </p>
-      <span className="mt-4 block h-[2px] w-14 bg-[#A3172C] max-sm:mx-auto" aria-hidden="true" />
-      <p className="mt-4 font-serif text-[1.125rem] text-[#F0C779] italic">{DEDICATION[cl]}</p>
+      <span className="mt-4 block h-[2px] w-14 bg-[#B3261E] max-sm:mx-auto" aria-hidden="true" />
+      <p className="mt-4 font-serif text-[1.125rem] text-[#F2C14E] italic">{DEDICATION[cl]}</p>
     </div>
   </article>
 );
@@ -198,7 +198,7 @@ const MartyrCard: React.FC<{ p: MemorialPerson; m: MergedMemorial; cl: CL }> = (
     ) : null}
     <Flags flags={p.flags} cl={cl} />
     <Notes id={p.id} m={m} cl={cl} />
-    <p className="mt-4 border-t border-white/10 pt-3 font-serif text-[0.9688rem] text-[#F0C779] italic">{DEDICATION[cl]}</p>
+    <p className="mt-4 border-t border-white/10 pt-3 font-serif text-[0.9688rem] text-[#F2C14E] italic">{DEDICATION[cl]}</p>
   </article>
 );
 
@@ -224,29 +224,29 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
     <article className="mx-auto max-w-[820px] text-center">
       <img src={LOGO_URL} alt="" className="mx-auto h-16 w-16 rounded-md object-cover" />
       <h3 className="mt-5 font-serif text-[1.75rem] leading-tight font-semibold text-white sm:text-[2.375rem]">{MEMORIAL_TITLE[cl]}</h3>
-      <p className="mt-3 text-[1.125rem] text-[#F0C779]">{MEMORIAL_SUBTITLE[cl]}</p>
+      <p className="mt-3 text-[1.125rem] text-[#F2C14E]">{MEMORIAL_SUBTITLE[cl]}</p>
     </article>
   ) };
   const eventSlides = [intro, ...m.events.filter((e) => e.key || (e as { added?: boolean }).added).map((e) => ({ key: e.id, label: memorialDate(e.date, cl).replace(/ ?2011$|ی 2011$/, ''), node: <EventSlide e={e} m={m} cl={cl} /> }))];
   const martyrSlides = m.people.map((p) => ({ key: p.id, label: personName(p, cl), node: <MartyrSlide p={p} m={m} cl={cl} /> }));
 
   return (
-    <div className="memorial bg-[#090F1C] text-white">
+    <div className="memorial bg-[#120A07] text-white">
       {/* Banner */}
       <header className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(163,23,44,0.22),transparent_60%)]" aria-hidden="true" />
         <Container className="relative py-10 sm:py-14">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <p className="text-[0.875rem] font-semibold tracking-[0.12em] text-[#F0C779] uppercase">17 Shubat 2011 Memorial</p>
+            <p className="text-[0.875rem] font-semibold tracking-[0.12em] text-[#F2C14E] uppercase">17 Shubat 2011 Memorial</p>
             <div role="group" aria-label={t.language} className="flex overflow-hidden rounded-lg border border-white/25 text-[0.9375rem]" data-i18n-skip="">
-              <button type="button" lang="ckb" onClick={() => setCl('ckb')} aria-pressed={cl === 'ckb'} className={`cursor-pointer px-3.5 py-1.5 font-kurdish ${cl === 'ckb' ? 'bg-white text-[#0C1B36]' : 'text-white hover:bg-white/10'}`}>کوردی</button>
-              <button type="button" lang="en" onClick={() => setCl('en')} aria-pressed={cl === 'en'} className={`cursor-pointer px-3.5 py-1.5 ${cl === 'en' ? 'bg-white text-[#0C1B36]' : 'text-white hover:bg-white/10'}`}>English</button>
+              <button type="button" lang="ckb" onClick={() => setCl('ckb')} aria-pressed={cl === 'ckb'} className={`cursor-pointer px-3.5 py-1.5 font-kurdish ${cl === 'ckb' ? 'bg-white text-[#3A140C]' : 'text-white hover:bg-white/10'}`}>کوردی</button>
+              <button type="button" lang="en" onClick={() => setCl('en')} aria-pressed={cl === 'en'} className={`cursor-pointer px-3.5 py-1.5 ${cl === 'en' ? 'bg-white text-[#3A140C]' : 'text-white hover:bg-white/10'}`}>English</button>
             </div>
           </div>
           <div data-i18n-skip="" lang={cl} dir={dir} className={cl === 'ckb' ? 'font-kurdish' : ''}>
             <h1 className="mt-6 max-w-[22ch] font-serif text-[2.25rem] leading-[1.1] font-semibold text-white sm:text-[3.25rem]">{MEMORIAL_TITLE[cl]}</h1>
-            <p className="mt-4 text-[1.1875rem] text-[#F0C779]">{MEMORIAL_SUBTITLE[cl]}</p>
-            <span className="mt-6 block h-[3px] w-20 bg-[#A3172C]" aria-hidden="true" />
+            <p className="mt-4 text-[1.1875rem] text-[#F2C14E]">{MEMORIAL_SUBTITLE[cl]}</p>
+            <span className="mt-6 block h-[3px] w-20 bg-[#B3261E]" aria-hidden="true" />
             <p className="mt-6 max-w-[70ch] text-[1.0938rem] leading-relaxed text-white/85">{MEMORIAL_INTRO[cl]}</p>
             <div className="mt-3"><SourceList ids={MEMORIAL_INTRO_SOURCES} m={m} cl={cl} /></div>
             <div className="mt-3 max-w-[70ch] text-[0.9375rem] text-white/70"><p className="font-semibold">{t.totals}</p>
@@ -255,7 +255,7 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
               {[['days', t.slideshow], ['timeline', t.timeline], ['martyrs', t.martyrs], ['archive', t.archive], ['sources', t.sources]].map(([id, l]) => (
                 <a key={id} href={`#${id}`} className="rounded-full border border-white/20 px-3.5 py-1.5 text-white no-underline hover:border-white/50">{l}</a>
               ))}
-              <a href="/sherwan-sherwani" className="rounded-full border border-[#F0C779]/50 px-3.5 py-1.5 text-[#F0C779] no-underline hover:border-[#F0C779]">{cl === 'ckb' ? 'شێروان شێروانی' : 'Sherwan Sherwani'}</a>
+              <a href="/sherwan-sherwani" className="rounded-full border border-[#F2C14E]/50 px-3.5 py-1.5 text-[#F2C14E] no-underline hover:border-[#F2C14E]">{cl === 'ckb' ? 'شێروان شێروانی' : 'Sherwan Sherwani'}</a>
             </nav>
           </div>
         </Container>
@@ -275,7 +275,7 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
         <section id="timeline" aria-labelledby="tl-h" className="scroll-mt-20 border-b border-white/10 py-12 sm:py-16">
           <Container>
             <h2 id="tl-h" className="font-serif text-[1.875rem] font-semibold text-white sm:text-[2.25rem]">{t.timeline}</h2>
-            <span className="mt-3 block h-[3px] w-12 bg-[#A3172C]" aria-hidden="true" />
+            <span className="mt-3 block h-[3px] w-12 bg-[#B3261E]" aria-hidden="true" />
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <label className="relative flex-1">
                 <span className="sr-only">{t.search}</span>
@@ -285,7 +285,7 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
               </label>
               <label className="sm:w-56">
                 <span className="sr-only">{t.allMonths}</span>
-                <select value={month} onChange={(e) => setMonth(e.target.value)} className="w-full rounded-lg border border-white/20 bg-[#101829] px-3 py-2.5 text-white">
+                <select value={month} onChange={(e) => setMonth(e.target.value)} className="w-full rounded-lg border border-white/20 bg-[#1F100B] px-3 py-2.5 text-white">
                   <option value="">{t.allMonths}</option>
                   {months.map((mo) => <option key={mo} value={mo}>{MONTHS[mo]?.[cl] || mo}</option>)}
                 </select>
@@ -296,14 +296,14 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
             {filtered.length === 0 && <p className="mt-8 text-white/70">{t.noMatch}</p>}
             {months.filter((mo) => filtered.some((e) => e.date.slice(5, 7) === mo)).map((mo) => (
               <div key={mo} className="mt-10">
-                <h3 className="text-[1.25rem] font-semibold text-[#F0C779]">{MONTHS[mo]?.[cl] || mo}</h3>
+                <h3 className="text-[1.25rem] font-semibold text-[#F2C14E]">{MONTHS[mo]?.[cl] || mo}</h3>
                 <ol className="mt-4 space-y-5 border-s border-white/15 ps-5 sm:ps-7">
                   {filtered.filter((e) => e.date.slice(5, 7) === mo).map((e) => (
                     <li key={e.id} id={`entry-${e.id}`} className="relative scroll-mt-24">
-                      <span className="absolute top-2 -start-[1.6rem] h-3 w-3 rounded-full border-2 border-[#A3172C] bg-[#090F1C] sm:-start-[2.1rem]" aria-hidden="true" />
+                      <span className="absolute top-2 -start-[1.6rem] h-3 w-3 rounded-full border-2 border-[#B3261E] bg-[#120A07] sm:-start-[2.1rem]" aria-hidden="true" />
                       <article className="rounded-xl border border-white/12 bg-white/[0.035] p-5">
                         <p className="text-[0.9375rem] font-semibold text-white tabular-nums">{memorialDate(e.date, cl)}{e.time ? <span className="font-normal text-white/70"> · {e.time[cl]}</span> : null}</p>
-                        <p className="text-[0.9375rem] text-[#F0C779]">{e.place[cl]}</p>
+                        <p className="text-[0.9375rem] text-[#F2C14E]">{e.place[cl]}</p>
                         <h4 className="mt-2 text-[1.25rem] leading-snug font-semibold text-white">{e.title[cl]}</h4>
                         <p className="mt-2 leading-relaxed text-white/85">{e.summary[cl]}</p>
                         {e.figures && <p className="mt-2 text-white/85">{e.figures[cl]}</p>}
@@ -333,7 +333,7 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
         <section id="martyrs" aria-labelledby="mt-h" className="scroll-mt-20 border-b border-white/10 py-12 sm:py-16">
           <Container>
             <h2 id="mt-h" className="text-center font-serif text-[1.875rem] font-semibold text-white sm:text-[2.5rem]">{MARTYRS_TITLE[cl]}</h2>
-            <span className="mx-auto mt-3 block h-[3px] w-14 bg-[#A3172C]" aria-hidden="true" />
+            <span className="mx-auto mt-3 block h-[3px] w-14 bg-[#B3261E]" aria-hidden="true" />
             <p className="mt-4 text-center text-white/70">{t.martyrSlides}</p>
             <div className="mt-8"><MemorialSlideshow slides={martyrSlides} labels={t.slides as unknown as SlideshowLabels} dir={dir} intervalMs={13000} /></div>
             <div className="mt-12 grid gap-5 md:grid-cols-2">
@@ -346,7 +346,7 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
         <section id="archive" aria-labelledby="ar-h" className="scroll-mt-20 border-b border-white/10 py-12 sm:py-16">
           <Container>
             <h2 id="ar-h" className="font-serif text-[1.875rem] font-semibold text-white sm:text-[2.25rem]">{t.archive}</h2>
-            <span className="mt-3 block h-[3px] w-12 bg-[#A3172C]" aria-hidden="true" />
+            <span className="mt-3 block h-[3px] w-12 bg-[#B3261E]" aria-hidden="true" />
             {m.media.filter((x) => x.role !== 'portrait').length === 0 ? (
               <p className="mt-6 max-w-[70ch] text-white/75">{t.noArchive}</p>
             ) : (
@@ -359,7 +359,7 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
         <section id="sources" aria-labelledby="so-h" className="scroll-mt-20 py-12 sm:py-16">
           <Container>
             <h2 id="so-h" className="font-serif text-[1.875rem] font-semibold text-white sm:text-[2.25rem]">{t.sources}</h2>
-            <span className="mt-3 block h-[3px] w-12 bg-[#A3172C]" aria-hidden="true" />
+            <span className="mt-3 block h-[3px] w-12 bg-[#B3261E]" aria-hidden="true" />
             <ol className="mt-6 space-y-4">
               {m.sources.map((s) => (
                 <li key={s.id} id={`source-${s.id}`} className="scroll-mt-24 rounded-xl border border-white/12 bg-white/[0.035] p-5">
@@ -367,7 +367,7 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
                   <p className="text-[0.9375rem] text-white/70">{s.publisher}{s.date ? ` · ${memorialDate(s.date, cl)}` : ''}</p>
                   {s.note && <p className="mt-2 text-[0.9375rem] text-white/80">{s.note[cl]}</p>}
                   {s.url && <a href={s.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-[0.9375rem] underline underline-offset-4">{t.open} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>}
-                  {s.pending && <p className="mt-2 text-[0.875rem] text-[#F0C779]">{t.pending}</p>}
+                  {s.pending && <p className="mt-2 text-[0.875rem] text-[#F2C14E]">{t.pending}</p>}
                   {(s.originalText || s.translation) && (
                     <details className="mt-3">
                       <summary className="cursor-pointer font-semibold">{t.original} / {t.englishT}</summary>

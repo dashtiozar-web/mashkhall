@@ -18,7 +18,7 @@ const MODES: { value: NewsBanner['mode']; label: string; hint: string }[] = [
 ];
 
 const PHASE: Record<BannerPhase, { label: string; cls: string }> = {
-  live: { label: 'Live now', cls: 'bg-[#A3172C] text-white' },
+  live: { label: 'Live now', cls: 'bg-[#B3261E] text-white' },
   scheduled: { label: 'Scheduled', cls: 'bg-amber-tint text-ink' },
   ended: { label: 'Ended', cls: 'bg-stone text-muted' },
   draft: { label: 'Draft', cls: 'bg-stone text-ink-soft' },
@@ -241,7 +241,7 @@ export const BannerManager: React.FC = () => {
                     <p className="flex flex-wrap items-center gap-2 text-[0.8125rem]">
                       <span className={`rounded-full px-2.5 py-0.5 font-semibold ${PHASE[phase].cls}`}>{PHASE[phase].label}</span>
                       <span className="text-muted">{MODES.find((m) => m.value === b.mode)?.label}</span>
-                      {showing.id === b.id && <span className="font-semibold text-[#C8102E]">On the website now</span>}
+                      {showing.id === b.id && <span className="font-semibold text-[#C2361A]">On the website now</span>}
                     </p>
                     <p className="mt-1.5 font-semibold">{b.message}</p>
                     <p className="text-[0.875rem] text-muted">

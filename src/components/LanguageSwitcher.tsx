@@ -31,7 +31,7 @@ export const LanguageSwitcher: React.FC<{ tone?: 'dark' | 'light'; className?: s
                 l.code === 'en' ? '' : 'font-[family-name:var(--f-arabic-ui)]',
                 i > 0 ? (dark ? 'border-s border-white/20' : 'border-s border-line') : '',
                 active
-                  ? (dark ? 'bg-amber text-[#0B1830]' : 'bg-navy text-white')
+                  ? (dark ? 'bg-amber text-[#1F100B]' : 'bg-navy text-white')
                   : (dark ? 'text-white/85 hover:bg-white/10 hover:text-white' : 'text-ink-soft hover:bg-stone hover:text-ink'),
               ].join(' ')}
             >

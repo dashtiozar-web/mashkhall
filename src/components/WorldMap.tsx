@@ -13,7 +13,7 @@ import { Flag } from './Flag';
 const MAP = world as unknown as { width: number; height: number; shapes: Record<string, string>; centres: Record<string, [number, number]> };
 
 /** Five steps from pale amber to deep crimson. */
-const STEPS = ['#F3D9A4', '#EDB25F', '#E07E35', '#C4511F', '#8E1A24'];
+const STEPS = ['#F3D9A4', '#EDB25F', '#E07E35', '#DB5F1C', '#8E1A24'];
 
 export interface MapDatum { code: string; visits: number; people: number }
 

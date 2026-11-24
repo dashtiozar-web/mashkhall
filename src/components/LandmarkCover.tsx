@@ -84,13 +84,13 @@ export const LandmarkCover: React.FC<{ councils: CityChapter[] }> = ({ councils 
 
   return (
     <>
-      <div className="absolute inset-0 overflow-hidden bg-[#0B1830]">
+      <div className="absolute inset-0 overflow-hidden bg-[#1F100B]">
         {councils.map((c, i) => (
           <Layer key={c.id} council={c} active={i === index % n} near={i === (index + 1) % n} still={still} allowVideo={allowVideo} cycle={cycle} />
         ))}
         {/* Keeps the words readable over any photo. */}
-        <div className="absolute inset-0 bg-gradient-to-r rtl:bg-gradient-to-l from-[#0B1830]/90 via-[#0B1830]/65 to-[#0B1830]/30" />
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0B1830]/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r rtl:bg-gradient-to-l from-[#1F100B]/90 via-[#1F100B]/65 to-[#1F100B]/30" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#1F100B]/70 to-transparent" />
       </div>
       <div className="absolute end-4 bottom-5 start-4 z-10 flex items-end justify-between gap-4 sm:end-6 sm:start-auto sm:justify-end">
         <p className="min-w-0 text-end text-[0.8125rem] leading-snug text-white/85" aria-live="polite">

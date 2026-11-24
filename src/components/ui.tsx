@@ -6,7 +6,7 @@ import { localeOf } from '../i18n/lang';
  * Keep pages composed from these so spacing, type and colour stay consistent.
  */
 
-export const LOGO_URL = '/logo.svg';
+export const LOGO_URL = '/logo-512.png';
 export const ORG_NAME = 'Mashkhally Zhyanawa Organisation';
 export const ORG_SHORT = 'Mashkhally Zhyanawa';
 
@@ -30,7 +30,7 @@ const buttonStyles: Record<ButtonVariant, string> = {
   secondary:
     'bg-surface text-ink border border-ink/25 hover:border-navy hover:text-navy',
   inverse:
-    'bg-white text-[#0C1B36] border border-white hover:bg-[#F3E6CC] hover:border-[#F3E6CC]',
+    'bg-white text-[#3A140C] border border-white hover:bg-[#F3E6CC] hover:border-[#F3E6CC]',
   quiet:
     'bg-transparent text-navy border border-transparent underline underline-offset-4 decoration-navy/40 hover:decoration-navy px-0',
   accent:
@@ -78,7 +78,7 @@ export const PageHeader: React.FC<{
 }> = ({ title, intro, kicker, children }) => (
   <header className="band-texture">
     <Container className="py-9 sm:py-12">
-      {kicker && <div className="mb-3 text-[0.9375rem] text-[#F0C779] [&_a]:text-white [&_button]:text-white">{kicker}</div>}
+      {kicker && <div className="mb-3 text-[0.9375rem] text-[#F2C14E] [&_a]:text-white [&_button]:text-white">{kicker}</div>}
       <h1 className="max-w-[24ch] text-[2.125rem] leading-[1.12] font-semibold text-white sm:text-[2.625rem]">{title}</h1>
       {intro && <div className="mt-3 max-w-[66ch] text-[1.0938rem] leading-relaxed text-white/80">{intro}</div>}
       {children && <div className="mt-6 flex flex-wrap gap-3">{children}</div>}

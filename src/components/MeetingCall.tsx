@@ -54,7 +54,7 @@ const elapsed = (from?: string) => {
 };
 
 const linkify = (text: string) => text.split(/(https?:\/\/[^\s]+)/g).map((part, i) => (/^https?:\/\//.test(part)
-  ? <a key={i} href={part} target="_blank" rel="noopener noreferrer nofollow" className="break-all text-[#F0C779] underline">{part}</a>
+  ? <a key={i} href={part} target="_blank" rel="noopener noreferrer nofollow" className="break-all text-[#F2C14E] underline">{part}</a>
   : <React.Fragment key={i}>{part}</React.Fragment>));
 
 /** Shows a remote or local video track. */
@@ -71,27 +71,27 @@ const VideoView: React.FC<{ track?: MediaStreamTrack; mirror?: boolean; contain?
 
 /** One person in an audio meeting: photo or initials, with the name underneath. */
 const AudioTile: React.FC<{ p: Person; isMe: boolean; micOn: boolean; speaking: boolean }> = ({ p, isMe, micOn, speaking }) => (
-  <div className="relative flex flex-col items-center gap-2 rounded-xl bg-[#18233A] px-2 py-4 ring-1 ring-white/10">
-    <span className={`relative rounded-full ${speaking ? 'ring-[3px] ring-[#2FA36B] ring-offset-2 ring-offset-[#18233A]' : ''}`}>
+  <div className="relative flex flex-col items-center gap-2 rounded-xl bg-[#2A1812] px-2 py-4 ring-1 ring-white/10">
+    <span className={`relative rounded-full ${speaking ? 'ring-[3px] ring-[#2FA36B] ring-offset-2 ring-offset-[#2A1812]' : ''}`}>
       {p.photo ? <img src={p.photo} alt="" className="h-16 w-16 rounded-full object-cover" />
-        : <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2E3E5E] text-xl font-semibold text-white">{initials(p.name)}</span>}
+        : <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#5A3A2C] text-xl font-semibold text-white">{initials(p.name)}</span>}
       <span className={`absolute -bottom-1 -end-1 rounded-full p-1 ${micOn ? 'bg-[#2FA36B]' : 'bg-[#3A2230]'}`}>
         {micOn ? <Mic className="h-3 w-3 text-white" aria-label="Microphone on" /> : <MicOff className="h-3 w-3 text-[#F28B82]" aria-label="Microphone off" />}
       </span>
     </span>
     <span className="w-full truncate text-center text-[0.875rem] text-white"><span data-i18n-skip="" dir="auto">{p.name}</span>{isMe && ' (you)'}</span>
     {p.host && <span className="rounded bg-white/15 px-1.5 text-[0.6875rem] text-white">{p.role === 'leader' ? 'Leader' : 'Host'}</span>}
-    {p.hand && <span className="absolute end-2 top-2 rounded-full bg-[#E9A23B] p-1.5 text-[#0B1220]" title="Hand raised"><Hand className="h-4 w-4" aria-label="Hand raised" /></span>}
+    {p.hand && <span className="absolute end-2 top-2 rounded-full bg-[#E9A23B] p-1.5 text-[#160C09]" title="Hand raised"><Hand className="h-4 w-4" aria-label="Hand raised" /></span>}
   </div>
 );
 
 /** One person in the grid: their camera, or their photo or initials. */
 const Tile: React.FC<{ p: Person; small?: boolean; audio?: boolean; isMe: boolean; micOn: boolean; track?: MediaStreamTrack; speaking: boolean }> = ({ p, small, audio, isMe, micOn, track, speaking }) => (audio && !small && !track ? <AudioTile p={p} isMe={isMe} micOn={micOn} speaking={speaking} /> : (
-  <div className={`relative overflow-hidden rounded-xl bg-[#18233A] ${speaking ? 'ring-[3px] ring-[#2FA36B]' : 'ring-1 ring-white/10'} ${small ? 'aspect-video w-40 shrink-0 sm:w-48' : audio ? 'aspect-[4/3]' : 'aspect-video'}`}>
+  <div className={`relative overflow-hidden rounded-xl bg-[#2A1812] ${speaking ? 'ring-[3px] ring-[#2FA36B]' : 'ring-1 ring-white/10'} ${small ? 'aspect-video w-40 shrink-0 sm:w-48' : audio ? 'aspect-[4/3]' : 'aspect-video'}`}>
     {track ? <VideoView track={track} mirror={isMe} label={`${p.name}'s camera`} /> : (
       <div className="flex h-full w-full items-center justify-center">
         {p.photo ? <img src={p.photo} alt="" className={`${small ? 'h-12 w-12' : 'h-20 w-20'} rounded-full object-cover`} />
-          : <span className={`flex ${small ? 'h-12 w-12 text-base' : 'h-20 w-20 text-2xl'} items-center justify-center rounded-full bg-[#2E3E5E] font-semibold text-white`}>{initials(p.name)}</span>}
+          : <span className={`flex ${small ? 'h-12 w-12 text-base' : 'h-20 w-20 text-2xl'} items-center justify-center rounded-full bg-[#5A3A2C] font-semibold text-white`}>{initials(p.name)}</span>}
       </div>
     )}
     <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-gradient-to-t from-black/75 to-transparent px-2.5 py-1.5 text-[0.8125rem] text-white">
@@ -99,7 +99,7 @@ const Tile: React.FC<{ p: Person; small?: boolean; audio?: boolean; isMe: boolea
       <span className="truncate" data-i18n-skip="" dir="auto">{p.name}</span>{isMe && <span className="shrink-0">(you)</span>}
       {p.host && <span className="ms-auto shrink-0 rounded bg-white/15 px-1.5 text-[0.6875rem]">{p.role === 'leader' ? 'Leader' : 'Host'}</span>}
     </div>
-    {p.hand && <span className="absolute end-2 top-2 rounded-full bg-[#E9A23B] p-1.5 text-[#0B1220]" title="Hand raised"><Hand className="h-4 w-4" aria-label="Hand raised" /></span>}
+    {p.hand && <span className="absolute end-2 top-2 rounded-full bg-[#E9A23B] p-1.5 text-[#160C09]" title="Hand raised"><Hand className="h-4 w-4" aria-label="Hand raised" /></span>}
     {speaking && <span className="absolute start-2 top-2 rounded-full bg-[#2FA36B] p-1 text-white" title="Speaking"><Volume2 className="h-3.5 w-3.5" aria-label="Speaking" /></span>}
   </div>
 ));
@@ -428,7 +428,7 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
   // ------------------------------------------------------------ view
   if (!snap) {
     return (
-      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#0B1220] text-white">
+      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#160C09] text-white">
         <p className="flex items-center gap-3"><Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> Connecting to the meeting…</p>
       </div>
     );
@@ -436,8 +436,8 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
 
   if (me?.state === 'waiting') {
     return (
-      <div className="fixed inset-0 z-[80] flex flex-col items-center justify-center gap-5 bg-[#0B1220] px-6 text-center text-white">
-        <Loader2 className="h-8 w-8 animate-spin text-[#F0C779]" aria-hidden="true" />
+      <div className="fixed inset-0 z-[80] flex flex-col items-center justify-center gap-5 bg-[#160C09] px-6 text-center text-white">
+        <Loader2 className="h-8 w-8 animate-spin text-[#F2C14E]" aria-hidden="true" />
         <h2 className="text-[1.5rem] font-semibold text-white" dir="auto">{title}</h2>
         <p className="max-w-[46ch] text-white/80">You are in the waiting room. The meeting leader will let you in shortly.</p>
         <button type="button" onClick={leave} className="cursor-pointer rounded-lg border border-white/30 px-4 py-2 font-semibold hover:bg-white/10">Leave</button>
@@ -451,7 +451,7 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
   const tileTrack = (p: Person) => !videoMeeting ? undefined : (p.uid === me?.uid ? (camOn ? localCam : undefined) : p.tracks.cam ? videoTracks[keyOf(p.tracks.cam)] : undefined);
   const screenTrack = presenter ? (presenter.uid === me?.uid ? localScreen : videoTracks[keyOf(presenter.tracks.screen)]) : undefined;
   const ctrl = 'flex cursor-pointer flex-col items-center gap-1 rounded-xl px-3 py-2 text-[0.75rem] font-semibold text-white/90 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4';
-  const round = (on: boolean, danger = false) => `flex h-11 w-11 items-center justify-center rounded-full ${danger ? 'bg-[#A3172C]' : on ? 'bg-white/15' : 'bg-[#A3172C]/90'}`;
+  const round = (on: boolean, danger = false) => `flex h-11 w-11 items-center justify-center rounded-full ${danger ? 'bg-[#B3261E]' : on ? 'bg-white/15' : 'bg-[#B3261E]/90'}`;
 
   const tile = (p: Person, small = false) => {
     const isMe = p.uid === me?.uid;
@@ -460,7 +460,7 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
   };
 
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-[#0B1220] text-white">
+    <div className="fixed inset-0 z-[80] flex flex-col bg-[#160C09] text-white">
       <audio ref={audioRef} autoPlay />
       {/* Top bar */}
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-2.5">
@@ -471,8 +471,8 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
             <span className="flex items-center gap-1">{videoMeeting ? <Video className="h-3.5 w-3.5" aria-hidden="true" /> : <Mic className="h-3.5 w-3.5" aria-hidden="true" />}{videoMeeting ? 'Audio and video' : 'Audio meeting'}</span>
             <span className="tabular-nums" aria-label="Meeting time">{elapsed(snap.meeting.startedAt)}</span>
             <span>{tiles.length} {tiles.length === 1 ? 'participant' : 'participants'}</span>
-            {snap.meeting.locked && <span className="flex items-center gap-1 text-[#F0C779]"><Lock className="h-3.5 w-3.5" aria-hidden="true" /> Locked</span>}
-            {connection !== 'open' && <span className="text-[#F0C779]">Reconnecting…</span>}
+            {snap.meeting.locked && <span className="flex items-center gap-1 text-[#F2C14E]"><Lock className="h-3.5 w-3.5" aria-hidden="true" /> Locked</span>}
+            {connection !== 'open' && <span className="text-[#F2C14E]">Reconnecting…</span>}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -489,7 +489,7 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
               {videoMeeting ? <VideoOff className="h-4 w-4" aria-hidden="true" /> : <Video className="h-4 w-4" aria-hidden="true" />} {videoMeeting ? 'Audio only' : 'Allow cameras'}
             </button>
           )}
-          {host && canEnd && <button type="button" disabled={busy === 'end'} onClick={endForAll} className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#A3172C] px-3 py-1.5 text-[0.875rem] font-semibold hover:brightness-110 disabled:opacity-50"><PhoneOff className="h-4 w-4" aria-hidden="true" /> End for all</button>}
+          {host && canEnd && <button type="button" disabled={busy === 'end'} onClick={endForAll} className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#B3261E] px-3 py-1.5 text-[0.875rem] font-semibold hover:brightness-110 disabled:opacity-50"><PhoneOff className="h-4 w-4" aria-hidden="true" /> End for all</button>}
         </div>
       </header>
 
@@ -520,7 +520,7 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
 
         {/* Side panel */}
         {panel && (
-          <aside className="fixed inset-0 z-[85] flex flex-col bg-[#111A2C] sm:static sm:z-auto sm:w-[360px] sm:border-s sm:border-white/10">
+          <aside className="fixed inset-0 z-[85] flex flex-col bg-[#1C120E] sm:static sm:z-auto sm:w-[360px] sm:border-s sm:border-white/10">
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <h3 className="font-semibold text-white">{panel === 'chat' ? 'Meeting chat' : `People (${tiles.length})`}</h3>
               <button type="button" onClick={() => setPanel(null)} className="cursor-pointer rounded-md p-1 hover:bg-white/10" aria-label="Close"><X className="h-5 w-5" /></button>
@@ -531,7 +531,7 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
                 {host && waiting.length > 0 && (
                   <section>
                     <div className="mb-2 flex items-center justify-between">
-                      <h4 className="font-sans font-semibold text-[#F0C779]">Waiting room ({waiting.length})</h4>
+                      <h4 className="font-sans font-semibold text-[#F2C14E]">Waiting room ({waiting.length})</h4>
                       <button type="button" onClick={() => send({ type: 'admitAll' })} className="cursor-pointer text-[0.8125rem] underline">Admit everyone</button>
                     </div>
                     <ul className="space-y-2">{waiting.map((p) => (
@@ -546,7 +546,7 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
                 {hands.length > 0 && (
                   <section>
                     <div className="mb-2 flex items-center justify-between">
-                      <h4 className="font-sans font-semibold text-[#F0C779]">Raised hands ({hands.length})</h4>
+                      <h4 className="font-sans font-semibold text-[#F2C14E]">Raised hands ({hands.length})</h4>
                       {host && <button type="button" onClick={() => send({ type: 'lowerHands' })} className="cursor-pointer text-[0.8125rem] underline">Lower all</button>}
                     </div>
                     <ol className="list-decimal space-y-1 ps-5">{hands.map((p) => <li key={p.uid} data-i18n-skip="" dir="auto">{p.name}</li>)}</ol>
@@ -564,7 +564,7 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
                   <h4 className="mb-2 font-sans font-semibold text-white">In the meeting</h4>
                   <ul className="space-y-2.5">{tiles.map((p) => (
                     <li key={p.uid} className="flex flex-wrap items-center gap-2">
-                      {p.photo ? <img src={p.photo} alt="" className="h-8 w-8 rounded-full object-cover" /> : <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2E3E5E] text-[0.75rem] font-semibold">{initials(p.name)}</span>}
+                      {p.photo ? <img src={p.photo} alt="" className="h-8 w-8 rounded-full object-cover" /> : <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#5A3A2C] text-[0.75rem] font-semibold">{initials(p.name)}</span>}
                       <span className="min-w-0 flex-1">
                         <span className="block truncate"><span data-i18n-skip="" dir="auto">{p.name}</span>{p.uid === me?.uid ? ' (you)' : ''}</span>
                         <span className="text-[0.75rem] text-white/60">{p.host ? (p.role === 'leader' ? 'Meeting leader' : p.role === 'senior' ? 'Senior official' : 'Administrator') : snap.meeting.speaking === 'controlled' ? (p.canSpeak ? 'May speak' : 'Listening') : 'Member'}</span>
@@ -613,8 +613,8 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
                     <button type="button" onClick={() => fileRef.current?.click()} className="cursor-pointer rounded-md p-2 hover:bg-white/10" aria-label="Share a picture or file"><Paperclip className="h-5 w-5" /></button>
                     <textarea value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(e); } }}
                       rows={1} maxLength={2000} dir="auto" placeholder="Write a message or paste a link" aria-label="Message"
-                      className="max-h-32 min-h-[40px] flex-1 resize-none rounded-md border border-white/15 bg-[#0B1220] px-3 py-2 text-[0.9375rem] text-white placeholder:text-white/40" />
-                    <button type="submit" className="cursor-pointer rounded-md bg-[#A3172C] p-2" aria-label="Send"><Send className="h-5 w-5" /></button>
+                      className="max-h-32 min-h-[40px] flex-1 resize-none rounded-md border border-white/15 bg-[#160C09] px-3 py-2 text-[0.9375rem] text-white placeholder:text-white/40" />
+                    <button type="submit" className="cursor-pointer rounded-md bg-[#B3261E] p-2" aria-label="Send"><Send className="h-5 w-5" /></button>
                   </form>
                 ) : <p className="border-t border-white/10 p-3 text-[0.875rem] text-white/60">The leader has paused the chat.</p>}
               </>
@@ -639,10 +639,10 @@ export const MeetingCall: React.FC<Props> = ({ meetingId, seat, title, canLock, 
           </button>
         )}
         <button type="button" onClick={() => send({ type: 'hand', raised: !myHand })} className={ctrl} aria-pressed={myHand}>
-          <span className={`${round(true)} ${myHand ? '!bg-[#E9A23B] text-[#0B1220]' : ''}`}><Hand className="h-5 w-5" /></span>{myHand ? 'Lower hand' : 'Raise hand'}
+          <span className={`${round(true)} ${myHand ? '!bg-[#E9A23B] text-[#160C09]' : ''}`}><Hand className="h-5 w-5" /></span>{myHand ? 'Lower hand' : 'Raise hand'}
         </button>
         <button type="button" onClick={() => setPanel(panel === 'people' ? null : 'people')} className={ctrl} aria-pressed={panel === 'people'}>
-          <span className={`relative ${round(true)}`}><Users className="h-5 w-5" />{host && waiting.length > 0 && <span className="absolute -end-1 -top-1 rounded-full bg-[#E9A23B] px-1.5 text-[0.6875rem] font-bold text-[#0B1220]">{waiting.length}</span>}</span>People
+          <span className={`relative ${round(true)}`}><Users className="h-5 w-5" />{host && waiting.length > 0 && <span className="absolute -end-1 -top-1 rounded-full bg-[#E9A23B] px-1.5 text-[0.6875rem] font-bold text-[#160C09]">{waiting.length}</span>}</span>People
         </button>
         <button type="button" onClick={() => setPanel(panel === 'chat' ? null : 'chat')} className={ctrl} aria-pressed={panel === 'chat'}>
           <span className={`relative ${round(true)}`}><MessageSquare className="h-5 w-5" />{unread > 0 && <span className="absolute -end-1 -top-1 rounded-full bg-[#E5484D] px-1.5 text-[0.6875rem] font-bold">{unread}</span>}</span>Chat

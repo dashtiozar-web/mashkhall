@@ -96,7 +96,7 @@ export const MemorialSlideshow: React.FC<{
                 type="button"
                 onClick={() => { setPlaying(false); go(n); }}
                 aria-current={n === i ? 'true' : undefined}
-                className={`cursor-pointer rounded-full px-2.5 py-1 text-[0.8125rem] tabular-nums ${n === i ? 'bg-[#A3172C] text-white' : 'text-white/65 hover:text-white'}`}
+                className={`cursor-pointer rounded-full px-2.5 py-1 text-[0.8125rem] tabular-nums ${n === i ? 'bg-[#B3261E] text-white' : 'text-white/65 hover:text-white'}`}
               >
                 {s.label}
               </button>

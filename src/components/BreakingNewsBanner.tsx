@@ -43,7 +43,7 @@ export const BreakingNewsStrip: React.FC<{ banner: Pick<NewsBanner, 'message' | 
     <div
       role={preview ? undefined : 'region'}
       aria-label={preview ? undefined : 'Breaking news'}
-      className="breaking-news relative flex items-stretch overflow-hidden bg-[#A3172C] text-white"
+      className="breaking-news relative flex items-stretch overflow-hidden bg-[#B3261E] text-white"
     >
       <span className="relative z-10 flex shrink-0 items-center gap-2 bg-[#7A1021] px-3 py-2 text-[0.8125rem] font-bold tracking-[0.08em] uppercase sm:px-4 sm:text-[0.875rem]">
         <span className="breaking-news-dot h-2 w-2 rounded-full bg-white" aria-hidden="true" />
@@ -64,7 +64,7 @@ export const BreakingNewsStrip: React.FC<{ banner: Pick<NewsBanner, 'message' | 
         <a
           href={href}
           {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          className="relative z-10 hidden shrink-0 items-center bg-[#A3172C] px-4 text-[0.875rem] font-semibold text-white underline underline-offset-4 sm:flex"
+          className="relative z-10 hidden shrink-0 items-center bg-[#B3261E] px-4 text-[0.875rem] font-semibold text-white underline underline-offset-4 sm:flex"
         >
           {banner.mode === 'announcement' ? 'Details and registration' : 'Read more'}
         </a>

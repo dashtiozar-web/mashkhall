@@ -9,21 +9,23 @@ import { VisitorAnalytics } from '../components/VisitorAnalytics';
 import { LandmarkCover } from '../components/LandmarkCover';
 import { FacebookFeed } from '../components/FacebookFeed';
 import { MediaImage } from '../components/MediaImage';
+import { TorchEmblem } from '../components/TorchEmblem';
 
 interface HomePageProps {
   onNavigate: (tab: string, param?: string) => void;
   onOpenAuth: () => void;
 }
 
-/** The identity's bold element: the torch of Mashkhally Zhyanawa
- *  (مەشخەڵی ژیانەوە, "the torch of revival"), with the name in both scripts. */
+/** The identity's bold element: the painted torch of Mashkhally Zhyanawa
+ *  (مەشخەڵی ژیانەوە, "the torch of revival"), its flame alive, in front of
+ *  falling fire, with the name in both scripts. */
 const Emblem: React.FC = () => (
-  <figure className="mx-auto w-full max-w-[340px] lg:mx-0 lg:ms-auto">
-    <div className="overflow-hidden rounded-2xl border border-white/15 bg-[#14284B] shadow-[0_28px_60px_-34px_rgba(0,0,0,0.6)]">
-      <img src="/logo.svg" alt="" width={340} height={340} className="block aspect-square w-full" />
-      <div className="border-t border-white/10 px-6 pt-3 pb-5 text-center">
+  <figure className="mx-auto w-full max-w-[360px] lg:mx-0 lg:ms-auto">
+    <div className="overflow-hidden rounded-2xl border border-white/15 shadow-[0_28px_60px_-30px_rgba(0,0,0,0.75)]">
+      <TorchEmblem className="aspect-[4/5] w-full" />
+      <div className="border-t border-white/10 bg-[#1F100B] px-6 pt-3 pb-5 text-center">
         <p className="font-serif text-[1.625rem] font-semibold text-white" translate="no">Mashkhally Zhyanawa</p>
-        <p className="mt-1 font-kurdish text-[1.375rem] text-[#F0C779]" lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</p>
+        <p className="mt-1 font-kurdish text-[1.375rem] text-[#F2C14E]" lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</p>
       </div>
     </div>
   </figure>
@@ -65,7 +67,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <LandmarkCover councils={councils} />
         <Container className="relative z-10 grid items-center gap-14 pt-12 pb-20 sm:pt-16 sm:pb-24 lg:grid-cols-[1.3fr_1fr] lg:gap-16 lg:pt-20 lg:pb-24">
           <div className="text-white">
-            <p className="flex flex-wrap items-baseline gap-x-3 text-[1.0625rem] text-[#F0C779]">
+            <p className="flex flex-wrap items-baseline gap-x-3 text-[1.0625rem] text-[#F2C14E]">
               <span className="font-kurdish text-[1.5rem] leading-none" lang="ckb" dir="rtl">بەخێربێن</span>
               <span className="font-medium">Welcome</span>
             </p>
@@ -105,22 +107,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       </section>
 
       {/* Remembrance and press freedom: the 2011 memorial and Sherwan Sherwani */}
-      <section className="border-b border-white/10 bg-[#090F1C] text-white">
+      <section className="border-b border-white/10 bg-[#120A07] text-white">
         <Container className="grid gap-5 py-10 md:grid-cols-2">
           <a href="/memorial" className="group block rounded-xl border border-white/12 bg-white/[0.04] p-6 no-underline hover:border-white/30">
-            <p className="text-[0.8125rem] font-semibold tracking-[0.1em] text-[#F0C779] uppercase">17 Shubat 2011 Memorial</p>
+            <p className="text-[0.8125rem] font-semibold tracking-[0.1em] text-[#F2C14E] uppercase">17 Shubat 2011 Memorial</p>
             <p className="mt-2 font-serif text-[1.5rem] leading-snug font-semibold text-white">The Days of the Bloody Streets</p>
             <p className="mt-2 text-white/75">The demonstrations that began in Sulaimani on 17 February 2011, the days that followed, and the martyrs we remember.</p>
-            <span className="mt-4 inline-block h-[2px] w-12 bg-[#A3172C]" aria-hidden="true" />
+            <span className="mt-4 inline-block h-[2px] w-12 bg-[#B3261E]" aria-hidden="true" />
             <p className="mt-3 font-semibold text-white group-hover:underline">Visit the memorial</p>
           </a>
           <a href="/sherwan-sherwani" className="group flex gap-5 rounded-xl border border-white/12 bg-white/[0.04] p-6 no-underline hover:border-white/30">
             <img src="/images/sherwan-sherwani.jpg" alt="" width={96} height={120} loading="lazy" className="h-[120px] w-24 shrink-0 rounded-md object-cover object-top" />
             <div className="min-w-0">
-            <p className="text-[0.8125rem] font-semibold tracking-[0.1em] text-[#F0C779] uppercase">Press freedom</p>
+            <p className="text-[0.8125rem] font-semibold tracking-[0.1em] text-[#F2C14E] uppercase">Press freedom</p>
             <p className="mt-2 font-serif text-[1.5rem] leading-snug font-semibold text-white">Sherwan Sherwani</p>
             <p className="mt-2 text-white/75">Journalist and former member of 17 Shubat, reportedly imprisoned in Erbil since October 2020. His case, the record of his arrests, and the sources.</p>
-            <span className="mt-4 inline-block h-[2px] w-12 bg-[#A3172C]" aria-hidden="true" />
+            <span className="mt-4 inline-block h-[2px] w-12 bg-[#B3261E]" aria-hidden="true" />
             <p className="mt-3 font-semibold text-white group-hover:underline">Read about his case</p>
             </div>
           </a>

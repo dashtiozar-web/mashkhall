@@ -447,7 +447,7 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
           <section className="band-texture rounded-xl p-5">
             <h2 className="font-sans text-[1.0625rem] font-semibold">{member ? 'You publish as a member' : 'Members publish without fees'}</h2>
             <p className="mt-1 text-[0.9375rem] text-white/80">{member ? 'There is no fee for members. You can choose to make a voluntary contribution.' : 'Membership is separate from publishing. It needs its own application and approval by the committee; it is never given because work is published.'}</p>
-            {!member && <button type="button" onClick={() => onNavigate('apply')} className="mt-3 cursor-pointer rounded-lg bg-white px-4 py-2 font-semibold text-[#0C1B36]">About membership</button>}
+            {!member && <button type="button" onClick={() => onNavigate('apply')} className="mt-3 cursor-pointer rounded-lg bg-white px-4 py-2 font-semibold text-[#3A140C]">About membership</button>}
           </section>
         </aside>
       </Container>

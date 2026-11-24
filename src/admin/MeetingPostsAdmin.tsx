@@ -51,7 +51,7 @@ const makeCollage = async (uids: string[]): Promise<{ blob: Blob | null; used: n
   canvas.height = pad * 2 + rows * cell + (rows - 1) * gap;
   const ctx = canvas.getContext('2d');
   if (!ctx) return { blob: null, used: 0, skipped };
-  ctx.fillStyle = '#0C1B36';
+  ctx.fillStyle = '#3A140C';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   photos.forEach((img, i) => {
     const x = pad + (i % cols) * (cell + gap);

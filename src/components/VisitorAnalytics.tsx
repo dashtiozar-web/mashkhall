@@ -199,7 +199,7 @@ export const VisitorAnalytics: React.FC<{ mode?: Mode }> = ({ mode = 'public' })
     <section aria-labelledby={`world-visitors-${mode}`} className={admin ? 'space-y-6' : 'overflow-hidden rounded-2xl border border-line bg-surface'}>
       <div className={admin ? 'flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between' : 'band-texture flex flex-col gap-4 px-5 py-6 sm:flex-row sm:items-end sm:justify-between sm:px-8'}>
         <div>
-          <p className={`flex items-center gap-2 text-[0.875rem] font-semibold ${admin ? 'text-crimson' : 'text-[#F0C779]'}`}><Globe2 className="h-4 w-4" aria-hidden="true" /> {admin ? 'Administrators only' : 'Our readers worldwide'}</p>
+          <p className={`flex items-center gap-2 text-[0.875rem] font-semibold ${admin ? 'text-crimson' : 'text-[#F2C14E]'}`}><Globe2 className="h-4 w-4" aria-hidden="true" /> {admin ? 'Administrators only' : 'Our readers worldwide'}</p>
           <h2 id={`world-visitors-${mode}`} className={`mt-1 leading-tight font-semibold ${admin ? 'text-[1.5rem]' : 'text-[1.75rem]'}`}>{admin ? 'Visitor analytics' : 'Visitors from around the world'}</h2>
           {stats?.since && <p className={`mt-1 text-[0.875rem] ${admin ? 'text-muted' : 'text-white/70'}`}>Counting since {dateText(stats.since, { day: 'numeric', month: 'long', year: 'numeric' })}</p>}
         </div>
@@ -207,7 +207,7 @@ export const VisitorAnalytics: React.FC<{ mode?: Mode }> = ({ mode = 'public' })
           <label className="sr-only" htmlFor={`period-${mode}`}>Period</label>
           <select id={`period-${mode}`} value={custom ? 'custom' : period}
             onChange={(e) => { if (e.target.value !== 'custom') { setCustom(null); setPeriod(e.target.value as Period); } }}
-            className={`rounded-lg border px-3 py-2 text-[0.9375rem] font-semibold ${admin ? 'border-line bg-surface' : 'border-white/25 bg-[#0C1B36] text-white'}`}>
+            className={`rounded-lg border px-3 py-2 text-[0.9375rem] font-semibold ${admin ? 'border-line bg-surface' : 'border-white/25 bg-[#3A140C] text-white'}`}>
             {periods.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
             {custom && <option value="custom">Chosen dates</option>}
           </select>

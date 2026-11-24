@@ -50,48 +50,48 @@
   --text-scale: 1;
   --reading-leading: 1.65;
   --reading-leading-rtl: 1.8;
-  --c-paper: #ECEAE5;        /* page: warm slate-ivory, never stark white */
-  --c-surface: #FBFAF7;      /* cards and forms: warm ivory */
-  --c-stone: #E2E0DA;
-  --c-stone-deep: #D6D3CB;
-  --c-line: #CFCBC2;
-  --c-ink: #161D2B;          /* charcoal-navy text */
-  --c-ink-soft: #364052;
-  --c-muted: #5A6273;
-  --c-navy: #14284B;         /* institutional colour */
-  --c-navy-deep: #0C1B36;
-  --c-navy-tint: #DDE3EE;
-  --c-crimson: #A3172C;      /* important accents */
-  --c-ember: #C4511F;        /* fire orange: activity and emphasis */
-  --c-amber: #D99A2B;        /* restrained amber */
-  --c-amber-tint: #F3E6CC;
-  --c-band: #0B1830;         /* header, page heads and footer */
-  --c-band-soft: #13264A;
-  --c-link: #1C4A8C;
-  --c-on-band: #E9EDF5;
+  --c-paper: #F1EADB;        /* page: warm slate-ivory, never stark white */
+  --c-surface: #FCF8F0;      /* cards and forms: warm ivory */
+  --c-stone: #E8DFCC;
+  --c-stone-deep: #DDD1B9;
+  --c-line: #D5C7AC;
+  --c-ink: #26160F;          /* charcoal-navy text */
+  --c-ink-soft: #4B372B;
+  --c-muted: #6F5D50;
+  --c-navy: #7A2414;         /* institutional colour: torch-handle ember brown */
+  --c-navy-deep: #561709;
+  --c-navy-tint: #F5E1D3;
+  --c-crimson: #B3261E;      /* important accents */
+  --c-ember: #DB5F1C;        /* fire orange: activity and emphasis */
+  --c-amber: #E3A325;        /* restrained amber */
+  --c-amber-tint: #F8EACB;
+  --c-band: #1F100B;         /* header, page heads and footer */
+  --c-band-soft: #321A11;
+  --c-link: #9A3412;
+  --c-on-band: #F7ECDD;
   color-scheme: light;
 }
 
 .dark {
-  --c-paper: #0A111F;
-  --c-surface: #111A2C;
-  --c-stone: #16213A;
-  --c-stone-deep: #1D2A46;
-  --c-line: #26344F;
-  --c-ink: #E7EAF0;
-  --c-ink-soft: #C3C9D5;
-  --c-muted: #929AAB;
-  --c-navy: #2D5193;
-  --c-navy-deep: #3A62A8;
-  --c-navy-tint: #18284A;
-  --c-crimson: #E2566A;
-  --c-ember: #EE8250;
-  --c-amber: #E9B455;
-  --c-amber-tint: #2C2414;
-  --c-band: #070D19;
-  --c-band-soft: #0E1830;
-  --c-link: #9EB9EA;
-  --c-on-band: #E9EDF5;
+  --c-paper: #130B08;
+  --c-surface: #1C120E;
+  --c-stone: #261812;
+  --c-stone-deep: #311F17;
+  --c-line: #432D21;
+  --c-ink: #F4EADF;
+  --c-ink-soft: #DCCBBB;
+  --c-muted: #AD9888;
+  --c-navy: #C2522A;
+  --c-navy-deep: #D9683A;
+  --c-navy-tint: #34180F;
+  --c-crimson: #F0705A;
+  --c-ember: #F4934B;
+  --c-amber: #F2C14E;
+  --c-amber-tint: #33260F;
+  --c-band: #0C0705;
+  --c-band-soft: #1B0F0A;
+  --c-link: #F5A877;
+  --c-on-band: #F7ECDD;
   color-scheme: dark;
 }
 
@@ -334,7 +334,7 @@ html[dir='rtl'] .rule-fire {
 
 /* UK council map: lines gently flow between councils. */
 :root { --map-land: #F4F2EE; --map-halo: #ffffff; --map-empty: #D9D6CF; }
-:root.dark { --map-land: #1B2742; --map-halo: #0A111F; --map-empty: #1B2742; }
+:root.dark { --map-land: #3A2419; --map-halo: #130B08; --map-empty: #3A2419; }
 .map-flow { stroke-dasharray: 8 7; animation: map-flow 2.4s linear infinite; }
 @keyframes map-flow { to { stroke-dashoffset: -30; } }
 @media (prefers-reduced-motion: reduce) { .map-flow { animation: none; } }
@@ -372,5 +372,28 @@ html[dir='rtl'] .rule-fire {
 @media (prefers-reduced-motion: reduce) {
   .memorial-slide { transition: none; }
 }
-.memorial ::selection { background: #A3172C; color: #fff; }
+.memorial ::selection { background: #B3261E; color: #fff; }
 .memorial .font-kurdish .font-serif, .memorial .font-kurdish h1, .memorial .font-kurdish h2, .memorial .font-kurdish h3, .memorial .font-kurdish h4 { font-family: var(--f-kurdish); }
+
+/* Mashkhally Zhyanawa torch: the flame sways and breathes; its glow flickers. */
+.torch-flame {
+  transform-box: view-box;
+  transform-origin: 450px 580px;
+  animation: torch-sway 2.8s ease-in-out infinite;
+}
+.torch-glow { animation: torch-glow 1.9s ease-in-out infinite; }
+@keyframes torch-sway {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  25% { transform: scale(1.015, 1.045) skewX(-1.6deg); }
+  50% { transform: scale(0.99, 1.005) skewX(1.1deg); }
+  75% { transform: scale(1.01, 1.03) skewX(-0.6deg); }
+}
+@keyframes torch-glow {
+  0%, 100% { opacity: 0.85; }
+  30% { opacity: 1; }
+  55% { opacity: 0.7; }
+  80% { opacity: 0.95; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .torch-flame, .torch-glow { animation: none; }
+}
