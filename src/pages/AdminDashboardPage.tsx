@@ -1,3 +1,4 @@
+import { MembersByCity } from '../admin/MembersByCity';
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Shield, 
@@ -153,6 +154,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     | 'appreciation'
     | 'overview' 
     | 'applications' 
+    | 'places'
     | 'members' 
     | 'cards'
     | 'people'
@@ -214,7 +216,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   const [manualName, setManualName] = useState('');
   const [manualEmail, setManualEmail] = useState('');
   const [manualPhone, setManualPhone] = useState('');
-  const [manualChapter, setManualChapter] = useState('london');
+  const [manualChapter, setManualChapter] = useState('britain');
   const [manualRole, setManualRole] = useState<Role>('member');
   const [manualHierarchy, setManualHierarchy] = useState<MemberHierarchyLevel>('general_member');
   const [manualBoardTitle, setManualBoardTitle] = useState('');
@@ -239,7 +241,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   const [importParsedHeaders, setImportParsedHeaders] = useState<string[]>([]);
   const [importRawRows, setImportRawRows] = useState<string[][]>([]);
   const [importColumnMappings, setImportColumnMappings] = useState<Record<string, string>>({});
-  const [importDefaultChapter, setImportDefaultChapter] = useState('london');
+  const [importDefaultChapter, setImportDefaultChapter] = useState('britain');
   const [importingInProgress, setImportingInProgress] = useState(false);
   const [importResult, setImportResult] = useState<{ success: number; failed: number } | null>(null);
 
@@ -789,6 +791,7 @@ Example Person,person@example.org,,London,,general_member,no,,`;
           { id: 'overview', label: 'Overview', badge: (pendingApps.length + pendingArticles.length + newEnquiries.length) || undefined },
           { id: 'applications', label: 'Applicants', badge: pendingApps.length || undefined },
           { id: 'people', label: 'Members' },
+          { id: 'places', label: 'Members by place' },
           { id: 'structure', label: 'Organisation structure' },
           { id: 'submissions', label: 'Article review', badge: pendingArticles.length || undefined },
           { id: 'comments', label: 'Comments' },
@@ -802,7 +805,7 @@ Example Person,person@example.org,,London,,general_member,no,,`;
           { id: 'users', label: 'Users and roles' },
           { id: 'members', label: 'Add members' },
           { id: 'import', label: 'Import members' },
-          { id: 'chapters', label: 'Councils' },
+          { id: 'chapters', label: 'Provinces and countries' },
           { id: 'donations', label: 'Donations' },
           { id: 'settings', label: 'Site text and Facebook' },
           { id: 'translations', label: 'Translations' },
@@ -856,6 +859,8 @@ Example Person,person@example.org,,London,,general_member,no,,`;
       {/* 2. HIERARCHICAL MEMBERS REGISTRY */}
       {/* ======================================================== */}
       {activeTab === 'cards' && <MembershipCards />}
+
+      {activeTab === 'places' && <MembersByCity applications={applications} />}
 
       {activeTab === 'members' && (
         <div className="space-y-8">

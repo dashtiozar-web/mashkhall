@@ -1,11 +1,9 @@
 import { CityChapter } from '../types';
 
 /**
- * Landmark photographs for each council. Administrators can upload their own
- * photo for any council (Administration → Councils); until then the
- * built-in photographs below are used. They are freely licensed photographs
- * from Wikimedia Commons and Geograph Britain and Ireland, shown with credit.
- * If one cannot be loaded, the next one is tried.
+ * A landmark picture for each member group. Administrators can upload their
+ * own photo for any group (Administration → Councils); until then the
+ * built-in animated illustrations below (public/kurdistan) are used.
  */
 
 export interface LandmarkPhoto {
@@ -42,57 +40,59 @@ const geograph = (id: string, path: string, who: string): LandmarkPhoto => ({
   source: `https://www.geograph.org.uk/photo/${id}`,
 });
 
+/** An animated illustration made for this website (no photo credit needed). */
+const scene = (id: string): LandmarkPhoto => ({ url: `/kurdistan/${id}.svg`, credit: 'Illustration: Mashkhally Zhyanawa', source: '' });
+
 export const LANDMARKS: Record<string, Landmark> = {
-  london: {
-    name: 'Big Ben, the Houses of Parliament and the London Eye',
-    lat: 51.5007, lng: -0.1246, region: 'London',
-    photos: [
-      commons('Palace of Westminster from the dome on Methodist Central Hall.jpg', 'Colin, CC BY-SA 4.0, via Wikimedia Commons'),
-      geograph('40176', 'photos/04/01/040176_de70a9e0.jpg', 'Christine Matthews'),
-    ],
+  britain: {
+    name: 'Big Ben and Westminster, with the flag of Kurdistan',
+    lat: 51.5007, lng: -0.1246, region: 'Britain',
+    photos: [scene('britain')],
   },
-  birmingham: {
-    name: 'The Library of Birmingham, Centenary Square',
-    lat: 52.4796, lng: -1.9086, region: 'West Midlands',
-    photos: [
-      commons('Birmingham, Library of Birmingham (23042834336).jpg'),
-      geograph('7714503', 'geophotos/07/71/45/7714503_1a89ed79.jpg', 'Roger D Kidd'),
-      geograph('7713964', 'geophotos/07/71/39/7713964_765292d4.jpg', 'Oliver Dixon'),
-    ],
+  australia: {
+    name: 'Sydney Opera House, with the flag of Kurdistan',
+    lat: -33.8568, lng: 151.2153, region: 'Australia',
+    photos: [scene('australia')],
   },
-  manchester: {
-    name: 'Manchester Town Hall, Albert Square',
-    lat: 53.4794, lng: -2.2453, region: 'North West England',
-    photos: [
-      commons('Manchester Town Hall and Memorial.jpg'),
-      geograph('2120812', 'geophotos/02/12/08/2120812_39af309d.jpg', 'David Dixon'),
-    ],
+  canada: {
+    name: 'The CN Tower, Toronto, with the flag of Kurdistan',
+    lat: 43.6426, lng: -79.3871, region: 'Canada',
+    photos: [scene('canada')],
   },
-  newcastle: {
-    name: 'The Tyne Bridge',
-    lat: 54.9681, lng: -1.6064, region: 'North East England',
-    photos: [
-      commons('Tyne Bridges and The Sage at dusk.jpg'),
-      geograph('7190799', 'geophotos/07/19/07/7190799_27726e7f.jpg', 'habiloid'),
-      geograph('6899882', 'geophotos/06/89/98/6899882_47b03cb0.jpg', 'habiloid'),
-    ],
+  germany: {
+    name: 'The Brandenburg Gate, Berlin, with the flag of Kurdistan',
+    lat: 52.5163, lng: 13.3777, region: 'Germany',
+    photos: [scene('germany')],
   },
-  glasgow: {
-    name: 'Glasgow City Chambers, George Square',
-    lat: 55.8611, lng: -4.2499, region: 'Scotland',
-    photos: [
-      commons('Glasgow, George Square mit City Chambers (38584813792).jpg'),
-      commons('City Chambers, George Square, Glasgow 05.jpg'),
-    ],
+  usa: {
+    name: 'The Statue of Liberty, New York, with the flag of Kurdistan',
+    lat: 40.6892, lng: -74.0445, region: 'USA',
+    photos: [scene('usa')],
   },
-  cardiff: {
-    name: 'Cardiff Castle',
-    lat: 51.4822, lng: -3.1812, region: 'Wales',
-    photos: [
-      commons('Cardiff Castle - 2022-08-17.jpg'),
-      geograph('7824560', 'geophotos/07/82/45/7824560_b7203458.jpg', 'DS Pugh'),
-      commons('Cardiff Castle clock tower.jpg'),
-    ],
+  sulaymaniyah: {
+    name: 'Sulaymaniyah beneath Goyzha mountain',
+    lat: 35.5613, lng: 45.4303, region: 'Kurdistan',
+    photos: [scene('sulaymaniyah')],
+  },
+  erbil: {
+    name: 'The Citadel of Erbil',
+    lat: 36.1912, lng: 44.0092, region: 'Kurdistan',
+    photos: [scene('erbil')],
+  },
+  duhok: {
+    name: 'Duhok, its dam and mountains',
+    lat: 36.8669, lng: 42.9503, region: 'Kurdistan',
+    photos: [scene('duhok')],
+  },
+  halabja: {
+    name: 'Halabja beneath the Hawraman mountains',
+    lat: 35.1778, lng: 45.9861, region: 'Kurdistan',
+    photos: [scene('halabja')],
+  },
+  kirkuk: {
+    name: 'Kirkuk citadel and the eternal fire of Baba Gurgur',
+    lat: 35.4681, lng: 44.3922, region: 'Kurdistan',
+    photos: [scene('kirkuk')],
   },
 };
 

@@ -6,7 +6,8 @@ import { Article } from '../types';
 import { CouncilRanking, UKCouncilMap } from '../components/UKCouncilMap';
 import { MemberCount } from '../components/MemberCount';
 import { VisitorAnalytics } from '../components/VisitorAnalytics';
-import { LandmarkCover } from '../components/LandmarkCover';
+import { KurdistanCover } from '../components/KurdistanCover';
+import { MembersByPlace } from '../components/MembersByPlace';
 import { FacebookFeed } from '../components/FacebookFeed';
 import { MediaImage } from '../components/MediaImage';
 import { TorchEmblem } from '../components/TorchEmblem';
@@ -57,14 +58,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     [articles],
   );
   const [lead, ...more] = published;
-  const councils = chapters.filter((c) => !c.isArchived);
   const areas = siteSettings.areasOfWork || [];
 
   return (
     <>
       {/* Hero: rotating council landmarks behind the welcome */}
       <section className="relative isolate overflow-hidden">
-        <LandmarkCover councils={councils} />
+        <KurdistanCover />
         <Container className="relative z-10 grid items-center gap-14 pt-12 pb-20 sm:pt-16 sm:pb-24 lg:grid-cols-[1.3fr_1fr] lg:gap-16 lg:pt-20 lg:pb-24">
           <div className="text-white">
             <p className="flex flex-wrap items-baseline gap-x-3 text-[1.0625rem] text-[#F2C14E]">
@@ -140,7 +140,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {areas.length > 0 && (
         <section>
           <Container className="py-12 sm:py-16">
-            <SectionHeading title="What we do" intro="Four strands of work, carried out by volunteers in our councils across the UK." />
+            <SectionHeading title="What we do" intro="Four strands of work, carried out by our volunteers in Kurdistan and abroad." />
             <div className="grid gap-5 md:grid-cols-2">
               {areas.map((area, i) => {
                 const Icon = AREA_ICONS[i % AREA_ICONS.length];
@@ -184,7 +184,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <Container className="py-12 sm:py-16">
           <SectionHeading
             title="Latest from Mashkhally Zhyanawa"
-            intro="Statements, research and reports from our members and councils."
+            intro="Statements, research and reports from our members."
             action={
               published.length > 0 ? (
                 <Button variant="secondary" onClick={() => onNavigate('news')}>All news and reports</Button>
@@ -238,28 +238,24 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         </Container>
       </section>
 
-      {/* Councils: map and membership league */}
+      {/* Members: the five provinces of Kurdistan and the countries abroad */}
       <section className="border-y border-line bg-stone">
         <Container className="py-12 sm:py-16">
           <SectionHeading
-            title="Our councils across the UK"
-            intro="One national organisation, six councils. Colours show how many members each council has, from fewest (green) to most (red). Choose a council to see its details."
-            action={<Button variant="secondary" onClick={() => onNavigate('directory')}>All councils</Button>}
+            title="Our members, in Kurdistan and abroad"
+            intro="Members join from the five provinces of Kurdistan and from Britain, Australia, Canada, Germany and the USA. Choose a place to see its members."
+            action={<Button variant="secondary" onClick={() => onNavigate('directory')}>All members</Button>}
           />
-          <UKCouncilMap onOpen={(slug) => onNavigate('chapter', slug)} />
-          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
-            <CouncilRanking />
-            <div className="flex flex-col gap-4 rounded-3xl border border-line bg-navy-tint p-6">
-              <div>
-                <h2 className="text-[1.375rem] font-semibold">Our structure</h2>
-                <p className="mt-1 text-ink-soft">The Board of Directors, each council’s leader and teams, and the Production Team.</p>
-              </div>
-              <div><Button onClick={() => onNavigate('structure')}>See the organisation chart</Button></div>
+          <MembersByPlace onOpen={(slug) => onNavigate('chapter', slug)} />
+          <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-line bg-navy-tint p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-[1.375rem] font-semibold">Our structure</h2>
+              <p className="mt-1 text-ink-soft">The Board of Directors, the leaders and teams of each province and country, and the Production Team.</p>
             </div>
+            <div className="shrink-0"><Button onClick={() => onNavigate('structure')}>See the organisation chart</Button></div>
           </div>
         </Container>
       </section>
-
 
       {/* Visitors from around the world */}
       <section>

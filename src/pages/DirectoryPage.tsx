@@ -6,6 +6,7 @@ import { PersonCard } from '../components/PersonCard';
 import { TopMembers } from '../components/TopMembers';
 import { LandmarkImage } from '../components/LandmarkImage';
 import { landmarkName } from '../lib/landmarks';
+import { groupLabel, isProvince } from '../lib/places';
 import { MemberHierarchyLevel, PublicProfile } from '../types';
 
 interface DirectoryPageProps {
@@ -53,22 +54,35 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
   return (
     <>
       <PageHeader
-        title="Councils and people"
-        intro="Our members organise in councils across the United Kingdom. Find your nearest council, see how each one is growing, and meet our members."
+        title="Members and people"
+        intro="Our members are organised by place: the five provinces of Kurdistan, and Britain, Australia, Canada, Germany and the USA. See how many members each place has, and meet them."
       />
 
       <section>
         <Container className="pt-12 pb-16 sm:pt-16 sm:pb-20">
-          <SectionHeading title="Our councils" />
+          <SectionHeading title="Members in Kurdistan" intro="The five provinces of Kurdistan." />
           <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {activeChapters.map((chapter) => (
+            {activeChapters.filter((c) => isProvince(c.id)).map((chapter) => (
               <li key={chapter.id}>
                 <a href={`/councils/${encodeURIComponent(chapter.slug || chapter.id)}`} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface no-underline transition-shadow hover:shadow-[0_18px_40px_-28px_rgba(31,38,34,0.6)]">
                   <LandmarkImage council={chapter} className="aspect-[16/9] w-full" />
                   <span className="flex flex-1 flex-col p-6">
                     <span className="font-serif text-[1.5rem] font-semibold text-ink group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">{chapter.name}</span>
                     <span className="text-[0.9063rem] text-muted">{(() => { const n = publicProfiles.filter((p) => p.chapterId === chapter.id).length; return `${n} ${n === 1 ? "member" : "members"}`; })()} · {landmarkName(chapter)}</span>
-                    <span className="mt-3 text-[0.9688rem] leading-relaxed text-ink-soft">{chapter.description}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-14"><SectionHeading title="Members abroad" intro="Members living in Britain, Australia, Canada, Germany and the USA." /></div>
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {activeChapters.filter((c) => !isProvince(c.id)).map((chapter) => (
+              <li key={chapter.id}>
+                <a href={`/councils/${encodeURIComponent(chapter.slug || chapter.id)}`} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface no-underline transition-shadow hover:shadow-[0_18px_40px_-28px_rgba(31,38,34,0.6)]">
+                  <LandmarkImage council={chapter} className="aspect-[16/9] w-full" />
+                  <span className="flex flex-1 flex-col p-6">
+                    <span className="font-serif text-[1.5rem] font-semibold text-ink group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">{chapter.name}</span>
+                    <span className="text-[0.9063rem] text-muted">{(() => { const n = publicProfiles.filter((p) => p.chapterId === chapter.id).length; return `${n} ${n === 1 ? "member" : "members"}`; })()} · {landmarkName(chapter)}</span>
                   </span>
                 </a>
               </li>
@@ -78,7 +92,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
           <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-line bg-navy-tint p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-[1.375rem] font-semibold">Our structure</h2>
-              <p className="mt-1 text-ink-soft">The Board of Directors, each council’s leader and teams, and the Production Team.</p>
+              <p className="mt-1 text-ink-soft">The Board of Directors, the leaders and teams of each province and country, and the Production Team.</p>
             </div>
             <div className="shrink-0"><Button onClick={() => onNavigate('structure')}>See the organisation chart</Button></div>
           </div>
@@ -106,14 +120,14 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
                 />
               </label>
               <label className="flex items-center gap-3 text-[0.9375rem] text-muted">
-                Council
+                Place
                 <select
                   value={chapterFilter}
                   onChange={(e) => setChapterFilter(e.target.value)}
                   className="rounded-lg border border-line bg-surface px-3 py-2.5 text-ink"
                 >
-                  <option value="all">All councils</option>
-                  {activeChapters.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  <option value="all">All places</option>
+                  {activeChapters.map((c) => <option key={c.id} value={c.id}>{groupLabel(c)}</option>)}
                 </select>
               </label>
             </div>

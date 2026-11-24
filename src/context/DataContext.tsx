@@ -17,6 +17,7 @@ import {
   runTransaction,
   Query
 } from 'firebase/firestore';
+import { RETIRED_GROUP_IDS } from '../lib/places';
 import { db, handleFirestoreError, OperationType, cleanFirestoreData, safeSetDoc, safeUpdateDoc } from '../firebase';
 import { useAuth } from './AuthContext';
 import { notifyUser } from '../lib/notify';
@@ -125,7 +126,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const byId = new Map(loaded.map((c) => [c.id, c]));
         const merged = [
           ...INITIAL_CHAPTERS.map((c) => ({ ...c, ...(byId.get(c.id) || {}) })),
-          ...loaded.filter((c) => !INITIAL_CHAPTERS.some((i) => i.id === c.id)),
+          ...loaded.filter((c) => !INITIAL_CHAPTERS.some((i) => i.id === c.id) && !RETIRED_GROUP_IDS.includes(c.id)),
         ].filter((c) => !c.isArchived);
         merged.sort((a, b) => (a.displayOrder || 99) - (b.displayOrder || 99));
         setChapters(merged);
@@ -739,13 +740,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const id = mem.id || `mem-imp-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
         const memberNumber = mem.memberNumber || `SHB-${Math.floor(1000 + Math.random() * 9000)}`;
-        const chapterId = mem.chapterId || 'london';
+        const chapterId = mem.chapterId || 'britain';
         const matchedChap = chapters.find(c => 
           c.id === chapterId || 
           c.slug === chapterId || 
           c.name.toLowerCase() === chapterId.toLowerCase()
         );
-        const resolvedChapterId = matchedChap ? matchedChap.id : 'london';
+        const resolvedChapterId = matchedChap ? matchedChap.id : 'britain';
         const resolvedChapterName = matchedChap ? matchedChap.name : 'London';
 
         const hierarchyLevel: MemberHierarchyLevel = mem.hierarchyLevel || (mem.boardTitle ? 'board_executive' : 'general_member');

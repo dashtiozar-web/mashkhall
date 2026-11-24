@@ -5,25 +5,25 @@ import * as Logic from '../worker/meetingLogic.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const L: any = Logic;
 
-const m = (id: string, extra: Record<string, unknown> = {}) => ({ id, status: 'active', chapterId: 'manchester', positionId: 'member', ...extra });
-const rooms = L.roomsFor([{ id: 'manchester', name: 'Manchester' }, { id: 'london', name: 'London' }]);
-const manchester = rooms.find((r: { id: string }) => r.id === 'council-manchester');
-const london = rooms.find((r: { id: string }) => r.id === 'council-london');
+const m = (id: string, extra: Record<string, unknown> = {}) => ({ id, status: 'active', chapterId: 'erbil', positionId: 'member', ...extra });
+const rooms = L.roomsFor([{ id: 'erbil', name: 'Erbil' }, { id: 'britain', name: 'Britain' }]);
+const erbil = rooms.find((r: { id: string }) => r.id === 'council-erbil');
+const britain = rooms.find((r: { id: string }) => r.id === 'council-britain');
 const board = rooms.find((r: { id: string }) => r.id === 'board');
 const joint = rooms.find((r: { id: string }) => r.id === 'joint');
 
 describe('meeting room access', () => {
   it('lets a council member into their own council room only', () => {
-    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: manchester }).allowed).toBe(true);
-    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: london }).allowed).toBe(false);
+    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: erbil }).allowed).toBe(true);
+    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: britain }).allowed).toBe(false);
     expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: board }).allowed).toBe(false);
     expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: joint }).allowed).toBe(false);
   });
 
   it('refuses visitors, suspended members and imported records', () => {
-    expect(L.accessFor({ uid: 'v', member: null, isAdmin: false, room: manchester }).allowed).toBe(false);
-    expect(L.accessFor({ uid: 'a', member: m('a', { status: 'suspended' }), isAdmin: false, room: manchester }).allowed).toBe(false);
-    expect(L.accessFor({ uid: 'mem-1', member: m('mem-1'), isAdmin: false, room: manchester }).allowed).toBe(false);
+    expect(L.accessFor({ uid: 'v', member: null, isAdmin: false, room: erbil }).allowed).toBe(false);
+    expect(L.accessFor({ uid: 'a', member: m('a', { status: 'suspended' }), isAdmin: false, room: erbil }).allowed).toBe(false);
+    expect(L.accessFor({ uid: 'mem-1', member: m('mem-1'), isAdmin: false, room: erbil }).allowed).toBe(false);
   });
 
   it('lets the President and Deputy President into all eleven rooms as hosts', () => {
@@ -39,10 +39,10 @@ describe('meeting room access', () => {
   });
 
   it('keeps other Board members to the Board and joint rooms, and council leaders to the joint room', () => {
-    const finance = m('f', { positionId: 'head_of_finance', chapterId: 'london' });
+    const finance = m('f', { positionId: 'head_of_finance', chapterId: 'britain' });
     expect(L.accessFor({ uid: 'f', member: finance, isAdmin: false, room: board }).allowed).toBe(true);
     expect(L.accessFor({ uid: 'f', member: finance, isAdmin: false, room: joint }).allowed).toBe(true);
-    expect(L.accessFor({ uid: 'f', member: finance, isAdmin: false, room: manchester }).allowed).toBe(false);
+    expect(L.accessFor({ uid: 'f', member: finance, isAdmin: false, room: erbil }).allowed).toBe(false);
     const leader = m('l', { positionId: 'council_leader' });
     expect(L.accessFor({ uid: 'l', member: leader, isAdmin: false, room: joint }).allowed).toBe(true);
     expect(L.accessFor({ uid: 'l', member: leader, isAdmin: false, room: board }).allowed).toBe(false);
@@ -50,25 +50,25 @@ describe('meeting room access', () => {
 
   it('makes the appointed leader host of their own room only, unless suspended', () => {
     const lead = { uid: 'a', suspended: false, permissions: {} };
-    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: manchester, leader: lead }).host).toBe(true);
-    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: london, leader: { uid: 'z' } }).allowed).toBe(false);
-    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: manchester, leader: { ...lead, suspended: true } }).host).toBe(false);
+    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: erbil, leader: lead }).host).toBe(true);
+    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: britain, leader: { uid: 'z' } }).allowed).toBe(false);
+    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: erbil, leader: { ...lead, suspended: true } }).host).toBe(false);
   });
 
   it('respects a selected-members invitation list', () => {
     const meeting = { invite: 'selected', invitees: ['b'] };
-    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: manchester, meeting }).allowed).toBe(false);
-    expect(L.accessFor({ uid: 'b', member: m('b'), isAdmin: false, room: manchester, meeting }).allowed).toBe(true);
-    expect(L.eligibleMembers([m('a'), m('b')], manchester, meeting).map((x: { id: string }) => x.id)).toEqual(['b']);
+    expect(L.accessFor({ uid: 'a', member: m('a'), isAdmin: false, room: erbil, meeting }).allowed).toBe(false);
+    expect(L.accessFor({ uid: 'b', member: m('b'), isAdmin: false, room: erbil, meeting }).allowed).toBe(true);
+    expect(L.eligibleMembers([m('a'), m('b')], erbil, meeting).map((x: { id: string }) => x.id)).toEqual(['b']);
   });
 
   it('chooses the Head of Online Meeting Management as default leader, then the Council Leader', () => {
     const members = [m('x', { positionId: 'council_leader' }), m('y', { positionId: 'head_of_online_meetings' })];
-    expect(L.leaderOf(manchester, null, members).uid).toBe('y');
-    expect(L.leaderOf(manchester, null, [members[0]]).uid).toBe('x');
-    expect(L.leaderOf(manchester, { leaderUid: 'q' }, members).uid).toBe('q');
-    expect(L.leaderOf(manchester, { leaderUid: 'q', leaderSuspended: true }, members).permissions.start).toBe(false);
-    expect(L.leaderOf(manchester, { leaderPermissions: { remove: false } }, members).permissions.remove).toBe(false);
+    expect(L.leaderOf(erbil, null, members).uid).toBe('y');
+    expect(L.leaderOf(erbil, null, [members[0]]).uid).toBe('x');
+    expect(L.leaderOf(erbil, { leaderUid: 'q' }, members).uid).toBe('q');
+    expect(L.leaderOf(erbil, { leaderUid: 'q', leaderSuspended: true }, members).permissions.start).toBe(false);
+    expect(L.leaderOf(erbil, { leaderPermissions: { remove: false } }, members).permissions.remove).toBe(false);
   });
 });
 
@@ -154,16 +154,16 @@ describe('schedule', () => {
 });
 
 describe('separate rooms for every group (tests 5–8)', () => {
-  const all = L.roomsFor([{ id: 'manchester', name: 'Manchester' }, { id: 'london', name: 'London' }]);
+  const all = L.roomsFor([{ id: 'erbil', name: 'Erbil' }, { id: 'britain', name: 'Britain' }]);
   const room = (id: string) => all.find((r: { id: string }) => r.id === id);
   const can = (member: Record<string, unknown>, id: string, r = room(id)) => L.accessFor({ uid: member.id, member, isAdmin: false, room: r }).allowed;
 
   it('the Head of Media enters the Board, Production Team and their own council, and nothing else', () => {
-    const hom = m('h', { positionId: 'head_of_media', chapterId: 'london' });
+    const hom = m('h', { positionId: 'head_of_media', chapterId: 'britain' });
     expect(can(hom, 'board')).toBe(true);
     expect(can(hom, 'production')).toBe(true);
-    expect(can(hom, 'council-london')).toBe(true);
-    expect(can(hom, 'council-manchester')).toBe(false);
+    expect(can(hom, 'council-britain')).toBe(true);
+    expect(can(hom, 'council-erbil')).toBe(false);
     expect(can(hom, 'research')).toBe(false);
     expect(can(hom, 'webadmin')).toBe(false);
     // …unless an administrator adds them.
@@ -190,25 +190,25 @@ describe('separate rooms for every group (tests 5–8)', () => {
   });
 
   it('an administrator can remove someone from a room even if their position would allow them', () => {
-    const r = L.roomsFor([{ id: 'london', name: 'London' }], { 'council-london': { excluded: ['a'] } }).find((x: { id: string }) => x.id === 'council-london');
-    const a = m('a', { chapterId: 'london' });
+    const r = L.roomsFor([{ id: 'britain', name: 'Britain' }], { 'council-britain': { excluded: ['a'] } }).find((x: { id: string }) => x.id === 'council-britain');
+    const a = m('a', { chapterId: 'britain' });
     expect(L.accessFor({ uid: 'a', member: a, isAdmin: false, room: r }).allowed).toBe(false);
     expect(L.accessFor({ uid: 'a', member: a, isAdmin: false, room: r }).reason).toMatch(/removed/);
     expect(L.accessFor({ uid: 'admin', member: null, isAdmin: true, room: r }).allowed).toBe(true);
   });
 
   it('a Council Leader runs their own council’s meetings; moderators chosen by an administrator too', () => {
-    const lon = room('council-london');
-    const cl = m('cl', { positionId: 'council_leader', chapterId: 'london' });
-    const hom = m('ho', { positionId: 'head_of_online_meetings', chapterId: 'london' });
+    const lon = room('council-britain');
+    const cl = m('cl', { positionId: 'council_leader', chapterId: 'britain' });
+    const hom = m('ho', { positionId: 'head_of_online_meetings', chapterId: 'britain' });
     const leader = L.leaderOf(lon, null, [cl, hom]);
     expect(leader.uid).toBe('ho');
     expect(leader.managers).toEqual(['cl']);
     const a = L.accessFor({ uid: 'cl', member: cl, isAdmin: false, room: lon, leader });
     expect(a).toMatchObject({ allowed: true, host: true, role: 'moderator' });
     expect(L.canManage(a, leader, 'schedule')).toBe(true);
-    const manchesterLeader = L.leaderOf(room('council-manchester'), null, [cl, hom]);
-    expect(L.accessFor({ uid: 'cl', member: cl, isAdmin: false, room: room('council-manchester'), leader: manchesterLeader }).allowed).toBe(false);
+    const erbilLeader = L.leaderOf(room('council-erbil'), null, [cl, hom]);
+    expect(L.accessFor({ uid: 'cl', member: cl, isAdmin: false, room: room('council-erbil'), leader: erbilLeader }).allowed).toBe(false);
     const prod = L.roomsFor([], { production: { moderators: ['z'] } }).find((r: { id: string }) => r.id === 'production');
     const z = m('z');
     const pl = L.leaderOf(prod, { leaderPermissions: { remove: false } }, [z]);
@@ -218,7 +218,7 @@ describe('separate rooms for every group (tests 5–8)', () => {
   });
 
   it('explains to administrators why someone can or cannot enter', () => {
-    const e = L.explainAccess(m('a', { chapterId: 'london' }), room('council-manchester'), null, false);
+    const e = L.explainAccess(m('a', { chapterId: 'britain' }), room('council-erbil'), null, false);
     expect(e.allowed).toBe(false);
     expect(e.why.join(' ')).toMatch(/different council/);
   });

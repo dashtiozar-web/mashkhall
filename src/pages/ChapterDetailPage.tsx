@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useData } from '../context/DataContext';
+import { isProvince } from '../lib/places';
 import { LandmarkImage } from '../components/LandmarkImage';
 import { CouncilTeamChart } from '../components/OrgStructureChart';
 import { useAssignments } from '../lib/orgStructure';
@@ -45,9 +46,9 @@ export const ChapterDetailPage: React.FC<ChapterDetailPageProps> = ({ slug, onNa
   if (!chapter) {
     return (
       <Container narrow className="py-24">
-        <h1 className="text-[2.25rem] font-semibold">We couldn’t find that council</h1>
-        <p className="mt-4 text-ink-soft">It may have been renamed or merged with another council.</p>
-        <Button className="mt-8" onClick={() => onNavigate('directory')}>See all councils</Button>
+        <h1 className="text-[2.25rem] font-semibold">We couldn’t find that place</h1>
+        <p className="mt-4 text-ink-soft">It may have been renamed or merged with another province or country.</p>
+        <Button className="mt-8" onClick={() => onNavigate('directory')}>See all places</Button>
       </Container>
     );
   }
@@ -60,13 +61,13 @@ export const ChapterDetailPage: React.FC<ChapterDetailPageProps> = ({ slug, onNa
       <header className="border-b border-line bg-stone">
         <Container className="grid gap-10 py-12 sm:py-16 lg:grid-cols-[1fr_1fr] lg:items-center">
           <div>
-            <TextLink onClick={() => onNavigate('directory')} className="text-[0.9375rem]">All councils</TextLink>
+            <TextLink onClick={() => onNavigate('directory')} className="text-[0.9375rem]">All provinces and countries</TextLink>
             <h1 className="mt-6 text-[2.75rem] leading-[1.05] font-semibold sm:text-[3.75rem]">{chapter.name}</h1>
-            <p className="mt-1 text-[1.0625rem] text-muted">{chapter.country}</p>
+            <p className="mt-1 text-[1.0625rem] text-muted">{isProvince(chapter.id) ? 'Province of Kurdistan' : 'Members abroad'}</p>
             <p className="mt-6 max-w-[52ch] text-[1.1875rem] leading-relaxed text-ink-soft">{chapter.description}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button size="lg" onClick={() => onNavigate('apply', chapter.id)}>Join the {chapter.name} Council</Button>
-              <Button size="lg" variant="secondary" onClick={() => onNavigate('contact')}>Contact the council</Button>
+              <Button size="lg" onClick={() => onNavigate('apply', chapter.id)}>Join in {chapter.name}</Button>
+              <Button size="lg" variant="secondary" onClick={() => onNavigate('contact')}>Contact us</Button>
             </div>
           </div>
           <LandmarkImage council={chapter} className="aspect-[4/3] w-full rounded-2xl" credit loading="eager" />
@@ -94,8 +95,8 @@ export const ChapterDetailPage: React.FC<ChapterDetailPageProps> = ({ slug, onNa
 
       <section className="border-t border-line bg-stone">
         <Container className="py-14">
-          <h2 className="text-[1.75rem] font-semibold">Council team</h2>
-          <p className="mt-2 text-ink-soft">The council’s leader and teams. <a href="/structure" className="font-semibold text-navy underline">See the whole organisation</a>.</p>
+          <h2 className="text-[1.75rem] font-semibold">Leaders and teams</h2>
+          <p className="mt-2 text-ink-soft">The leader and teams in {chapter.name}. <a href="/structure" className="font-semibold text-navy underline">See the whole organisation</a>.</p>
           <div className="mt-8">
             {assignments === null ? <p className="text-muted">Loading…</p> : (
               <CouncilTeamChart council={chapter} assignments={assignments} profiles={publicProfiles.filter((p) => p.membershipStatus !== 'suspended')} activities={banners} />
@@ -107,9 +108,9 @@ export const ChapterDetailPage: React.FC<ChapterDetailPageProps> = ({ slug, onNa
       <section className="border-t border-line">
         <Container className="py-14">
           <h2 className="text-[1.75rem] font-semibold">Activity participation</h2>
-          <p className="mt-2 text-ink-soft">How members of the {chapter.name} Council answered for recent activities.</p>
+          <p className="mt-2 text-ink-soft">How members in {chapter.name} answered for recent activities.</p>
           {participation === null ? <p className="mt-6 text-muted">Loading…</p> : participation.length === 0 ? (
-            <p className="mt-6 text-ink-soft">No answers from this council yet.</p>
+            <p className="mt-6 text-ink-soft">No answers from members here yet.</p>
           ) : (
             <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-surface">
               <table className="w-full min-w-[560px] text-start text-[0.9375rem]">
@@ -135,8 +136,8 @@ export const ChapterDetailPage: React.FC<ChapterDetailPageProps> = ({ slug, onNa
       {people.length > 0 && (
         <section className="border-t border-line">
           <Container className="py-14">
-            <h2 className="text-[1.75rem] font-semibold">Members of this council ({people.length})</h2>
-            <p className="mt-2 text-ink-soft">Every approved member of the {chapter.name} Council.</p>
+            <h2 className="text-[1.75rem] font-semibold">Members in {chapter.name} ({people.length})</h2>
+            <p className="mt-2 text-ink-soft">Every approved member in {chapter.name}.</p>
             <div className="mt-8 grid gap-x-10 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
               {people.map((p) => <PersonCard key={p.id} profile={p} />)}
             </div>

@@ -30,8 +30,8 @@ const STATIC: Page[] = [
   { path: '/appreciation', title: 'Appreciation', description: 'Members of Mashkhally Zhyanawa Organisation recognised for taking part in its official activities, with verifiable Letters of Appreciation.', changefreq: 'weekly', priority: 0.7 },
   { path: '/news', title: 'News and reports', description: 'Statements, monitoring reports, research and articles from Mashkhally Zhyanawa Organisation.', changefreq: 'daily', priority: 0.9 },
   { path: '/videos', title: 'Videos', description: 'Talks, interviews, reports and footage on human rights and Kurdish affairs from Mashkhally Zhyanawa members and contributors.', changefreq: 'weekly', priority: 0.8 },
-  { path: '/structure', title: 'Our structure', description: 'How Mashkhally Zhyanawa is organised: the Board of Directors, six councils with their teams, and the Production Team.', changefreq: 'monthly', priority: 0.6 },
-  { path: '/people', title: 'Councils and people', description: 'Find your nearest Mashkhally Zhyanawa council across the United Kingdom and meet the people who lead our work.', changefreq: 'weekly', priority: 0.7 },
+  { path: '/structure', title: 'Our structure', description: 'How Mashkhally Zhyanawa is organised: the Board of Directors, its provinces and countries with their teams, and the Production Team.', changefreq: 'monthly', priority: 0.6 },
+  { path: '/people', title: 'Members and people', description: 'Mashkhally Zhyanawa members in the five provinces of Kurdistan — Sulaymaniyah, Erbil, Duhok, Halabja and Kirkuk — and in Britain, Australia, Canada, Germany and the USA.', changefreq: 'weekly', priority: 0.7 },
   { path: '/sherwan-sherwani', title: 'Sherwan Sherwani — Former Member of 17 Shubat Organisation', description: 'Journalism, reported arrests and imprisonment, and press-freedom concerns in the case of Sherwan Sherwani.', changefreq: 'monthly', priority: 0.7 },
   { path: '/memorial', title: '17 Shubat 2011 Memorial', description: 'The demonstrations that began in Sulaimani on 17 February 2011, the days that followed, and the martyrs of 17 Shubat.', changefreq: 'monthly', priority: 0.8 },
   { path: '/history', title: 'Our history', description: 'From the peaceful protests of 17 February 2011 in Sulaymaniyah to Mashkhally Zhyanawa today.', changefreq: 'yearly', priority: 0.5 },
@@ -110,8 +110,8 @@ const loadCouncils = async (): Promise<Page[]> => {
   }
   return councils.filter((c) => !c.archived && c.name).map((c) => ({
     path: `/councils/${encodeURIComponent(c.slug)}`,
-    title: `${c.name} Council`,
-    description: clip(c.description || `The ${c.name} council of Mashkhally Zhyanawa Organisation.`),
+    title: `Members in ${c.name}`,
+    description: clip(c.description || `Members of Mashkhally Zhyanawa Organisation in ${c.name}.`),
     changefreq: 'monthly',
     priority: 0.6,
   }));

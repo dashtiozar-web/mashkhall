@@ -60,7 +60,7 @@ const validApplication = (uid: string) => ({
   email: `${uid}@example.com`,
   phone: '',
   country: 'United Kingdom',
-  chapterId: 'london',
+  chapterId: 'britain',
   reason: 'I want to support peaceful civic work.',
   skills: '',
   photoUrl: '',
@@ -127,13 +127,13 @@ beforeEach(async () => {
       setDoc(doc(db, 'members', uid), {
         id: uid, userId: uid, memberNumber: '17S-00001', fullName: `${uid} Legalname`,
         displayName: uid, email: `${uid}@example.com`, phone: '+44 7000 000000',
-        chapterId: 'london', status: 'active', roles: ['member'],
+        chapterId: 'britain', status: 'active', roles: ['member'],
         consentToDirectory: consent, joinedAt: NOW, updatedAt: NOW,
       });
     await member(BOB, false);
     await member(CAROL, true);
     await setDoc(doc(db, 'public_profiles', CAROL), {
-      id: CAROL, userId: CAROL, displayName: 'Carol', chapterId: 'london', chapterName: 'London', updatedAt: NOW,
+      id: CAROL, userId: CAROL, displayName: 'Carol', chapterId: 'britain', chapterName: 'Britain', updatedAt: NOW,
     });
 
     await setDoc(doc(db, 'articles', 'published-1'), article({ id: 'published-1', status: 'published', viewsCount: 5 }));
@@ -287,7 +287,7 @@ describe("Nobody can take over someone else's records", () => {
 
   it("an attacker cannot overwrite another member's public profile", async () => {
     await assertFails(setDoc(doc(asUser(MALLORY), 'public_profiles', CAROL), {
-      id: CAROL, userId: MALLORY, displayName: 'Hijacked', chapterId: 'london', chapterName: 'London', updatedAt: NOW,
+      id: CAROL, userId: MALLORY, displayName: 'Hijacked', chapterId: 'britain', chapterName: 'Britain', updatedAt: NOW,
     }));
   });
 
@@ -306,13 +306,13 @@ describe("Nobody can take over someone else's records", () => {
         tx.update(appRef, { status: 'approved', reviewerUid: staff, updatedAt: NOW });
         tx.set(memberRef, {
           id: ALICE, userId: ALICE, memberNumber: '17S-P000001', fullName: 'Test Person', displayName: 'Tester',
-          email: 'alice@example.com', phone: '', chapterId: 'london', status: 'active', roles: ['member'],
+          email: 'alice@example.com', phone: '', chapterId: 'britain', status: 'active', roles: ['member'],
           consentToDirectory: true, photoUrl: '', joinedAt: NOW, updatedAt: NOW,
         }, { merge: true });
         const roles = (userSnap.data()?.roles || []) as string[];
         if (!roles.includes('member')) tx.update(userRef, { roles: [...roles, 'member'], updatedAt: NOW });
         tx.set(doc(db, 'public_profiles', ALICE), {
-          id: ALICE, userId: ALICE, displayName: 'Tester', photoUrl: '', chapterId: 'london', chapterName: 'London', updatedAt: NOW,
+          id: ALICE, userId: ALICE, displayName: 'Tester', photoUrl: '', chapterId: 'britain', chapterName: 'Britain', updatedAt: NOW,
         }, { merge: true });
       }));
       await assertSucceeds(runTransaction(db, async (tx) => {
@@ -333,7 +333,7 @@ describe("Nobody can take over someone else's records", () => {
 // ---------------------------------------------------------------------------
 describe('The public directory is opt-in', () => {
   const profile = (uid: string, extra: Record<string, unknown> = {}) => ({
-    id: uid, userId: uid, displayName: uid, chapterId: 'london', chapterName: 'London', updatedAt: NOW, ...extra,
+    id: uid, userId: uid, displayName: uid, chapterId: 'britain', chapterName: 'Britain', updatedAt: NOW, ...extra,
   });
 
   it('a member who has not consented cannot publish a profile', async () => {
@@ -759,7 +759,7 @@ describe('Media, events and the news banner', () => {
   });
 
   it('an activity announcement can carry its date, but no unexpected fields', async () => {
-    await assertSucceeds(setDoc(doc(asUser(ADMIN), 'news_banners', 'b3'), { ...banner, id: 'b3', eventAt: NOW, startAt: NOW, endAt: NOW, videoUrl: 'https://youtu.be/dQw4w9WgXcQ', location: 'Manchester', details: 'Bring a friend' }));
+    await assertSucceeds(setDoc(doc(asUser(ADMIN), 'news_banners', 'b3'), { ...banner, id: 'b3', eventAt: NOW, startAt: NOW, endAt: NOW, videoUrl: 'https://youtu.be/dQw4w9WgXcQ', location: 'Erbil', details: 'Bring a friend' }));
     await assertFails(setDoc(doc(asUser(ADMIN), 'news_banners', 'b4'), { ...banner, id: 'b4', html: '<script>' }));
   });
 
@@ -773,7 +773,7 @@ describe('Media, events and the news banner', () => {
 // ---------------------------------------------------------------------------
 describe('Activity answers: attending or cannot attend', () => {
   const activity = { id: 'act1', mode: 'announcement', message: 'Workshop', status: 'published', attendeeCount: 0, createdAt: NOW, updatedAt: NOW };
-  const reg = (uid: string, status: string) => ({ userId: uid, name: 'Member', chapterId: 'london', status, createdAt: NOW });
+  const reg = (uid: string, status: string) => ({ userId: uid, name: 'Member', chapterId: 'britain', status, createdAt: NOW });
   const seed = async (extra: Record<string, unknown> = {}) => {
     await env.withSecurityRulesDisabled(async (ctx) => {
       await setDoc(doc(ctx.firestore(), 'news_banners', 'act1'), { ...activity, ...extra });
@@ -870,7 +870,7 @@ describe('Points ledger', () => {
 
   it('authors earn nothing for reacting to their own article', async () => {
     await env.withSecurityRulesDisabled(async (ctx) => {
-      await setDoc(doc(ctx.firestore(), 'public_profiles', BOB), { id: BOB, userId: BOB, displayName: 'Bob', chapterId: 'london', updatedAt: NOW });
+      await setDoc(doc(ctx.firestore(), 'public_profiles', BOB), { id: BOB, userId: BOB, displayName: 'Bob', chapterId: 'britain', updatedAt: NOW });
       await updateDoc(doc(ctx.firestore(), 'members', BOB), { consentToDirectory: true });
     });
     await assertFails(react(asUser(BOB), BOB));
@@ -1291,7 +1291,7 @@ describe('Online meetings and Appreciation', () => {
   const seed = (path: string, data: Record<string, unknown>) => env.withSecurityRulesDisabled(async (ctx) => { await setDoc(doc(ctx.firestore(), path), data); });
 
   it('meeting records are closed to every browser, even administrators', async () => {
-    await seed('meetings/mt1', { id: 'mt1', roomId: 'council-london', title: 'x', status: 'scheduled' });
+    await seed('meetings/mt1', { id: 'mt1', roomId: 'council-britain', title: 'x', status: 'scheduled' });
     await seed('meeting_attendance/mt1__bob', { uid: BOB, meetingId: 'mt1', status: 'attended' });
     await seed('meeting_rooms/board', { leaderUid: ADMIN });
     for (const who of [asAnon(), asUser(BOB), asUser(ADMIN)]) {

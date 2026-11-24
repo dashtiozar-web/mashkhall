@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { authErrorMessage } from '../lib/authErrors';
+import { COUNTRIES, KURDISTAN, PROVINCES, ABROAD_IDS, countryName, groupLabel, isProvince, normaliseCity } from '../lib/places';
 import { ArrowLeft, Check, Camera, Eye, EyeOff, Pencil, X } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
@@ -20,7 +21,7 @@ interface BecomeMemberPageProps {
   onOpenAuth: () => void;
 }
 
-const STEPS = ['Your name', 'Contact', 'Council and position', 'About you', 'Review'] as const;
+const STEPS = ['Your name', 'Contact', 'Place and position', 'About you', 'Review'] as const;
 type StepIndex = 0 | 1 | 2 | 3 | 4;
 
 const field =
@@ -107,12 +108,12 @@ const StatusView: React.FC<{
         </h1>
         <p className={`mt-3 text-[1.0938rem] ${approved ? 'text-white/85' : 'text-ink-soft'}`}>
           {approved
-            ? `You are now a member of the ${councilName} council. Your account is where you can edit your profile and write articles.`
+            ? `You are now a member in ${councilName}. Your account is where you can edit your profile and write articles.`
             : changes
               ? 'The membership committee has a question or needs a little more information before deciding.'
               : rejected
                 ? 'We were not able to accept your application this time. If you have questions, please get in touch.'
-                : `We have your application for the ${councilName} council. You don’t need to do anything else for now.`}
+                : `We have your application to join in ${councilName}. You don’t need to do anything else for now.`}
         </p>
 
         {app.applicantFeedback && (changes || rejected) && (
@@ -181,8 +182,11 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
   const [displayTouched, setDisplayTouched] = useState(false);
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [country, setCountry] = useState('United Kingdom');
   const [councilId, setCouncilId] = useState(initialChapterId || '');
+  // Where the applicant joins from: a country, then (in Kurdistan) a province, and a city.
+  const [placeCountry, setPlaceCountry] = useState(() => (isProvince(initialChapterId) ? KURDISTAN : ABROAD_IDS.includes(initialChapterId || '') ? initialChapterId || '' : ''));
+  const [city, setCity] = useState('');
+  const country = countryName(placeCountry);
   const [positionId, setPositionId] = useState('');
   const [reason, setReason] = useState('');
   const [skills, setSkills] = useState('');
@@ -224,8 +228,9 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
             setDisplayName((v) => v || app.displayName || '');
             setDisplayTouched(true);
             setPhone((v) => v || app.phone || '');
-            setCountry(app.country || 'United Kingdom');
             setCouncilId((v) => v || app.chapterId || '');
+            setPlaceCountry((v) => v || (isProvince(app.chapterId) ? KURDISTAN : ABROAD_IDS.includes(app.chapterId) ? app.chapterId : ''));
+            setCity((v) => v || app.city || '');
             setPositionId((v) => v || app.positionId || '');
             setReason((v) => v || app.reason || '');
             setSkills((v) => v || app.skills || '');
@@ -278,9 +283,10 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
     }
     if (s === 1) {
       if (!/^\S+@\S+\.\S+$/.test(email.trim())) e.email = 'Please enter a valid email address.';
-      if (!country.trim()) e.country = 'Please tell us which country you live in.';
     }
-    if (s === 2 && !councilId) e.council = 'Please choose the council nearest to you.';
+    if (s === 2 && !placeCountry) e.council = 'Please choose the country you are joining from.';
+    else if (s === 2 && (!councilId || (placeCountry === KURDISTAN ? !isProvince(councilId) : councilId !== placeCountry))) e.council = 'Please choose your province in Kurdistan.';
+    if (s === 2 && normaliseCity(city).length < 2) e.city = 'Please tell us which city or town you are joining from.';
     if (s === 2 && !positionById(positionId)) e.position = 'Please choose one position.';
     if (s === 3 && reason.trim().length < 20) e.reason = 'Please write a sentence or two (at least 20 characters).';
     if (s === 3 && !involvement) e.involvement = 'Please tell us whether you are already a member of Mashkhally Zhyanawa.';
@@ -377,8 +383,9 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
         displayName: displayName.trim(),
         email: email.trim().toLowerCase(),
         phone: phone.trim(),
-        country: country.trim(),
+        country,
         chapterId: councilId,
+        city: normaliseCity(city).slice(0, 100),
         positionId,
         reason: reason.trim(),
         skills: skills.trim(),
@@ -413,7 +420,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
   };
 
   const council = councils.find((c) => c.id === councilId);
-  const councilName = council?.name || councils.find((c) => c.id === existingApp?.chapterId)?.name || 'your local';
+  const councilName = groupLabel(council || councils.find((c) => c.id === existingApp?.chapterId)) || 'your';
 
   // ---------------------------------------------------------------- views
 
@@ -532,59 +539,75 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                   Phone number <span className="font-normal text-muted">(optional)</span>
                   <input type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={field} />
                 </label>
-                <label className={labelCls}>
-                  Country you live in
-                  <input autoComplete="country-name" value={country} onChange={(e) => setCountry(e.target.value)} className={field} aria-invalid={Boolean(errors.country)} />
-                  {err('country')}
-                </label>
               </div>
             )}
 
             {/* Step 3: council */}
             {step === 2 && (
               <div className="space-y-5">
-                <h2 ref={headingRef} tabIndex={-1} id="council-heading" className="text-[1.75rem] font-semibold outline-none">Which council is nearest to you?</h2>
-                <p className="text-ink-soft">Councils are our local groups. You can change this later by contacting us.</p>
-                {councils.length === 0 ? (
-                  <p className="rounded-xl bg-stone p-4 text-ink-soft">The list of councils is loading. Please wait a moment.</p>
-                ) : (
-                  <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-labelledby="council-heading">
-                    {councils.map((c) => {
-                      const selected = c.id === councilId;
-                      return (
-                        <label
-                          key={c.id}
-                          className={`relative flex cursor-pointer items-start gap-3 rounded-2xl border-2 p-4 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-amber ${
-                            selected ? 'border-navy bg-navy-tint' : 'border-line hover:border-ink/30'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="council"
-                            value={c.id}
-                            checked={selected}
-                            onChange={() => { setCouncilId(c.id); setErrors(({ council: _c, ...rest }) => rest); }}
-                            className="sr-only"
-                          />
-                          <span
-                            className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${
-                              selected ? 'border-navy bg-navy text-white' : 'border-line bg-surface'
-                            }`}
-                            aria-hidden="true"
-                          >
-                            {selected && <Check className="h-3.5 w-3.5" />}
-                          </span>
-                          <span>
-                            <span className="block font-serif text-[1.25rem] font-semibold">{c.name}</span>
-                            <span className="block text-[0.875rem] text-muted">{c.country}</span>
-                          </span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
+                <h2 ref={headingRef} tabIndex={-1} id="council-heading" className="text-[1.75rem] font-semibold outline-none">Where are you joining from?</h2>
+                <p className="text-ink-soft">Members are organised by country, and in Kurdistan by province. You can change this later by contacting us.</p>
+                {(() => {
+                  const Choice = (opt: { id: string; name: string; ku: string }, selected: boolean, group: string, onPick: () => void) => (
+                  <label
+                    key={opt.id}
+                    className={`relative flex cursor-pointer items-center gap-3 rounded-2xl border-2 p-4 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-amber ${
+                      selected ? 'border-navy bg-navy-tint' : 'border-line hover:border-ink/30'
+                    }`}
+                  >
+                    <input type="radio" name={group} value={opt.id} checked={selected} onChange={onPick} className="sr-only" />
+                    <span className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${selected ? 'border-navy bg-navy text-white' : 'border-line bg-surface'}`} aria-hidden="true">
+                      {selected && <Check className="h-3.5 w-3.5" />}
+                    </span>
+                    <span>
+                      <span className="block font-serif text-[1.25rem] font-semibold">{opt.name}</span>
+                      <span className="ku-sub block w-fit font-kurdish text-[0.9375rem] text-muted" lang="ckb" dir="rtl" translate="no">{opt.ku}</span>
+                    </span>
+                  </label>
+                );
+                  const pickCountry = (id: string) => {
+                    setPlaceCountry(id);
+                    setCouncilId(id === KURDISTAN ? (isProvince(councilId) ? councilId : '') : id);
+                    setErrors(({ council: _c, ...rest }) => rest);
+                  };
+                  return (
+                    <>
+                      <fieldset>
+                        <legend className={labelCls}>Country</legend>
+                        <div className="mt-2 grid gap-3 sm:grid-cols-3" role="radiogroup">
+                          {COUNTRIES.map((c) => Choice(c, placeCountry === c.id, 'place-country', () => pickCountry(c.id)))}
+                        </div>
+                      </fieldset>
+                      {placeCountry === KURDISTAN && (
+                        <fieldset>
+                          <legend className={labelCls}>Province in Kurdistan</legend>
+                          <div className="mt-2 grid gap-3 sm:grid-cols-3" role="radiogroup">
+                            {PROVINCES.map((p) => Choice(p, councilId === p.id, 'place-province', () => { setCouncilId(p.id); setErrors(({ council: _c, ...rest }) => rest); }))}
+                          </div>
+                        </fieldset>
+                      )}
+                    </>
+                  );
+                })()}
+                <label className={labelCls}>
+                  City or town you are joining from
+                  <input
+                    value={city}
+                    onChange={(e) => { setCity(e.target.value); setErrors(({ city: _c, ...rest }) => rest); }}
+                    list="member-city-list"
+                    autoComplete="address-level2"
+                    maxLength={100}
+                    className={field}
+                    aria-invalid={Boolean(errors.city)}
+                  />
+                  <datalist id="member-city-list">
+                    {(PROVINCES.find((p) => p.id === councilId)?.cities || []).map((c) => <option key={c} value={c} />)}
+                  </datalist>
+                  <span className={hintCls}>For example {placeCountry === KURDISTAN ? (PROVINCES.find((p) => p.id === councilId)?.cities.slice(0, 3).join(', ') || 'Ranya, Koya or Zakho') : 'London, Sydney or Berlin'}. We count how many members join from each city.</span>
+                  {err('city')}
+                </label>
                 <p className="min-h-[1.5rem] text-[0.9688rem] text-ink-soft" aria-live="polite">
-                  {council && <>You chose <strong className="text-ink">{council.name}</strong>.</>}
+                  {council && <>You chose <strong className="text-ink">{groupLabel(council)}{city.trim() ? ` — ${normaliseCity(city)}` : ''}</strong>.</>}
                 </p>
                 {err('council')}
 
@@ -594,7 +617,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                   </label>
                   <p className="mt-1 text-[0.9375rem] text-muted">
                     Choose one. If you don’t hold a specific role, choose <strong className="font-semibold text-ink-soft">Member</strong>.
-                    Positions are appointed by the committee; council positions are in your own council.
+                    Positions are appointed by the committee; group positions are in your own province or country.
                   </p>
                   <select
                     id="position"
@@ -606,13 +629,13 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                   >
                     <option value="" disabled>Select a position…</option>
                     {DEPARTMENTS.map((d) => (
-                      <optgroup key={d.id} label={d.id === 'council' ? 'Your council' : d.name}>
+                      <optgroup key={d.id} label={d.id === 'council' ? 'Your province or country' : d.name}>
                         {positionsIn(d.id).map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
                       </optgroup>
                     ))}
                   </select>
                   {positionById(positionId) && (
-                    <p className="mt-2 text-[0.9375rem] text-ink-soft">Part of: <strong className="text-ink">{departmentFor(positionId)?.id === 'council' ? 'your council' : departmentFor(positionId)?.name}</strong></p>
+                    <p className="mt-2 text-[0.9375rem] text-ink-soft">Part of: <strong className="text-ink">{departmentFor(positionId)?.id === 'council' ? 'your province or country' : departmentFor(positionId)?.name}</strong></p>
                   )}
                   {errors.position && <p id="position-error" className="mt-2 text-[0.9375rem] font-semibold text-crimson">{errors.position}</p>}
                 </div>
@@ -721,8 +744,8 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                 <dl className="divide-y divide-line rounded-2xl border border-line">
                   {[
                     { label: 'Name', value: `${fullName}${displayName && displayName !== fullName ? ` (shown as ${displayName})` : ''}`, step: 0 as StepIndex },
-                    { label: 'Contact', value: [email, phone, country].filter(Boolean).join(', '), step: 1 as StepIndex },
-                    { label: 'Council', value: council?.name || 'Not chosen', step: 2 as StepIndex },
+                    { label: 'Contact', value: [email, phone].filter(Boolean).join(', '), step: 1 as StepIndex },
+                    { label: 'Joining from', value: council ? [normaliseCity(city), groupLabel(council)].filter(Boolean).join(', ') : 'Not chosen', step: 2 as StepIndex },
                     { label: 'Position', value: positionById(positionId) ? `${positionTitle(positionId)} (${departmentFor(positionId)?.name})` : 'Not chosen', step: 2 as StepIndex },
                     { label: 'About you', value: reason, step: 3 as StepIndex },
                     { label: 'Member since', value: involvement === 'new' ? 'New member (joining now)' : involvedSince ? formatDate(involvedSince) : 'Not answered', step: 3 as StepIndex },

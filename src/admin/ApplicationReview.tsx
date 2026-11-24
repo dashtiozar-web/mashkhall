@@ -8,6 +8,7 @@ import { useData } from '../context/DataContext';
 import { defaultCardDates, issueCredential, statedMemberSince } from '../lib/membership';
 import { formatDate } from '../components/ui';
 import { CityChapter, MemberApplication } from '../types';
+import { groupLabel, isProvince, normaliseCity } from '../lib/places';
 import { CredentialForm, credentialValid, defaultCredentialValues } from './CredentialForm';
 
 const INVOLVEMENT_LABEL: Record<string, string> = {
@@ -42,7 +43,7 @@ export const ApplicationReview: React.FC<{
   const [corrected, setCorrected] = useState(false);
   const [form, setForm] = useState({
     fullName: app.fullName, displayName: app.displayName, email: app.email, phone: app.phone || '',
-    country: app.country || '', chapterId: app.chapterId, positionId: positionOf({ positionId: app.positionId }),
+    country: app.country || '', city: app.city || '', chapterId: app.chapterId, positionId: positionOf({ positionId: app.positionId }),
   });
   const [notes, setNotes] = useState(app.staffNotes || '');
   const [message, setMessage] = useState(app.applicantFeedback || '');
@@ -124,7 +125,8 @@ export const ApplicationReview: React.FC<{
       displayName: form.displayName.trim() || form.fullName.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
-      country: form.country.trim(),
+      country: isProvince(form.chapterId) ? 'Kurdistan' : (chapters.find((c) => c.id === form.chapterId)?.name || form.country.trim()),
+      city: normaliseCity(form.city).slice(0, 100),
       chapterId: form.chapterId,
       positionId: form.positionId,
     };
@@ -169,16 +171,16 @@ export const ApplicationReview: React.FC<{
           <div className="mt-5 space-y-4">
             <h3 className="text-[1.25rem] font-semibold">Correct the application</h3>
             <div className="grid gap-4 sm:grid-cols-2">
-              {([['fullName', 'Full name'], ['displayName', 'Name shown publicly'], ['email', 'Email'], ['phone', 'Phone'], ['country', 'Country']] as const).map(([k, l]) => (
+              {([['fullName', 'Full name'], ['displayName', 'Name shown publicly'], ['email', 'Email'], ['phone', 'Phone'], ['city', 'City or town']] as const).map(([k, l]) => (
                 <label key={k} className="block text-[0.9375rem] font-semibold">
                   {l}
                   <input value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={`mt-1 ${box}`} type={k === 'email' ? 'email' : 'text'} />
                 </label>
               ))}
               <label className="block text-[0.9375rem] font-semibold">
-                Council
+                Province or country
                 <select value={form.chapterId} onChange={(e) => setForm({ ...form, chapterId: e.target.value })} className={`mt-1 ${box}`}>
-                  {chapters.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {chapters.map((c) => <option key={c.id} value={c.id}>{groupLabel(c)}</option>)}
                 </select>
               </label>
               <label className="block text-[0.9375rem] font-semibold sm:col-span-2">
@@ -206,8 +208,8 @@ export const ApplicationReview: React.FC<{
                 <dt className="text-muted">Position applied for</dt>
                 <dd className="font-semibold">{positionTitle(pid)} <span className="font-normal text-ink-soft">· {departmentFor(pid)?.name}</span></dd>
               </div>
-              <div><dt className="text-muted">Council</dt><dd className="font-semibold">{council}</dd></div>
-              <div><dt className="text-muted">Country</dt><dd className="font-semibold">{app.country}</dd></div>
+              <div><dt className="text-muted">Joining in</dt><dd className="font-semibold">{groupLabel(chapters.find((c) => c.id === app.chapterId)) || council}</dd></div>
+              <div><dt className="text-muted">City or town</dt><dd className="font-semibold" dir="auto">{normaliseCity(app.city) || 'Not given'}</dd></div>
               <div>
                 <dt className="text-muted">Member of Mashkhally Zhyanawa since</dt>
                 <dd className="font-semibold">

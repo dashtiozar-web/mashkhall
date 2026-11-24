@@ -118,8 +118,8 @@ const PAGE_TITLES: Record<string, string> = {
   history: 'Our history',
   memorial: '17 Shubat 2011 Memorial',
   sherwani: 'Sherwan Sherwani',
-  directory: 'People and councils',
-  chapter: 'Council',
+  directory: 'Members and people',
+  chapter: 'Members by place',
   'member-profile': 'Member',
   resources: 'Resources',
   news: 'News and reports',
@@ -276,7 +276,7 @@ const AppContent: React.FC = () => {
         )}
 
         {currentTab === 'chapter' && (
-          <ChapterDetailPage slug={currentParam || 'london'} onNavigate={handleNavigate} />
+          <ChapterDetailPage slug={currentParam || 'britain'} onNavigate={handleNavigate} />
         )}
 
         {currentTab === 'member-profile' && (

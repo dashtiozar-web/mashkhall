@@ -1,35 +1,55 @@
 {
-  "_comment": "The six councils built into the website. They exist even before an administrator saves them in the database; saved settings (name, order, archived) override these. Must match INITIAL_CHAPTERS in src/data/initialData.ts (checked by tests/councils.test.ts).",
+  "_comment": "The member groups built into the website: five countries abroad and the five provinces of Kurdistan (see src/lib/places.ts). They exist even before an administrator saves them in the database; saved settings (name, order, archived) override these. Must match INITIAL_CHAPTERS in src/data/initialData.ts (checked by tests/councils.test.ts).",
   "councils": [
     {
-      "id": "london",
-      "name": "London",
+      "id": "britain",
+      "name": "Britain",
       "displayOrder": 1
     },
     {
-      "id": "birmingham",
-      "name": "Birmingham",
+      "id": "australia",
+      "name": "Australia",
       "displayOrder": 2
     },
     {
-      "id": "manchester",
-      "name": "Manchester",
+      "id": "canada",
+      "name": "Canada",
       "displayOrder": 3
     },
     {
-      "id": "newcastle",
-      "name": "Newcastle",
+      "id": "germany",
+      "name": "Germany",
       "displayOrder": 4
     },
     {
-      "id": "glasgow",
-      "name": "Glasgow",
+      "id": "usa",
+      "name": "USA",
       "displayOrder": 5
     },
     {
-      "id": "cardiff",
-      "name": "Cardiff",
+      "id": "sulaymaniyah",
+      "name": "Sulaymaniyah",
       "displayOrder": 6
+    },
+    {
+      "id": "erbil",
+      "name": "Erbil",
+      "displayOrder": 7
+    },
+    {
+      "id": "duhok",
+      "name": "Duhok",
+      "displayOrder": 8
+    },
+    {
+      "id": "halabja",
+      "name": "Halabja",
+      "displayOrder": 9
+    },
+    {
+      "id": "kirkuk",
+      "name": "Kirkuk",
+      "displayOrder": 10
     }
   ]
 }

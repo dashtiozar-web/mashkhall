@@ -125,7 +125,10 @@ export interface MemberApplication {
   email: string;
   phone?: string;
   country: string;
+  /** The member group: a country abroad or a province of Kurdistan (see lib/places). */
   chapterId: string;
+  /** The city or town the applicant is joining from. */
+  city?: string;
   reason: string;
   skills?: string;
   photoUrl?: string;

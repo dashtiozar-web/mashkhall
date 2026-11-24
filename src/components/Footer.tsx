@@ -19,7 +19,7 @@ const COLUMNS: { heading: string; links: { id: string; label: string }[] }[] = [
       { id: 'structure', label: 'Our structure' },
       { id: 'activities', label: 'Our activities' },
       { id: 'appreciation', label: 'Appreciation' },
-      { id: 'directory', label: 'Councils' },
+      { id: 'directory', label: 'Members' },
       { id: 'news', label: 'News and reports' },
     ],
   },

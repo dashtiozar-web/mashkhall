@@ -240,7 +240,7 @@ export const MemberDashboardPage: React.FC<MemberDashboardPageProps> = ({
       const pubRef = doc(db, 'public_profiles', currentUser.uid);
       if (consent) {
         // Publish to directory
-        const memberChapterId = memberRecord.chapterId || application?.chapterId || 'london';
+        const memberChapterId = memberRecord.chapterId || application?.chapterId || 'britain';
         const chapter = chapters.find(c => c.id === memberChapterId);
         const newPub: PublicProfile = {
           id: currentUser.uid,
@@ -368,7 +368,7 @@ export const MemberDashboardPage: React.FC<MemberDashboardPageProps> = ({
         videoUrl: postVideoUrl.trim() || undefined,
         direction: postDirection,
         language: postDirection === 'rtl' ? 'ckb' : 'en',
-        chapterId: memberRecord?.chapterId || application?.chapterId || 'london',
+        chapterId: memberRecord?.chapterId || application?.chapterId || 'britain',
         status,
         isOfficialNews: false,
       });
@@ -422,7 +422,7 @@ export const MemberDashboardPage: React.FC<MemberDashboardPageProps> = ({
   const myArticles = articles.filter(a => a.authorUid === currentUser.uid);
 
   const assignedChapter = chapters.find(
-    c => c.id === (memberRecord?.chapterId || application?.chapterId || 'london')
+    c => c.id === (memberRecord?.chapterId || application?.chapterId || 'britain')
   );
 
   return (

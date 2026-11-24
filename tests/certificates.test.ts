@@ -19,7 +19,7 @@ const call = async (path: string, body?: unknown, as = 'owner') => {
   return { status: res.status, data: await res.json() as any };
 };
 
-const draft = { memberId: 'alice', kind: 'certificate', category: 'media', achievement: 'Coverage of the 17 February commemoration', reason: 'For outstanding photography and reporting of the commemoration in London.', issueDate: '2026-11-01' };
+const draft = { memberId: 'alice', kind: 'certificate', category: 'media', achievement: 'Coverage of the 17 February commemoration', reason: 'For outstanding photography and reporting of the commemoration in Britain.', issueDate: '2026-11-01' };
 
 beforeAll(async () => {
   fake = await installFakeFirestore();
@@ -30,12 +30,12 @@ beforeAll(async () => {
 afterAll(() => fake.restore());
 beforeEach(() => {
   fake.docs.clear();
-  fake.set('chapters/london', { name: 'London', isArchived: false });
+  fake.set('chapters/britain', { name: 'Britain', isArchived: false });
   fake.set('users/owner-uid', { roles: ['owner'] });
   fake.set('users/reviewer', { roles: ['member', 'membership_reviewer'] });
   fake.set('users/carol', { roles: ['member'] });
-  fake.set('members/alice', { userId: 'alice', fullName: 'Alice Kareem', displayName: 'Alice K.', chapterId: 'london', status: 'active', positionId: 'council_photographer', memberNumber: 'M0000005', updatedAt: '2026-01-01T00:00:00.000Z', verifyToken: 'MemberCardTokenAAAAAAAA', verifyUrl: 'https://mashkhall.com/id/MemberCardTokenAAAAAAAA', credentialIssuedAt: '2025-01-01' });
-  fake.set('members/carol', { userId: 'carol', fullName: 'Carol', status: 'active', chapterId: 'london' });
+  fake.set('members/alice', { userId: 'alice', fullName: 'Alice Kareem', displayName: 'Alice K.', chapterId: 'britain', status: 'active', positionId: 'council_photographer', memberNumber: 'M0000005', updatedAt: '2026-01-01T00:00:00.000Z', verifyToken: 'MemberCardTokenAAAAAAAA', verifyUrl: 'https://mashkhall.com/id/MemberCardTokenAAAAAAAA', credentialIssuedAt: '2025-01-01' });
+  fake.set('members/carol', { userId: 'carol', fullName: 'Carol', status: 'active', chapterId: 'britain' });
   fake.set('site_settings/appreciation', { signatoryName: 'Sangar Hussein', signatoryTitle: 'Vice President' });
 });
 

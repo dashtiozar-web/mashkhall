@@ -1,8 +1,11 @@
 import builtIn from '../src/config/councils.json';
 import { queryDocs } from './firestore.js';
 
+/** Councils of the earlier United Kingdom structure, replaced by countries and Kurdish provinces. */
+const RETIRED = ['london', 'birmingham', 'manchester', 'newcastle', 'glasgow', 'cardiff'];
+
 /**
- * Every council, as the website shows them: the six built-in councils
+ * Every member group (country or Kurdish province), as the website shows them: the built-in groups
  * (src/config/councils.json), with anything an administrator saved in the
  * database applied on top, plus councils added by administrators. Archived
  * councils are left out unless asked for.
@@ -15,7 +18,7 @@ export const councilsOf = async (env, { includeArchived = false } = {}) => {
   const byId = new Map(saved.map((c) => [c.id, c]));
   const merged = [
     ...builtIn.councils.map((c) => ({ ...c, isArchived: false, ...(byId.get(c.id) || {}), id: c.id })),
-    ...saved.filter((c) => !builtIn.councils.some((b) => b.id === c.id)),
+    ...saved.filter((c) => !builtIn.councils.some((b) => b.id === c.id) && !RETIRED.includes(c.id)),
   ];
   return merged
     .filter((c) => includeArchived || !c.isArchived)

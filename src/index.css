@@ -375,6 +375,9 @@ html[dir='rtl'] .rule-fire {
 .memorial ::selection { background: #B3261E; color: #fff; }
 .memorial .font-kurdish .font-serif, .memorial .font-kurdish h1, .memorial .font-kurdish h2, .memorial .font-kurdish h3, .memorial .font-kurdish h4 { font-family: var(--f-kurdish); }
 
+/* Kurdish names shown beside English ones: not needed when the page is in Kurdish or Arabic. */
+html:not([lang^="en"]) .ku-sub { display: none; }
+
 /* Mashkhally Zhyanawa torch: the flame sways and breathes; its glow flickers. */
 .torch-flame {
   transform-box: view-box;
@@ -382,6 +385,8 @@ html[dir='rtl'] .rule-fire {
   animation: torch-sway 2.8s ease-in-out infinite;
 }
 .torch-glow { animation: torch-glow 1.9s ease-in-out infinite; }
+.sunburst-spin { animation: sunburst-spin 160s linear infinite; }
+@keyframes sunburst-spin { to { transform: rotate(360deg); } }
 @keyframes torch-sway {
   0%, 100% { transform: scale(1, 1) skewX(0deg); }
   25% { transform: scale(1.015, 1.045) skewX(-1.6deg); }
@@ -395,5 +400,5 @@ html[dir='rtl'] .rule-fire {
   80% { opacity: 0.95; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .torch-flame, .torch-glow { animation: none; }
+  .torch-flame, .torch-glow, .sunburst-spin { animation: none; }
 }
