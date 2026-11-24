@@ -1,13 +1,11 @@
 import React, { useEffect, useId, useState } from 'react';
 
 /**
- * The Mashkhally Zhyanawa emblem: the painted hand raising a torch, with a
- * living flame (gently displaced and swaying) in front of the slowly turning
- * sun of Kurdistan. Motion stops for visitors who ask their system for
+ * The Mashkhally Zhyanawa emblem: the hand raising a burning torch, in
+ * front of the slowly turning sun of Kurdistan. Motion stops for visitors who ask their system for
  * reduced motion.
  */
 
-const TORCH_SRC = '/brand/torch.webp';
 
 const useReducedMotion = () => {
   const [reduced, setReduced] = useState(() => {
@@ -63,51 +61,30 @@ export const SunBurst: React.FC<{ className?: string }> = ({ className = '' }) =
   );
 };
 
-/** The painted torch with a moving flame (SVG turbulence and a slow sway). */
-export const AnimatedTorch: React.FC<{ className?: string }> = ({ className = '' }) => {
-  const id = useId().replace(/:/g, '');
-  const reduced = useReducedMotion();
-  return (
-    <svg viewBox="0 0 800 1344" className={className} aria-hidden="true" preserveAspectRatio="xMidYMax meet">
-      <defs>
-        <linearGradient id={`${id}-fg`} x1="0" y1="0" x2="0" y2="1344" gradientUnits="userSpaceOnUse">
-          <stop offset="0.37" stopColor="#fff" />
-          <stop offset="0.47" stopColor="#000" />
-        </linearGradient>
-        <linearGradient id={`${id}-bg`} x1="0" y1="0" x2="0" y2="1344" gradientUnits="userSpaceOnUse">
-          <stop offset="0.37" stopColor="#000" />
-          <stop offset="0.47" stopColor="#fff" />
-        </linearGradient>
-        <mask id={`${id}-flame`} maskUnits="userSpaceOnUse" x="-100" y="-100" width="1000" height="1544">
-          <rect x="-100" y="-100" width="1000" height="1544" fill={`url(#${id}-fg)`} />
-        </mask>
-        <mask id={`${id}-body`} maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="1344">
-          <rect width="800" height="1344" fill={`url(#${id}-bg)`} />
-        </mask>
-        <radialGradient id={`${id}-glow`} cx="400" cy="300" r="380" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#FFD36B" stopOpacity="0.55" />
-          <stop offset="0.5" stopColor="#F07A2A" stopOpacity="0.22" />
-          <stop offset="1" stopColor="#C2361A" stopOpacity="0" />
-        </radialGradient>
-        <filter id={`${id}-fire`} x="-15%" y="-15%" width="130%" height="130%" colorInterpolationFilters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency="0.009 0.028" numOctaves="2" seed="7" result="noise">
-            {!reduced && (
-              <animate attributeName="baseFrequency" dur="3.2s" repeatCount="indefinite"
-                values="0.009 0.028;0.012 0.040;0.008 0.032;0.009 0.028" />
-            )}
-          </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="26" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-      </defs>
+const STILL = '/brand/torch-still.webp';
+const VIDEO = '/brand/torch-anim.webm';
+const ANIMATED_IMAGE = '/brand/torch-anim.webp';
 
-      <ellipse cx="400" cy="320" rx="380" ry="360" fill={`url(#${id}-glow)`} className={reduced ? '' : 'torch-glow'} />
-      <image href={TORCH_SRC} width="800" height="1344" mask={`url(#${id}-body)`} />
-      <g mask={`url(#${id}-flame)`}>
-        <g className={reduced ? '' : 'torch-flame'}>
-          <image href={TORCH_SRC} width="800" height="1344" filter={`url(#${id}-fire)`} />
-        </g>
-      </g>
-    </svg>
+/** Safari cannot show the transparent video, so it gets the animated image instead. */
+const isSafari = () => {
+  try { return /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent); } catch { return false; }
+};
+
+/**
+ * The logo: the hand raising the torch, its fire burning and sending up
+ * sparks, on a transparent background (a looping video; an animated image
+ * on Safari; a still picture for visitors who prefer less motion).
+ */
+export const AnimatedTorch: React.FC<{ className?: string }> = ({ className = '' }) => {
+  const reduced = useReducedMotion();
+  const [safari] = useState(isSafari);
+  const cls = `aspect-[720/1020] object-contain object-bottom ${className}`;
+  if (reduced) return <img src={STILL} alt="" aria-hidden="true" className={cls} />;
+  if (safari) return <img src={ANIMATED_IMAGE} alt="" aria-hidden="true" className={cls} />;
+  return (
+    <video autoPlay muted loop playsInline preload="auto" poster={STILL} aria-hidden="true" disablePictureInPicture className={cls}>
+      <source src={VIDEO} type="video/webm" />
+    </video>
   );
 };
 

@@ -6,7 +6,7 @@
  *   downloaded, so the app opens quickly.
  * Nothing else (the database, sign-in, videos) passes through here.
  */
-const CACHE = 'mashkhall-v4';
+const CACHE = 'mashkhall-v5';
 const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
