@@ -41,8 +41,8 @@ export const SunBurst: React.FC<{ className?: string }> = ({ className = '' }) =
     <svg viewBox="-500 -500 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" className={`pointer-events-none block h-full w-full ${className}`}>
       <defs>
         <radialGradient id={`${id}-ray`} cx="0" cy="0" r="700" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#FEBD11" stopOpacity="0.55" />
-          <stop offset="0.45" stopColor="#E9A12A" stopOpacity="0.22" />
+          <stop offset="0" stopColor="#FEBD11" stopOpacity="0.28" />
+          <stop offset="0.45" stopColor="#E9A12A" stopOpacity="0.1" />
           <stop offset="1" stopColor="#B8461C" stopOpacity="0" />
         </radialGradient>
         <radialGradient id={`${id}-core`} cx="0" cy="0" r="330" gradientUnits="userSpaceOnUse">

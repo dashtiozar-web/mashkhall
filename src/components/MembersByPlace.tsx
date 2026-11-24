@@ -1,6 +1,15 @@
 import React, { useMemo } from 'react';
 import { useData } from '../context/DataContext';
+import { useLandmarkPhoto } from './LandmarkImage';
 import { ABROAD_IDS, COUNTRIES, PROVINCES, PROVINCE_IDS } from '../lib/places';
+
+/** A small landmark photograph for a place (tries the next photo if one fails). */
+const Thumb: React.FC<{ id: string }> = ({ id }) => {
+  const { src, failed } = useLandmarkPhoto({ id });
+  return src
+    ? <img src={src.replace('width=1920', 'width=320')} alt="" onError={failed} referrerPolicy="no-referrer" loading="lazy" className="h-11 w-16 shrink-0 rounded-md bg-stone-deep object-cover ring-1 ring-line" />
+    : <span className="h-11 w-16 shrink-0 rounded-md bg-stone-deep ring-1 ring-line" aria-hidden="true" />;
+};
 
 /**
  * How many approved members there are in each country abroad and in each of
@@ -28,7 +37,7 @@ export const MembersByPlace: React.FC<{ onOpen?: (slug: string) => void }> = ({ 
     <li>
       <button type="button" onClick={() => onOpen?.(slugOf(r.id))}
         className="group flex w-full cursor-pointer items-center gap-4 rounded-xl px-3 py-2.5 text-start hover:bg-stone">
-        <img src={`/kurdistan/${r.id}.svg`} alt="" className="h-11 w-16 shrink-0 rounded-md object-cover ring-1 ring-line" loading="lazy" />
+        <Thumb id={r.id} />
         <span className="min-w-0 flex-1">
           <span className="flex items-baseline justify-between gap-3">
             <span className="font-semibold text-ink group-hover:underline">{r.name}
