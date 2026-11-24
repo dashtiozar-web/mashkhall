@@ -88,7 +88,7 @@ export const ViewModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           <div className="flex flex-1 justify-center py-6">
             <iframe
               ref={frameRef}
-              title={`17 Shubat website, ${mode} layout`}
+              title={`Mashkhally Zhyanawa website, ${mode} layout`}
               src={window.location.href}
               className="h-[calc(100vh-7rem)] rounded-[1.75rem] border-[10px] border-ink bg-paper shadow-2xl"
               style={{ width: target + 20 }}

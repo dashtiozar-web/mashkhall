@@ -87,7 +87,7 @@ export const INITIAL_TIMELINE: TimelineEvent[] = [
   {
     id: 'hist-2',
     date: '17 February 2015',
-    title: 'Founding of 17 Shubat Organization',
+    title: 'Founding of Mashkhally Zhyanawa Organisation',
     description: 'The organisation was established on 17 February 2015 by community members, writers, and human-rights advocates committed to institutionalising peaceful advocacy, independent research, and continuous support for affected communities.',
     isApproved: true,
   },
@@ -95,7 +95,7 @@ export const INITIAL_TIMELINE: TimelineEvent[] = [
     id: 'hist-5',
     date: 'Present Day',
     title: 'Expanding Nationwide & International Advocacy',
-    description: 'Today, 17 Shubat Organization maintains active city councils, publishes rigorous research across nine primary socio-political topics, and coordinates peaceful awareness campaigns in cooperation with civil society partners.',
+    description: 'Today, Mashkhally Zhyanawa Organisation maintains active city councils, publishes rigorous research across nine primary socio-political topics, and coordinates peaceful awareness campaigns in cooperation with civil society partners.',
     isApproved: true,
   },
 ];
@@ -131,7 +131,7 @@ export const INITIAL_FAQS: FaqItem[] = [
   {
     id: 'faq-1',
     category: 'membership',
-    question: 'Who is eligible to apply for membership with 17 Shubat Organization?',
+    question: 'Who is eligible to apply for membership with Mashkhally Zhyanawa Organisation?',
     answer: 'Membership is open to anyone who shares our commitment to human rights, peaceful awareness, transparency, and freedom of expression. All applicants submit an application which is reviewed by our membership committee.',
     isPublished: true,
   },
@@ -173,7 +173,7 @@ export const INITIAL_FAQS: FaqItem[] = [
   {
     id: 'faq-7',
     category: 'general',
-    question: 'How can our institution or university contact 17 Shubat for speaking engagements?',
+    question: 'How can our institution or university contact Mashkhally Zhyanawa for speaking engagements?',
     answer: 'You can submit an enquiry through our Contact page selecting Academic & Research Enquiry, and our secretariat will respond within 3–5 working days.',
     isPublished: true,
   },

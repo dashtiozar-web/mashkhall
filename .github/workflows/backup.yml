@@ -51,7 +51,7 @@ jobs:
         env:
           BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
         run: |
-          name="17shubat-db-$(date -u +%Y%m%d-%H%M).tar.gz.enc"
+          name="mashkhall-db-$(date -u +%Y%m%d-%H%M).tar.gz.enc"
           tar -C backup-out -czf - . | openssl enc -aes-256-cbc -pbkdf2 -iter 250000 -salt -pass env:BACKUP_PASSPHRASE -out "$name"
           sha256sum "$name" > "$name.sha256"
           cp backup-out/manifest.json manifest.json

@@ -4,7 +4,7 @@
  * library. Audio and video travel through Cloudflare; this server only
  * lets someone use it while they hold a valid seat in a live meeting.
  *
- * Worker secrets (Settings > Variables and secrets of the "17shubat" Worker):
+ * Worker secrets (Settings > Variables and secrets of the "mashkhall" Worker):
  *   SFU_APP_ID, SFU_APP_TOKEN            – Realtime > SFU app (required)
  *   TURN_KEY_ID, TURN_KEY_API_TOKEN      – Realtime > TURN key (recommended:
  *                                          helps people on strict networks)

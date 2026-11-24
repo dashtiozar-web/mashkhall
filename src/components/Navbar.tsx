@@ -75,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
             <Logo size={42} className="rounded-md ring-1 ring-white/20" />
             <span className="leading-tight">
               <span className="block font-serif text-[1.1875rem] font-semibold text-white">{ORG_SHORT}</span>
-              <span className="block text-[0.75rem] tracking-wide text-white/65">Organisation for Human Rights</span>
+              <span className="block w-fit font-kurdish text-[0.875rem] text-white/70" lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</span>
             </span>
           </a>
 

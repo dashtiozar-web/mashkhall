@@ -11,7 +11,7 @@ const save = (href: string, filename: string) => {
 
 /**
  * Download a print-ready QR code (PNG, 1200 px, high error correction) with
- * the "17 SHUBAT" mark in the middle, matching the printed card.
+ * the torch mark in the middle, matching the printed card.
  */
 export const downloadQrPng = async (url: string, filename: string, size = 1200) => {
   const canvas = document.createElement('canvas');
@@ -23,13 +23,14 @@ export const downloadQrPng = async (url: string, filename: string, size = 1200) 
     const x = (w - box) / 2;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(x, x, box, box);
-    ctx.fillStyle = '#111111';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `bold ${Math.round(box * 0.5)}px Georgia, serif`;
-    ctx.fillText('17', w / 2, w / 2 - box * 0.1);
-    ctx.font = `bold ${Math.round(box * 0.14)}px Arial, sans-serif`;
-    ctx.fillText('SHUBAT', w / 2, w / 2 + box * 0.3);
+    const mark = await new Promise<HTMLImageElement | null>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = '/logo-512.png';
+    });
+    const pad = Math.round(box * 0.06);
+    if (mark) ctx.drawImage(mark, x + pad, x + pad, box - pad * 2, box - pad * 2);
   }
   save(canvas.toDataURL('image/png'), filename.endsWith('.png') ? filename : `${filename}.png`);
 };

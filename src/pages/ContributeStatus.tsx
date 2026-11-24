@@ -158,14 +158,14 @@ export const ContributeStatus: React.FC<{ id: string; onNavigate: (tab: string, 
               <h2 className="flex items-center gap-2 text-[1.25rem] font-semibold"><BadgeCheck className="h-5 w-5 text-navy" aria-hidden="true" /> Members publish without a fee</h2>
               {signedIn && isMember ? (
                 <>
-                  <p className="mt-2 text-ink-soft">You are signed in as a member of 17 Shubat, so you do not need to pay. Your work will go straight to editorial review.</p>
+                  <p className="mt-2 text-ink-soft">You are signed in as a member of Mashkhally Zhyanawa, so you do not need to pay. Your work will go straight to editorial review.</p>
                   <Button className="mt-3" disabled={busy} onClick={() => run(() => waivePublicationFee(id), 'No fee is due. Your work has been sent for editorial review.')}>{busy ? 'Please wait…' : 'Send for review without a fee'}</Button>
                 </>
               ) : signedIn ? (
                 <p className="mt-2 text-ink-soft">This account is not linked to a membership. If you are a member, sign in with the account your membership was approved on, or contact us and we will remove the fee.</p>
               ) : (
                 <>
-                  <p className="mt-2 text-ink-soft">If you are a member of 17 Shubat, sign in with your member account and you will not be asked to pay. Your work then goes straight to editorial review. Keep this page open.</p>
+                  <p className="mt-2 text-ink-soft">If you are a member of Mashkhally Zhyanawa, sign in with your member account and you will not be asked to pay. Your work then goes straight to editorial review. Keep this page open.</p>
                   {onOpenAuth && <Button className="mt-3" onClick={() => onOpenAuth('signin')}>Sign in as a member</Button>}
                 </>
               )}

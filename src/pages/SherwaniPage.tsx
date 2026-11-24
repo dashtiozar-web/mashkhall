@@ -77,7 +77,7 @@ export const SherwaniPage: React.FC = () => {
   const m = useMemorial();
   const [cl, setCl] = useState<CL>(prefLang);
   useEffect(() => { try { localStorage.setItem('17shubat_memorial_lang', cl); } catch { /* storage blocked */ } }, [cl]);
-  useEffect(() => { document.title = `${S_TITLE.en} | 17 Shubat`; }, []);
+  useEffect(() => { document.title = `${S_TITLE.en} | Mashkhally Zhyanawa`; }, []);
   const t = T[cl];
   const dir = cl === 'ckb' ? 'rtl' : 'ltr';
   // An approved portrait added from Administration replaces the one supplied by the organisation.

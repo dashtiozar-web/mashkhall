@@ -15,7 +15,7 @@ const STATE_STYLE: Record<VerificationState, { box: string; icon: React.ReactNod
   active: {
     box: 'border-navy bg-navy-tint',
     icon: <CheckCircle2 className="h-10 w-10 text-navy" aria-hidden="true" />,
-    message: 'This is a current member of 17 Shubat Organisation for Human Rights.',
+    message: 'This is a current member of Mashkhally Zhyanawa Organisation.',
   },
   expired: {
     box: 'border-amber bg-amber-tint',

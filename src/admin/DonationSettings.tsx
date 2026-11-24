@@ -140,7 +140,7 @@ export const DonationSettings: React.FC<{ onNavigate: (tab: string) => void }> =
       <div className="rounded-2xl border border-line bg-surface p-6">
         {!loaded ? <p className="text-muted">Loading…</p> : (
           <div className="grid gap-5 sm:grid-cols-2">
-            {input('accountHolder', 'Name on the account', { placeholder: '17 Shubat Organization for Human Rights' })}
+            {input('accountHolder', 'Name on the account', { placeholder: 'Mashkhally Zhyanawa Organisation' })}
             {input('bankName', 'Bank', { placeholder: 'For example: Barclays' })}
             {input('accountNumber', 'Account number', { mono: true, inputMode: 'numeric', placeholder: '12345678', hint: '8 digits', onChange: (v) => set('accountNumber', v.replace(/[^\d\s]/g, '').slice(0, 9)) })}
             {input('sortCode', 'Sort code', { mono: true, inputMode: 'numeric', placeholder: '12-34-56', onChange: (v) => set('sortCode', formatSortCode(v)) })}

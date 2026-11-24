@@ -209,7 +209,7 @@ export const MemorialPage: React.FC<{ onNavigate?: (tab: string, param?: string)
   const [q, setQ] = useState('');
   const [month, setMonth] = useState('');
   useEffect(() => { try { localStorage.setItem('17shubat_memorial_lang', cl); } catch { /* storage blocked */ } }, [cl]);
-  useEffect(() => { document.title = `${MEMORIAL_TITLE.en} | 17 Shubat`; }, []);
+  useEffect(() => { document.title = `${MEMORIAL_TITLE.en} | Mashkhally Zhyanawa`; }, []);
   void ui;
   const t = T[cl];
   const dir = cl === 'ckb' ? 'rtl' : 'ltr';

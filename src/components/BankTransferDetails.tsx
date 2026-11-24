@@ -44,7 +44,7 @@ export const BankTransferDetails: React.FC<{ amount?: string; reference?: string
  */
 export const VoluntaryContribution: React.FC<{ value: 'yes' | 'no' | ''; onChange: (v: 'yes' | 'no') => void }> = ({ value, onChange }) => (
   <fieldset className="rounded-2xl border border-line bg-surface p-4 sm:p-5">
-    <legend className="px-1 text-[1rem] font-semibold">Would you like to make a voluntary contribution to support the work of 17 Shubat Organization?</legend>
+    <legend className="px-1 text-[1rem] font-semibold">Would you like to make a voluntary contribution to support the work of Mashkhally Zhyanawa Organisation?</legend>
     <div className="mt-2 space-y-2">
       <label className="flex cursor-pointer items-center gap-3"><input type="radio" name="voluntary" checked={value === 'yes'} onChange={() => onChange('yes')} className="h-4 w-4" /> Yes, I would like to contribute.</label>
       <label className="flex cursor-pointer items-center gap-3"><input type="radio" name="voluntary" checked={value === 'no'} onChange={() => onChange('no')} className="h-4 w-4" /> No, I do not wish to contribute.</label>

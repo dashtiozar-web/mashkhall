@@ -234,7 +234,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrentUser(null);
         setUserProfile(null);
         setLoading(false);
-        window.alert('This account has been removed by 17 Shubat Organization for Human Rights.');
+        window.alert('This account has been removed by Mashkhally Zhyanawa Organisation.');
         return;
       }
       setCurrentUser(user);

@@ -1,4 +1,4 @@
-# 17 Shubat Organization — Security Specification & Threat Model
+# Mashkhally Zhyanawa Organisation — Security Specification & Threat Model
 
 ## 1. System Invariants
 

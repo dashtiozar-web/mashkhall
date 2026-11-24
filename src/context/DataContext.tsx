@@ -77,7 +77,7 @@ interface DataContextType {
 const defaultSiteSettings: SiteSettings = {
   id: 'default',
   mission: 'We inform, connect, and mobilise communities to challenge injustice peacefully, promote transparency, and uphold human rights worldwide.',
-  background: '17 Shubat Organization describes its founding date as 17 February 2015, inspired by peaceful civil demonstrations in Kurdistan in February 2011 calling for institutional transparency, freedom of expression, and an end to systemic corruption. Our work is dedicated to peaceful human-rights advocacy, research, and grassroots solidarity.',
+  background: 'Mashkhally Zhyanawa Organisation describes its founding date as 17 February 2015, inspired by peaceful civil demonstrations in Kurdistan in February 2011 calling for institutional transparency, freedom of expression, and an end to systemic corruption. Our work is dedicated to peaceful human-rights advocacy, research, and grassroots solidarity.',
   history: INITIAL_TIMELINE,
   faqs: INITIAL_FAQS,
   areasOfWork: INITIAL_AREAS_OF_WORK,
@@ -470,7 +470,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Tell the applicant what happened.
       const applicantId = id.startsWith('app-') ? id.slice(4) : undefined;
       const messages: Partial<Record<string, { title: string; body?: string }>> = {
-        approved: { title: 'Your membership application has been approved', body: 'Welcome to 17 Shubat. Your membership card will be issued shortly.' },
+        approved: { title: 'Your membership application has been approved', body: 'Welcome to Mashkhally Zhyanawa. Your membership card will be issued shortly.' },
         changes_requested: { title: 'The membership committee has asked for changes', body: feedback || 'Please update your application and send it again.' },
         rejected: { title: 'Update on your membership application', body: feedback || 'Your application was not accepted this time.' },
         under_review: { title: 'Your application is being reviewed', body: 'The membership committee has started reviewing your application.' },

@@ -13,7 +13,7 @@ const LOOK: Record<State, { box: string; icon: React.ReactNode; title: string; m
     box: 'border-navy bg-navy-tint',
     icon: <CheckCircle2 className="h-9 w-9 shrink-0 text-navy" aria-hidden="true" />,
     title: 'Valid membership',
-    message: 'This person is a current member of 17 Shubat Organisation for Human Rights.',
+    message: 'This person is a current member of Mashkhally Zhyanawa Organisation.',
   },
   expired: {
     box: 'border-amber bg-amber-tint',
@@ -115,7 +115,7 @@ export const IdCheckPage: React.FC<{ token: string; onNavigate: (tab: string, pa
           </div>
         </div>
       )}
-      <p className="mt-6 text-[0.875rem] text-muted">Only scan cards with your phone’s camera and check that the address starts with https://17shubat.org.uk/id/. If anything looks wrong, contact us through the website.</p>
+      <p className="mt-6 text-[0.875rem] text-muted">Only scan cards with your phone’s camera and check that the address starts with https://mashkhall.com/id/. If anything looks wrong, contact us through the website.</p>
     </Container>
   );
 };

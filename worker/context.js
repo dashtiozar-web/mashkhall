@@ -8,7 +8,7 @@ import * as L from './meetingLogic.js';
 import { councilsOf } from './councils.js';
 
 export const OWNER = 'dashtiozar@gmail.com';
-export const SITE = 'https://17shubat.org.uk';
+export const SITE = 'https://mashkhall.com';
 
 export class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }

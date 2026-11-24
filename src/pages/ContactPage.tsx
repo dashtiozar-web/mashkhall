@@ -113,7 +113,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                 <span>
                   I have read the{' '}
                   <TextLink onClick={() => onNavigate('legal')} className="font-semibold">privacy policy</TextLink> and agree to
-                  17 Shubat using these details to reply to me.
+                  Mashkhally Zhyanawa using these details to reply to me.
                 </span>
               </label>
               {error && <p role="alert" className="border-s-4 border-crimson bg-crimson/5 px-4 py-3 text-[0.9688rem] text-ink">{error}</p>}

@@ -12,18 +12,18 @@ import dns from 'node:dns/promises';
 import tls from 'node:tls';
 import { writeFileSync } from 'node:fs';
 
-const DOMAIN = process.env.MONITOR_DOMAIN || '17shubat.org.uk';
+const DOMAIN = process.env.MONITOR_DOMAIN || 'mashkhall.com';
 const SITE = `https://${DOMAIN}`;
 const results = []; // { name, ok, critical, detail }
 const add = (name, ok, detail = '', critical = true) => results.push({ name, ok, critical, detail });
 const timed = async (fn) => { const t = Date.now(); const r = await fn(); return [r, Date.now() - t]; };
-const get = (url, init = {}) => fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(20000), headers: { 'user-agent': '17shubat-monitor (GitHub Actions)' }, ...init });
+const get = (url, init = {}) => fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(20000), headers: { 'user-agent': 'mashkhall-monitor (GitHub Actions)' }, ...init });
 
 // ---------------------------------------------------------------- website
 try {
   const [res, ms] = await timed(() => get(`${SITE}/`));
   const body = await res.text();
-  add('Home page', res.status === 200 && /17 Shubat/i.test(body), `HTTP ${res.status}, ${ms} ms`);
+  add('Home page', res.status === 200 && /Mashkhally Zhyanawa/i.test(body), `HTTP ${res.status}, ${ms} ms`);
   const h = (k) => res.headers.get(k) || '';
   add('Security headers', /default-src 'self'/.test(h('content-security-policy')) && /max-age=\d+/.test(h('strict-transport-security')) && h('x-content-type-options') === 'nosniff',
     `CSP ${h('content-security-policy') ? 'on' : 'MISSING'}, HSTS ${h('strict-transport-security') ? 'on' : 'MISSING'}, nosniff ${h('x-content-type-options') || 'MISSING'}`);

@@ -753,7 +753,7 @@ Example Person,person@example.org,,London,,general_member,no,,`;
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-navy text-white">
-                17 Shubat
+                Mashkhally Zhyanawa
               </span>
               <span className="text-[0.8438rem] text-slate-400">
                 {isOwner ? '👑 Organization Owner' : '🛡️ Administrator'}

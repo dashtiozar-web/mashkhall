@@ -187,7 +187,7 @@ export const AppreciationAdmin: React.FC = () => {
           <label className="block font-semibold">Signatory’s name<input className={field} value={settings.signatoryName || ''} onChange={(e) => setSettings({ ...settings, signatoryName: e.target.value })} dir="auto" /></label>
           <label className="block font-semibold">Signatory’s position<input className={field} value={settings.signatoryTitle || ''} placeholder="President" onChange={(e) => setSettings({ ...settings, signatoryTitle: e.target.value })} /></label>
           <label className="block font-semibold sm:col-span-2">Statement on the letter
-            <textarea rows={3} maxLength={600} className={field} value={settings.statement || ''} placeholder="In recognition of your active participation and your contribution to the work of 17 Shubat Organisation for Human Rights." onChange={(e) => setSettings({ ...settings, statement: e.target.value })} />
+            <textarea rows={3} maxLength={600} className={field} value={settings.statement || ''} placeholder="In recognition of your active participation and your contribution to the work of Mashkhally Zhyanawa Organisation." onChange={(e) => setSettings({ ...settings, statement: e.target.value })} />
           </label>
           <div className="sm:col-span-2">
             <p className="font-semibold">Signature image <span className="font-normal text-muted">(optional; only if the signatory has authorised it)</span></p>

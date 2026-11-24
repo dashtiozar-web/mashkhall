@@ -4,7 +4,7 @@ import { MemberRecord, Verification, VerificationState } from '../types';
 import { issueCard, setMemberStatus } from './memberApi';
 
 /** Used in QR codes until an administrator sets the address in Settings. */
-export const DEFAULT_SITE_URL = 'https://17shubat.org.uk';
+export const DEFAULT_SITE_URL = 'https://mashkhall.com';
 
 /** Membership numbers follow the printed cards: M followed by seven digits. */
 export const MEMBER_NUMBER_PATTERN = /^M\d{7}$/;

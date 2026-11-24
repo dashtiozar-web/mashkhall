@@ -62,7 +62,7 @@ const SetupGuide: React.FC<{ setup: AdminData['setup'] | null; error?: string }>
       {error && <p className="mt-2 text-crimson">{error}</p>}
       <ol className="mt-4 space-y-5">
         <Step done={Boolean(setup?.database)} title="1. Firebase service account (lets the server record attendance and points)">
-          <p>Firebase console › Project settings › Service accounts › “Generate new private key”. Then Cloudflare dashboard › Workers › 17shubat › Settings › Variables and secrets › Add › type “Secret”, name <code>FIREBASE_SERVICE_ACCOUNT</code>, and paste the whole contents of the downloaded file.</p>
+          <p>Firebase console › Project settings › Service accounts › “Generate new private key”. Then Cloudflare dashboard › Workers › mashkhall › Settings › Variables and secrets › Add › type “Secret”, name <code>FIREBASE_SERVICE_ACCOUNT</code>, and paste the whole contents of the downloaded file.</p>
         </Step>
         <Step done={Boolean(setup?.video)} title="2. Cloudflare Realtime video (free up to 1,000 GB a month)">
           <p>Cloudflare dashboard › Realtime › SFU › Create application. Add its App ID and token as secrets <code>SFU_APP_ID</code> and <code>SFU_APP_TOKEN</code>.</p>

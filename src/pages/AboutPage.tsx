@@ -45,7 +45,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
   return (
     <>
-      <PageHeader title="About 17 Shubat" intro={siteSettings.mission} />
+      <PageHeader title="About Mashkhally Zhyanawa" intro={siteSettings.mission} />
 
       <section>
         <Container className="grid gap-14 py-16 sm:py-20 lg:grid-cols-[2fr_1fr] lg:gap-20">
@@ -59,7 +59,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               </p>
               <p>
                 We do not want the principles of that movement to be forgotten or distorted. On 17 February 2015,
-                members of the Kurdish community in the United Kingdom founded 17 Shubat as a lasting, structured
+                members of the Kurdish community in the United Kingdom founded Mashkhally Zhyanawa as a lasting, structured
                 organisation to keep that work going: documenting what happens, researching its causes, and supporting
                 people who face injustice.
               </p>

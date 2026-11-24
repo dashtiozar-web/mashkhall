@@ -13,7 +13,7 @@ export const InstallApp: React.FC = () => {
       <div className="flex items-center gap-3">
         <img src="/icons/icon-192.png" alt="" width={44} height={44} className="h-11 w-11 rounded-xl" />
         <div>
-          <p className="text-[0.9375rem] font-semibold text-white">17 Shubat app</p>
+          <p className="text-[0.9375rem] font-semibold text-white">Mashkhally Zhyanawa app</p>
           <p className="text-[0.875rem] text-white/70">Add the website to your home screen and open it like an app.</p>
         </div>
       </div>

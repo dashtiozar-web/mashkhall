@@ -58,7 +58,7 @@ export const DonatePage: React.FC<DonatePageProps> = ({ onNavigate }) => {
     <>
       <PageHeader
         title="Support our work"
-        intro="17 Shubat is funded by its members and supporters. We do not take money from governments or political parties, so every donation helps keep our work independent."
+        intro="Mashkhally Zhyanawa is funded by its members and supporters. We do not take money from governments or political parties, so every donation helps keep our work independent."
       />
 
       <Container className="grid gap-14 py-16 sm:py-20 lg:grid-cols-[1.2fr_1fr] lg:gap-20">

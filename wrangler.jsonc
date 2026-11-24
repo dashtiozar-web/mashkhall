@@ -1,10 +1,10 @@
-// Cloudflare deployment settings for the 17 Shubat website.
+// Cloudflare deployment settings for the Mashkhally Zhyanawa website.
 // Every page address (/about, /news/…) is served the app, so links and
 // bookmarks work and search engines can index each page. Addresses under
 // /api/ go to the worker (worker/index.js): the visitor counter and the
 // online meetings. Every five minutes the worker sends meeting reminders.
 {
-  "name": "17shubat",
+  "name": "mashkhall",
   "main": "worker/index.js",
   "compatibility_date": "2025-09-01",
   "assets": {

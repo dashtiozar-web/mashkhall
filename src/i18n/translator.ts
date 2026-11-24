@@ -49,7 +49,7 @@ export const lookup = (text: string): string | null => {
     const t = dict[templ];
     if (t !== undefined) return t.replace(/\{(\d+)\}/g, (_, i) => nums[Number(i)] ?? '');
   }
-  // "Page title | 17 Shubat"
+  // "Page title | Mashkhally Zhyanawa"
   if (key.includes(' | ')) {
     const parts = key.split(' | ').map((p) => dict![p] ?? p);
     if (parts.some((p, i) => p !== key.split(' | ')[i])) return parts.join(' | ');

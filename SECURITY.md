@@ -1,6 +1,6 @@
 # Security, recovery and incident response
 
-The 17 Shubat website publishes political and human-rights material and is
+The Mashkhally Zhyanawa website publishes political and human-rights material and is
 used by members in the UK, Iraq, the Kurdistan Region and Iran. This file
 records how it is protected, how to recover it, and what to do in an
 incident. No website can be made impossible to attack or to block; the aim
@@ -13,7 +13,7 @@ is strong protection, early warning and fast recovery.
 | Website and server code | Cloudflare Workers (`worker/`, `dist/`) | No origin server: Cloudflare serves everything, so there is no server address to discover or attack directly. |
 | Database and sign-in | Google Firebase (project `shubat-ac738`) | Protected by `firestore.rules` (tested in CI). |
 | Video meetings | Cloudflare Realtime SFU | Only people the meeting room has admitted can use it. |
-| Code | GitHub `dashtiozar-web/17shubat` (private) | Every change is built and tested before it goes live. |
+| Code | GitHub `dashtiozar-web/mashkhall` (private) | Every change is built and tested before it goes live. |
 
 ## Protections in place
 

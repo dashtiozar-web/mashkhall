@@ -1,5 +1,5 @@
 /**
- * The official structure of 17 Shubat Organization for Human Rights.
+ * The official structure of Mashkhally Zhyanawa Organisation.
  *
  * Four parts:
  *  1. Board of Directors: eight central positions, one person each.

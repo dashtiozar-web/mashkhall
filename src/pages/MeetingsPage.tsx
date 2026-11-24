@@ -843,7 +843,7 @@ export const MeetingsPage: React.FC<Props> = ({ param, onNavigate, onOpenAuth })
   if (!currentUser) {
     return (
       <>
-        <PageHeader title="Online meetings" intro="Private meeting rooms for members of 17 Shubat. Please sign in with your member account." />
+        <PageHeader title="Online meetings" intro="Private meeting rooms for members of Mashkhally Zhyanawa. Please sign in with your member account." />
         <Container className="py-12"><EmptyState title="Members only" body="Online meetings are open only to approved members, in the rooms of their own council or group." action={<Button onClick={onOpenAuth}>Sign in</Button>} /></Container>
       </>
     );

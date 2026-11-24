@@ -93,7 +93,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => (
       <InstallApp />
 
       <div className="mt-6 flex flex-col gap-3 border-t border-white/15 pt-6 text-[0.875rem] text-white/60 sm:flex-row sm:justify-between">
-        <p>© {new Date().getFullYear()} {ORG_NAME}. Registered in England and Wales, company number 16809857. <a href="mailto:info@17shubat.org.uk" translate="no" className="ltr-value text-white/80 underline underline-offset-2 hover:text-white">info@17shubat.org.uk</a>. <a href={DEFAULT_FACEBOOK_PAGE} target="_blank" rel="noopener noreferrer" className="text-white/80 underline underline-offset-2 hover:text-white">Facebook</a></p>
+        <p>© {new Date().getFullYear()} {ORG_NAME}. Registered in England and Wales, company number 16809857. <a href="mailto:info@mashkhall.com" translate="no" className="ltr-value text-white/80 underline underline-offset-2 hover:text-white">info@mashkhall.com</a>. <a href={DEFAULT_FACEBOOK_PAGE} target="_blank" rel="noopener noreferrer" className="text-white/80 underline underline-offset-2 hover:text-white">Facebook</a></p>
         <p>Named after the peaceful protests that began in Sulaymaniyah on 17 February 2011.</p>
       </div>
     </Container>

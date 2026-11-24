@@ -11,7 +11,7 @@ let fake: Fake;
 const tokens: Record<string, string> = {};
 const call = async (path: string, body?: unknown, as = 'owner') => {
   const handler = path.startsWith('appreciation/') ? handleCertificates : handleMembers;
-  const res = await handler(new Request(`https://17shubat.org.uk/api/${path}`, {
+  const res = await handler(new Request(`https://mashkhall.com/api/${path}`, {
     method: body === undefined ? 'GET' : 'POST',
     headers: { authorization: `Bearer ${tokens[as] || ''}`, 'content-type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -34,7 +34,7 @@ beforeEach(() => {
   fake.set('users/owner-uid', { roles: ['owner'] });
   fake.set('users/reviewer', { roles: ['member', 'membership_reviewer'] });
   fake.set('users/carol', { roles: ['member'] });
-  fake.set('members/alice', { userId: 'alice', fullName: 'Alice Kareem', displayName: 'Alice K.', chapterId: 'london', status: 'active', positionId: 'council_photographer', memberNumber: 'M0000005', updatedAt: '2026-01-01T00:00:00.000Z', verifyToken: 'MemberCardTokenAAAAAAAA', verifyUrl: 'https://17shubat.org.uk/id/MemberCardTokenAAAAAAAA', credentialIssuedAt: '2025-01-01' });
+  fake.set('members/alice', { userId: 'alice', fullName: 'Alice Kareem', displayName: 'Alice K.', chapterId: 'london', status: 'active', positionId: 'council_photographer', memberNumber: 'M0000005', updatedAt: '2026-01-01T00:00:00.000Z', verifyToken: 'MemberCardTokenAAAAAAAA', verifyUrl: 'https://mashkhall.com/id/MemberCardTokenAAAAAAAA', credentialIssuedAt: '2025-01-01' });
   fake.set('members/carol', { userId: 'carol', fullName: 'Carol', status: 'active', chapterId: 'london' });
   fake.set('site_settings/appreciation', { signatoryName: 'Sangar Hussein', signatoryTitle: 'Vice President' });
 });
@@ -52,7 +52,7 @@ describe('Appreciation workflow', () => {
     const a = fake.get(`appreciation_awards/${id}`) as any;
     expect(a.status).toBe('published');
     expect(a.number).toMatch(/^17S-APP-2026-[2-9A-Z]{6}$/);
-    expect(a.verifyUrl).toBe(`https://17shubat.org.uk/appreciation/${id}`);
+    expect(a.verifyUrl).toBe(`https://mashkhall.com/appreciation/${id}`);
     // Separate from the membership card's verification.
     expect(a.verifyUrl).not.toContain('MemberCardToken');
     expect(a.name).toBe('Alice Kareem');

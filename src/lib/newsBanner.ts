@@ -3,7 +3,7 @@ import { collection, deleteDoc, doc, getDoc, onSnapshot, query, where } from 'fi
 import { auth, db, safeSetDoc, safeUpdateDoc } from '../firebase';
 import { NewsBanner } from '../types';
 
-export const DEFAULT_BANNER_MESSAGE = '17 Shubat Organization for Human Rights';
+export const DEFAULT_BANNER_MESSAGE = 'Mashkhally Zhyanawa Organisation';
 
 export type BannerPhase = 'live' | 'scheduled' | 'ended' | 'draft' | 'archived';
 

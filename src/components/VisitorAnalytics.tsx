@@ -190,7 +190,7 @@ export const VisitorAnalytics: React.FC<{ mode?: Mode }> = ({ mode = 'public' })
     const blob = new Blob([toCsv(stats)], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `17shubat-visitors-${stats.range ? `${stats.range.from}_${stats.range.to}` : 'all-time'}.csv`;
+    a.download = `mashkhall-visitors-${stats.range ? `${stats.range.from}_${stats.range.to}` : 'all-time'}.csv`;
     a.click();
     URL.revokeObjectURL(a.href);
   };

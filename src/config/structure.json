@@ -1,5 +1,5 @@
 {
-  "_comment": "The official structure of 17 Shubat Organization for Human Rights. Used by the website, the server and (through scripts/sync-pricing.ts) the database rules. 'number' is seniority: lower is more senior. Run `npx tsx scripts/sync-pricing.ts` after changing it.",
+  "_comment": "The official structure of Mashkhally Zhyanawa Organisation. Used by the website, the server and (through scripts/sync-pricing.ts) the database rules. 'number' is seniority: lower is more senior. Run `npx tsx scripts/sync-pricing.ts` after changing it.",
   "units": [
     { "id": "board", "number": 1, "name": "Board of Directors" },
     { "id": "council", "number": 2, "name": "Council Structure" },

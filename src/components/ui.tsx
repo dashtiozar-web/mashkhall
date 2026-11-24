@@ -2,13 +2,13 @@ import React from 'react';
 import { localeOf } from '../i18n/lang';
 
 /**
- * Shared building blocks for the 17 Shubat site.
+ * Shared building blocks for the Mashkhally Zhyanawa site.
  * Keep pages composed from these so spacing, type and colour stay consistent.
  */
 
-export const LOGO_URL = 'https://pub-a93d746cecd74baeb713913a45e911cf.r2.dev/222222.jpg';
-export const ORG_NAME = '17 Shubat Organisation for Human Rights';
-export const ORG_SHORT = '17 Shubat';
+export const LOGO_URL = '/logo.svg';
+export const ORG_NAME = 'Mashkhally Zhyanawa Organisation';
+export const ORG_SHORT = 'Mashkhally Zhyanawa';
 
 const cx = (...classes: (string | false | null | undefined)[]) => classes.filter(Boolean).join(' ');
 
@@ -125,7 +125,7 @@ export const Logo: React.FC<{ size?: number; className?: string }> = ({ size = 4
         style={{ width: size, height: size, fontSize: size * 0.45 }}
         aria-hidden="true"
       >
-        17
+        MZ
       </span>
     );
   }

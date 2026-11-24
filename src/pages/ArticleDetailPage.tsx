@@ -164,7 +164,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ slug, onNa
         <Container narrow className="pt-12 pb-10 sm:pt-16">
           <TextLink onClick={() => onNavigate('news')} className="text-[0.9375rem]">News and reports</TextLink>
           <p className="mt-8 text-[0.9375rem] font-semibold text-navy">
-            {article.isOfficialNews ? 'Statement from 17 Shubat' : categoryLabel(article.category)}
+            {article.isOfficialNews ? 'Statement from Mashkhally Zhyanawa' : categoryLabel(article.category)}
           </p>
           <h1 dir={dir} lang={article.language} data-i18n-skip="" className={`mt-3 font-semibold ${dir === 'rtl' ? 'text-[2.125rem] leading-[1.5] sm:text-[2.75rem]' : 'text-[2.375rem] leading-[1.1] sm:text-[3.25rem]'}`}>{article.title}</h1>
           {article.excerpt && (
@@ -294,7 +294,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ slug, onNa
       {related.length > 0 && (
         <section className="border-t border-line bg-stone">
           <Container className="py-14">
-            <h2 className="text-[1.75rem] font-semibold">More from 17 Shubat</h2>
+            <h2 className="text-[1.75rem] font-semibold">More from Mashkhally Zhyanawa</h2>
             <ul className="mt-8 grid gap-8 md:grid-cols-3">
               {related.map((a) => (
                 <li key={a.id}>

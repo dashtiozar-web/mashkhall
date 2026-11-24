@@ -80,7 +80,7 @@ const StatusView: React.FC<{
       state: approved || rejected ? 'done' : changes ? 'stopped' : 'current',
     },
     {
-      title: approved ? 'Welcome to 17 Shubat' : 'Decision',
+      title: approved ? 'Welcome to Mashkhally Zhyanawa' : 'Decision',
       body: approved
         ? 'Your membership is confirmed.'
         : rejected
@@ -283,7 +283,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
     if (s === 2 && !councilId) e.council = 'Please choose the council nearest to you.';
     if (s === 2 && !positionById(positionId)) e.position = 'Please choose one position.';
     if (s === 3 && reason.trim().length < 20) e.reason = 'Please write a sentence or two (at least 20 characters).';
-    if (s === 3 && !involvement) e.involvement = 'Please tell us whether you are already a member of 17 Shubat.';
+    if (s === 3 && !involvement) e.involvement = 'Please tell us whether you are already a member of Mashkhally Zhyanawa.';
     if (s === 3 && involvement !== 'new' && involvement && !involvedSince) e.involvement = 'Please give the date you became a member.';
     if (s === 3 && involvedSince && involvedSince > new Date().toISOString().slice(0, 10)) e.involvement = 'The date cannot be in the future.';
     if (s === 4) {
@@ -452,7 +452,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
           {step === 0 && !editing && (
             <div className="mb-8 text-center">
               <p className="font-kurdish text-[1.5rem] text-navy" lang="ckb" dir="rtl">بەخێربێن</p>
-              <h1 className="mt-1 text-[2.25rem] leading-tight font-semibold sm:text-[2.75rem]">Join 17 Shubat</h1>
+              <h1 className="mt-1 text-[2.25rem] leading-tight font-semibold sm:text-[2.75rem]">Join Mashkhally Zhyanawa</h1>
               <p className="mx-auto mt-3 max-w-[36rem] text-[1.0938rem] text-ink-soft">
                 It takes about five minutes. Our membership committee reviews every application, and your personal
                 details are never published.
@@ -637,7 +637,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                   {err('reason')}
                 </label>
                 <fieldset>
-                  <legend className={labelCls}>Are you already a member of 17 Shubat Organization for Human Rights?</legend>
+                  <legend className={labelCls}>Are you already a member of Mashkhally Zhyanawa Organisation?</legend>
                   <p className="mt-1 text-[0.9375rem] font-normal text-muted">If you already hold a membership card or were a member before this website, tell us the date you became a member.</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2" role="radiogroup">
                     {INVOLVEMENT_OPTIONS.map((o) => (
@@ -795,7 +795,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                   <label className="flex cursor-pointer items-start gap-3">
                     <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[var(--c-pine)]" />
                     <span className="text-ink">
-                      I agree to 17 Shubat’s principles of non-violence and human rights, to being listed publicly as a member, and to the{' '}
+                      I agree to Mashkhally Zhyanawa’s principles of non-violence and human rights, to being listed publicly as a member, and to the{' '}
                       <a href="/legal" target="_blank" rel="noopener" className="font-semibold text-navy underline underline-offset-4">terms of membership</a>.
                     </span>
                   </label>

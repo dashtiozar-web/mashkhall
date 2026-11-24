@@ -71,7 +71,7 @@ const Logo: React.FC<{ size: string; faded?: boolean }> = ({ size, faded }) => {
         }}
         aria-hidden="true"
       >
-        17
+        MZ
       </span>
     );
   }
@@ -203,7 +203,7 @@ export const MemberCardFront: React.FC<CardProps> = ({ member, unit }) => {
 /** Long position titles get smaller type so they fit the pill on one or two lines. */
 const pillSize = (t: string) => (t.length <= 14 ? '5.8cqw' : t.length <= 20 ? '4.8cqw' : t.length <= 26 ? '4cqw' : '3.5cqw');
 
-/** QR code for the member's fixed verification link, with the "17" mark in
+/** QR code for the member's fixed verification link, with the torch mark in
  *  the middle like the printed card (high error correction keeps it readable). */
 export const MemberQr: React.FC<{ url: string; size?: string }> = ({ url, size = '42cqw' }) => {
   const [svg, setSvg] = useState('');
@@ -217,14 +217,13 @@ export const MemberQr: React.FC<{ url: string; size?: string }> = ({ url, size =
   return (
     <div className="relative bg-white" style={{ width: size, height: size }}>
       <div className="h-full w-full [&>svg]:h-full [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
-      <span
-        className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center bg-white font-bold leading-none"
-        style={{ width: '24%', height: '24%', fontFamily: 'Georgia, serif', color: '#111' }}
+      <img
+        src="/logo.svg"
+        alt=""
         aria-hidden="true"
-      >
-        <span style={{ fontSize: '3.4cqw' }}>17</span>
-        <span style={{ fontSize: '0.95cqw', letterSpacing: '0.08em', fontFamily: CARD_FONT }}>SHUBAT</span>
-      </span>
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-[0.6cqw] border-white bg-white"
+        style={{ width: '24%', height: '24%' }}
+      />
     </div>
   );
 };
@@ -239,12 +238,12 @@ export const MemberCardBack: React.FC<CardProps> = ({ member }) => (
       [26, 65], [42, 65], [58, 65], [74, 65],
     ]} />
     <div className="absolute inset-x-[16%] text-center" style={{ top: '30.5%', fontSize: '3.7cqw', lineHeight: 1.25 }}>
-      <p className="font-bold" style={{ fontSize: '4.7cqw' }}>17 Shubat for Human Rights</p>
+      <p className="font-bold" style={{ fontSize: '4.7cqw' }}>Mashkhally Zhyanawa Organisation</p>
       <p>Registered in England and Wales</p>
       <p className="mt-[2.6cqw] font-bold">Nature of business:</p>
       <p>Research and experimental development on social sciences and humanities</p>
       <p className="mt-[2.6cqw]"><span className="font-bold">Company Registration Number:</span> 16809857</p>
-      <p className="mt-[2.2cqw]"><span className="font-bold">Email:</span> info@17shubat.org.uk</p>
+      <p className="mt-[2.2cqw]"><span className="font-bold">Email:</span> info@mashkhall.com</p>
     </div>
     {member.joinedAt && (
       <p className="absolute inset-x-0 text-center" style={{ top: '66.6%', fontSize: '3.4cqw' }}>

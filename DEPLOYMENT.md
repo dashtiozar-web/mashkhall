@@ -1,6 +1,6 @@
-# 17 Shubat Organization — Deployment & Operations Guide
+# Mashkhally Zhyanawa Organisation — Deployment & Operations Guide
 
-This guide documents the architecture, administrative onboarding, security policies, and production deployment procedures for the **17 Shubat Organization** platform.
+This guide documents the architecture, administrative onboarding, security policies, and production deployment procedures for the **Mashkhally Zhyanawa Organisation** platform.
 
 ---
 
@@ -46,8 +46,8 @@ When moving from development to a production environment:
      browser sends work. It is not an account and grants no membership.
    - **Fixes `auth/unauthorized-domain`**: open **Authentication → Settings →
      Authorized domains** and add every address the website is opened on:
-     `17shubat.org.uk`, `www.17shubat.org.uk`, and the Cloudflare Workers
-     address (`17shubat.<your-subdomain>.workers.dev`). Google sign-in fails
+     `mashkhall.com`, `www.mashkhall.com`, and the Cloudflare Workers
+     address (`mashkhall.<your-subdomain>.workers.dev`). Google sign-in fails
      with this error on any address that is not on the list.
    - Signing in with Google never makes anyone a member: membership is granted
      only when the committee approves an application.
@@ -158,7 +158,7 @@ that Cloudflare charges $0.05 per GB. Everything else (who may enter, the
 waiting room, chat, attendance, points, letters) runs on the website's own
 server (`worker/meetings.js`, `worker/meetingRoom.js`, `worker/appreciation.js`).
 
-### One-time set-up (Cloudflare dashboard › Workers › 17shubat › Settings › Variables and secrets, type "Secret")
+### One-time set-up (Cloudflare dashboard › Workers › mashkhall › Settings › Variables and secrets, type "Secret")
 
 | Secret | Where it comes from |
 | --- | --- |

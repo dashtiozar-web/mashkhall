@@ -1,12 +1,12 @@
 /*
- * 17 Shubat app service worker.
+ * Mashkhally Zhyanawa app service worker.
  * - Pages: always fetched from the network so the newest version shows;
  *   if the device is offline, the last saved copy of the app is used.
  * - Built files (/assets/…, named by their content) and icons: kept once
  *   downloaded, so the app opens quickly.
  * Nothing else (the database, sign-in, videos) passes through here.
  */
-const CACHE = '17shubat-v2';
+const CACHE = 'mashkhall-v3';
 const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {

@@ -5,7 +5,6 @@ import { Button, Container, EmptyState, SectionHeading, TextLink, categoryLabel,
 import { Article } from '../types';
 import { CouncilRanking, UKCouncilMap } from '../components/UKCouncilMap';
 import { MemberCount } from '../components/MemberCount';
-import { BleedingEdge } from '../components/BleedingEdge';
 import { VisitorAnalytics } from '../components/VisitorAnalytics';
 import { LandmarkCover } from '../components/LandmarkCover';
 import { FacebookFeed } from '../components/FacebookFeed';
@@ -16,27 +15,17 @@ interface HomePageProps {
   onOpenAuth: () => void;
 }
 
-/** The identity's bold element: a calendar leaf for the date the
- *  organisation is named after, bleeding in memory of the martyrs of the
- *  17 February 2011 demonstrations. */
-const DateLeaf: React.FC = () => (
+/** The identity's bold element: the torch of Mashkhally Zhyanawa
+ *  (مەشخەڵی ژیانەوە, "the torch of revival"), with the name in both scripts. */
+const Emblem: React.FC = () => (
   <figure className="mx-auto w-full max-w-[340px] lg:mx-0 lg:ms-auto">
-    <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_28px_60px_-34px_rgba(31,38,34,0.55)]">
-      <div className="relative z-0 flex items-baseline justify-between bg-crimson px-6 py-3 text-white">
-        <span className="font-serif text-[1.375rem] font-semibold">Shubat</span>
-        <span className="font-kurdish text-[1.125rem] text-white/90" lang="ckb" dir="rtl">شوبات</span>
-        <BleedingEdge className="absolute top-full start-0 w-full" />
+    <div className="overflow-hidden rounded-2xl border border-white/15 bg-[#14284B] shadow-[0_28px_60px_-34px_rgba(0,0,0,0.6)]">
+      <img src="/logo.svg" alt="" width={340} height={340} className="block aspect-square w-full" />
+      <div className="border-t border-white/10 px-6 pt-3 pb-5 text-center">
+        <p className="font-serif text-[1.625rem] font-semibold text-white" translate="no">Mashkhally Zhyanawa</p>
+        <p className="mt-1 font-kurdish text-[1.375rem] text-[#F0C779]" lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</p>
       </div>
-      <p className="date-leaf relative z-10 pt-5 pb-1 text-center text-[8.5rem] leading-[0.95] font-semibold tracking-[-0.04em] text-ink sm:text-[10rem]">
-        17
-      </p>
-      <p className="relative z-10 pb-5 text-center text-[1rem] font-medium text-muted">February 2011</p>
     </div>
-    <figcaption className="mt-5 text-[0.9688rem] leading-relaxed text-white/85 [text-shadow:0_1px_8px_rgba(0,0,0,0.4)]">
-      On 17 February 2011, peaceful protests for freedom of expression and an end to corruption began in
-      Sulaymaniyah. Protesters lost their lives for those demands. Our organisation carries their name, and we
-      remember the martyrs of 17 Shubat.
-    </figcaption>
   </figure>
 );
 
@@ -84,7 +73,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               Standing up for human rights, together and peacefully.
             </h1>
             <p className="mt-6 max-w-[52ch] text-[1.1875rem] leading-relaxed text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.35)]">
-              17 Shubat is an independent organisation founded by the Kurdish community in the United Kingdom. We
+              Mashkhally Zhyanawa is an independent organisation founded by the Kurdish community in the United Kingdom. We
               document abuses, support people who need help and work for accountability through non-violent means.
               Everyone who shares these values is welcome.
             </p>
@@ -93,7 +82,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Button size="lg" variant="inverse" onClick={() => onNavigate('about')}>Get to know us</Button>
             </div>
           </div>
-          <DateLeaf />
+          <Emblem />
         </Container>
         <div className="rule-fire relative z-10" aria-hidden="true" />
       </section>
@@ -192,7 +181,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       <section className="border-t border-line">
         <Container className="py-12 sm:py-16">
           <SectionHeading
-            title="Latest from 17 Shubat"
+            title="Latest from Mashkhally Zhyanawa"
             intro="Statements, research and reports from our members and councils."
             action={
               published.length > 0 ? (

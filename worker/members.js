@@ -732,7 +732,7 @@ export const waivePublicationFee = async (env, staff, body) => {
   const s = await getDoc(env, `guest_submissions/${id}`);
   if (!s) throw new HttpError(404, 'This submission no longer exists.');
   const asMember = staff.member && staff.member.status === 'active';
-  need(staff.canWaiveFees || asMember, 'Only members of 17 Shubat publish without a fee. Sign in with your member account.');
+  need(staff.canWaiveFees || asMember, 'Only members of Mashkhally Zhyanawa publish without a fee. Sign in with your member account.');
   const p = s.payment || {};
   if (p.status === 'waived') return { ok: true, status: s.status, already: true };
   if (!WAIVABLE.includes(p.status)) throw new HttpError(409, p.status === 'verified' ? 'The fee has already been paid; record a refund if it should be returned.' : 'There is no fee to waive on this submission.');
@@ -740,7 +740,7 @@ export const waivePublicationFee = async (env, staff, body) => {
   const byMember = !staff.canWaiveFees;
   const at = now();
   const nextStatus = s.status === 'awaiting_payment' ? 'submitted' : s.status;
-  const action = byMember ? 'No fee: sent by a member of 17 Shubat; sent for editorial review' : `No fee (waived by ${staff.name}); sent for editorial review`;
+  const action = byMember ? 'No fee: sent by a member of Mashkhally Zhyanawa; sent for editorial review' : `No fee (waived by ${staff.name}); sent for editorial review`;
   const history = [...(Array.isArray(s.history) ? s.history : []), { at, action: nextStatus === s.status ? action.replace('; sent for editorial review', '') : action, by: byMember ? 'contributor' : 'finance', ...(p.status === 'claimed' ? { note: 'The contributor had reported a payment: check the bank account and refund it if it arrived.' } : {}) }].slice(-300);
   await run(env, [
     { update: `guest_submissions/${id}`, data: {

@@ -157,7 +157,7 @@ export const review = async (ctx, b) => {
     if (d.decision === 'approved' && e.status === 'attended') {
       const profile = await getDoc(ctx.env, `public_profiles/${e.uid}`);
       const awardId = `ap-${e.activityId}-${e.uid}`.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 140);
-      const statement = str(settings.statement, 600) || 'In recognition of your active participation and your contribution to the work of 17 Shubat Organisation for Human Rights.';
+      const statement = str(settings.statement, 600) || 'In recognition of your active participation and your contribution to the work of Mashkhally Zhyanawa Organisation.';
       ops.push({ create: `appreciation_awards/${awardId}`, data: {
         id: awardId, number: awardNumber(), uid: e.uid, name: profile?.displayName || e.name,
         // The photograph is shown only if the member has a public profile photo.
@@ -211,8 +211,8 @@ export const myActivities = async (ctx) => {
 export const withCommit = (ctx, env) => Object.assign(ctx, { commit: (ops) => commit(env, ops) });
 
 /** The organisation logo, served from this site so letters can include it. */
-export const logo = async () => {
-  const r = await fetch('https://pub-a93d746cecd74baeb713913a45e911cf.r2.dev/222222.jpg', { cf: { cacheTtl: 86400, cacheEverything: true } });
+export const logo = async (request, env) => {
+  const r = await env.ASSETS.fetch(new Request(new URL('/logo-512.png', request.url)));
   if (!r.ok) return new Response('Not found', { status: 404 });
   return new Response(r.body, { headers: { 'content-type': r.headers.get('content-type') || 'image/jpeg', 'cache-control': 'public, max-age=86400' } });
 };

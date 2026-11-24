@@ -42,7 +42,7 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then regional="${{ inputs.regional && '1' || '0' }}"; elif [ "$hour" = "00" ] || [ "$hour" = "12" ]; then regional=1; else regional=0; fi
           REGIONAL=$regional node scripts/monitor.mjs
         env:
-          MONITOR_DOMAIN: 17shubat.org.uk
+          MONITOR_DOMAIN: mashkhall.com
 
       - name: Summary
         if: always()

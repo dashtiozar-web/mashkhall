@@ -53,9 +53,9 @@ export const SetupStatus: React.FC = () => {
         <div className="rounded-lg border border-line bg-paper p-3 text-[0.9375rem] text-ink-soft">
           <p className="font-semibold text-ink">If you have already added it</p>
           <ul className="mt-1 list-disc space-y-1 ps-5">
-            <li>It must be under <strong>Workers &amp; Pages › 17shubat › Settings › Variables and Secrets</strong>, not under <strong>Settings › Build</strong> (build variables are not used by the running website).</li>
+            <li>It must be under <strong>Workers &amp; Pages › mashkhall › Settings › Variables and Secrets</strong>, not under <strong>Settings › Build</strong> (build variables are not used by the running website).</li>
             <li>Choose the type <strong>Secret</strong>, then press <strong>Deploy</strong> to save.</li>
-            <li>Check it was added to the <strong>17shubat</strong> Worker (the one serving 17shubat.org.uk), not another one.</li>
+            <li>Check it was added to the <strong>mashkhall</strong> Worker (the one serving mashkhall.com), not another one.</li>
           </ul>
         </div>
       )}

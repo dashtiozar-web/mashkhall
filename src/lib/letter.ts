@@ -135,10 +135,10 @@ export const drawLetter = async (a: Award): Promise<HTMLCanvasElement> => {
   ctx.textAlign = 'center';
   ctx.fillStyle = NAVY;
   ctx.font = `600 78px ${SERIF}`;
-  ctx.fillText('17 Shubat Organisation for Human Rights', W / 2, 740);
+  ctx.fillText('Mashkhally Zhyanawa Organisation', W / 2, 740);
   ctx.font = `500 62px "Noto Naskh Arabic Variable", ${SERIF}`;
   ctx.direction = 'rtl';
-  ctx.fillText('ڕێکخراوی 17ی شوبات بۆ مافەکانی مرۆڤ', W / 2, 840);
+  ctx.fillText('ڕێکخراوی مەشخەڵی ژیانەوە', W / 2, 840);
   ctx.direction = 'ltr';
   ctx.fillStyle = CRIMSON;
   ctx.fillRect(W / 2 - 160, 900, 320, 8);
@@ -268,7 +268,7 @@ const pdfFromJpeg = (jpeg: Uint8Array, title: string) => {
   obj(3, () => add(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pw} ${ph}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`));
   obj(4, () => { add(`<< /Type /XObject /Subtype /Image /Width ${W} /Height ${H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`); add(jpeg); add('\nendstream'); });
   obj(5, () => add(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`));
-  obj(6, () => add(`<< /Title (${safe}) /Producer (17 Shubat Organisation) /CreationDate (D:${new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14)}Z) >>`));
+  obj(6, () => add(`<< /Title (${safe}) /Producer (Mashkhally Zhyanawa Organisation) /CreationDate (D:${new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14)}Z) >>`));
   const xref = length;
   add(`xref\n0 7\n0000000000 65535 f \n${offsets.slice(1).map((o) => `${String(o).padStart(10, '0')} 00000 n \n`).join('')}`);
   add(`trailer\n<< /Size 7 /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
@@ -296,7 +296,7 @@ export const downloadLetter = async (a: Award) => {
   const url = URL.createObjectURL(pdf);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `17-Shubat-Appreciation-${a.number}.pdf`;
+  link.download = `Mashkhally-Zhyanawa-Appreciation-${a.number}.pdf`;
   document.body.appendChild(link);
   link.click();
   link.remove();

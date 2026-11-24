@@ -1035,7 +1035,7 @@ export const MemberDashboardPage: React.FC<MemberDashboardPageProps> = ({
                 Directory Visibility & Public Profile
               </h3>
               <p className="text-[0.8438rem] text-muted">
-                Every member of 17 Shubat is listed publicly. Choose the name, photo and short description people see.
+                Every member of Mashkhally Zhyanawa is listed publicly. Choose the name, photo and short description people see.
               </p>
             </div>
 

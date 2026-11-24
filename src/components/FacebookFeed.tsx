@@ -4,7 +4,7 @@ import { useData } from '../context/DataContext';
 
 const CONSENT_KEY = '17shubat_show_facebook';
 
-/** 17 Shubat's Facebook Page, used until an administrator sets another one. */
+/** Mashkhally Zhyanawa's Facebook Page, used until an administrator sets another one. */
 export const DEFAULT_FACEBOOK_PAGE = 'https://www.facebook.com/61555753452199';
 
 const readConsent = () => {
@@ -105,7 +105,7 @@ export const FacebookFeed: React.FC<{ height?: number; className?: string }> = (
       <div ref={box} className="mx-auto w-full max-w-[500px] overflow-hidden rounded-2xl border border-line bg-white">
         <iframe
           key={`${width}-${height}`}
-          title="17 Shubat on Facebook: latest posts"
+          title="Mashkhally Zhyanawa on Facebook: latest posts"
           src={src}
           width={width}
           height={height}

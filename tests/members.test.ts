@@ -12,7 +12,7 @@ const OWNER_UID = 'owner-uid';
 const tokens: Record<string, string> = {};
 
 const call = async (path: string, body?: unknown, as = 'owner') => {
-  const res = await handleMembers(new Request(`https://17shubat.org.uk/api/${path}`, {
+  const res = await handleMembers(new Request(`https://mashkhall.com/api/${path}`, {
     method: body === undefined ? 'GET' : 'POST',
     headers: { authorization: `Bearer ${tokens[as] || ''}`, 'content-type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -45,7 +45,7 @@ beforeEach(() => {
   fake.set('users/carol', { uid: 'carol', roles: ['member'] });
   fake.set('members/carol', member('carol'));
   fake.set('users/alice', { uid: 'alice', roles: ['member'], displayName: 'alice', permissions: [] });
-  fake.set('members/alice', member('alice', { positionId: 'council_photographer', designation: 'Photographer', memberNumber: 'M0000005', credentialIssuedAt: '2025-01-01', validFrom: '2025-01-01', expiresAt: '2099-01-01', verifyUrl: 'https://17shubat.org.uk/#/people/M0000005' }));
+  fake.set('members/alice', member('alice', { positionId: 'council_photographer', designation: 'Photographer', memberNumber: 'M0000005', credentialIssuedAt: '2025-01-01', validFrom: '2025-01-01', expiresAt: '2099-01-01', verifyUrl: 'https://mashkhall.com/#/people/M0000005' }));
   fake.set('public_profiles/alice', { id: 'alice', userId: 'alice', displayName: 'alice', chapterId: 'london', chapterName: 'London', positionId: 'council_photographer', designation: 'Photographer' });
   fake.set('verifications/M0000005', { id: 'M0000005', memberNumber: 'M0000005', name: 'alice Full', designation: 'Photographer', status: 'active' });
   fake.set('org_assignments/council__london__council_photographer', { id: 'council__london__council_photographer', unit: 'council', positionId: 'council_photographer', councilId: 'london', memberId: 'alice', memberName: 'alice' });
@@ -219,7 +219,7 @@ describe('Digital membership ID and QR verification', () => {
     expect(r.status).toBe(200);
     const m = fake.get('members/carol') as any;
     expect(m.memberNumber).toBe('M0000001');
-    expect(m.verifyUrl).toBe(`https://17shubat.org.uk/id/${m.verifyToken}`);
+    expect(m.verifyUrl).toBe(`https://mashkhall.com/id/${m.verifyToken}`);
     expect(m.verifyToken).toMatch(/^[A-Za-z0-9]{24}$/);
     expect(m.verifyUrl).not.toContain('carol');
     const v = await call(`verify/id/${m.verifyToken}`, undefined, 'none');
@@ -258,7 +258,7 @@ describe('Digital membership ID and QR verification', () => {
   it('a renewal keeps the printed QR code; a number cannot be used twice', async () => {
     const r = await call('members/card', { memberId: 'alice', joinedAt: '2024-01-01', validFrom: '2026-01-01', expiresAt: '2027-01-01', kind: 'renewed' });
     expect(r.status).toBe(200);
-    expect(fake.get('members/alice')?.verifyUrl).toBe('https://17shubat.org.uk/#/people/M0000005');
+    expect(fake.get('members/alice')?.verifyUrl).toBe('https://mashkhall.com/#/people/M0000005');
     const dup = await call('members/card', { memberId: 'carol', memberNumber: 'M0000005', joinedAt: '2024-01-01', validFrom: '2024-01-01', expiresAt: '2099-01-01', kind: 'issued' });
     expect(dup.status).toBe(409);
   });

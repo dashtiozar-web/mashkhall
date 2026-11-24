@@ -242,7 +242,7 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
 
   return (
     <>
-      <PageHeader title="Publish with 17 Shubat" intro="Send us articles, reports, videos, news and statements on human rights, democracy, freedom of expression and Kurdish affairs. You do not need an account or a membership. Everything is reviewed by our editorial team before it is published." />
+      <PageHeader title="Publish with Mashkhally Zhyanawa" intro="Send us articles, reports, videos, news and statements on human rights, democracy, freedom of expression and Kurdish affairs. You do not need an account or a membership. Everything is reviewed by our editorial team before it is published." />
       <Container className="grid gap-8 py-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:items-start">
         <div className="min-w-0 space-y-6">
           {msg && (
@@ -276,10 +276,10 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
                 <>
                   <div className="flex flex-col gap-3 rounded-lg border border-navy/25 bg-navy-tint px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                     {currentUser && !currentUser.isAnonymous ? (
-                      <p className="text-[0.9375rem]"><strong>Are you a member of 17 Shubat?</strong> This account is not linked to a membership. Sign in with the account your membership was approved on, or contact us. Members publish without a fee.</p>
+                      <p className="text-[0.9375rem]"><strong>Are you a member of Mashkhally Zhyanawa?</strong> This account is not linked to a membership. Sign in with the account your membership was approved on, or contact us. Members publish without a fee.</p>
                     ) : (
                       <>
-                        <p className="text-[0.9375rem]"><strong>Are you a member of 17 Shubat?</strong> Sign in with your member account first. Members publish without a fee, and their work goes straight to editorial review.</p>
+                        <p className="text-[0.9375rem]"><strong>Are you a member of Mashkhally Zhyanawa?</strong> Sign in with your member account first. Members publish without a fee, and their work goes straight to editorial review.</p>
                         <Button className="shrink-0" onClick={() => onOpenAuth('signin')}>Sign in as a member</Button>
                       </>
                     )}
@@ -411,7 +411,7 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
                   <input type="checkbox" checked={termsOk} onChange={(e) => setTermsOk(e.target.checked)} className="mt-1 h-4 w-4 shrink-0" />
                   <span>{member
                     ? 'This is my own work or I have permission to share it. I understand it is published only if the editorial team approves it.'
-                    : <>I accept the <a href="/legal#terms" className="underline">publication terms</a> and the <a href="/legal#privacy" className="underline">privacy notice</a>. This is my own work or I have permission to share it. I understand that any fee is paid before editorial review and refunded if my work is not accepted, that paying does not guarantee publication or mean 17 Shubat endorses my views, and that sending work does not make me a member.</>}</span>
+                    : <>I accept the <a href="/legal#terms" className="underline">publication terms</a> and the <a href="/legal#privacy" className="underline">privacy notice</a>. This is my own work or I have permission to share it. I understand that any fee is paid before editorial review and refunded if my work is not accepted, that paying does not guarantee publication or mean Mashkhally Zhyanawa endorses my views, and that sending work does not make me a member.</>}</span>
                 </label>
 
                 {member ? <VoluntaryContribution value={voluntary} onChange={setVoluntary} /> : (

@@ -21,7 +21,7 @@ export const StructurePage: React.FC<StructurePageProps> = ({ onNavigate }) => {
     <>
       <PageHeader
         title="Our structure"
-        intro="How 17 Shubat Organization for Human Rights is organised: the Board of Directors, six councils with their own teams, and an organisation-wide Production Team."
+        intro="How Mashkhally Zhyanawa Organisation is organised: the Board of Directors, six councils with their own teams, and an organisation-wide Production Team."
       />
       <Container className="py-12 sm:py-16">
         {assignments === null ? (
@@ -31,7 +31,7 @@ export const StructurePage: React.FC<StructurePageProps> = ({ onNavigate }) => {
         )}
         <div className="mt-16 rounded-2xl border border-line bg-surface p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
           <p className="text-ink-soft">
-            <strong className="text-ink">{total.toLocaleString('en-GB')} approved members</strong> belong to 17 Shubat. Positions marked “Vacant” are not currently held.
+            <strong className="text-ink">{total.toLocaleString('en-GB')} approved members</strong> belong to Mashkhally Zhyanawa. Positions marked “Vacant” are not currently held.
           </p>
           <div className="mt-4 flex shrink-0 flex-wrap gap-3 sm:mt-0">
             <Button variant="secondary" onClick={() => onNavigate('directory')}>Councils and people</Button>

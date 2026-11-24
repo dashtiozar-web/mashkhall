@@ -206,7 +206,7 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const title = PAGE_TITLES[currentTab];
-    document.title = title ? `${title} | 17 Shubat` : '17 Shubat Organization for Human Rights';
+    document.title = title ? `${title} | Mashkhally Zhyanawa` : 'Mashkhally Zhyanawa Organisation';
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.setAttribute('href', `${window.location.origin}${window.location.pathname}`);
     // Members' own pages, QR checks and private areas stay out of search results.

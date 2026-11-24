@@ -120,7 +120,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 {mode === 'reset' && 'Reset your password'}
               </h2>
               <p className="text-[0.8438rem] text-ink-soft">
-                17 Shubat member account
+                Mashkhally Zhyanawa member account
               </p>
             </div>
           </div>
@@ -237,7 +237,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     className="mt-0.5 rounded border-line text-navy focus:ring-navy/30"
                   />
                   <label htmlFor="policyAgreement" className="text-[0.8438rem] text-ink-soft leading-snug">
-                    I agree to 17 Shubat's peaceful principles, universal human rights code of conduct, and privacy policy.
+                    I agree to Mashkhally Zhyanawa's peaceful principles, universal human rights code of conduct, and privacy policy.
                   </label>
                 </div>
               </div>

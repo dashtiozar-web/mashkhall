@@ -89,7 +89,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
         <Container className="py-16 sm:py-20">
           <SectionHeading
             title="Our people"
-            intro="Every approved member of 17 Shubat, by role."
+            intro="Every approved member of Mashkhally Zhyanawa, by role."
           />
 
           {publicProfiles.length > 0 && (

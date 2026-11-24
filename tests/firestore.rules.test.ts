@@ -1,5 +1,5 @@
 /**
- * Firestore security rules tests for the 17 Shubat platform.
+ * Firestore security rules tests for the Mashkhally Zhyanawa platform.
  *
  * Run with:  npm run test:rules
  * (starts the Firestore emulator, runs these tests, then shuts it down)
@@ -507,7 +507,7 @@ describe('Notifications', () => {
 describe('Membership verification (QR codes)', () => {
   const ver = (overrides: Record<string, unknown> = {}) => ({
     id: 'M0000001', memberNumber: 'M0000001', name: 'Test Person', designation: 'Journalist',
-    status: 'active', validFrom: NOW, expiresAt: NOW, verifyUrl: 'https://17shubat.org.uk/#/verify/M0000001', updatedAt: NOW, ...overrides,
+    status: 'active', validFrom: NOW, expiresAt: NOW, verifyUrl: 'https://mashkhall.com/#/verify/M0000001', updatedAt: NOW, ...overrides,
   });
 
   it('anyone can check a member number, but nobody can list the register', async () => {

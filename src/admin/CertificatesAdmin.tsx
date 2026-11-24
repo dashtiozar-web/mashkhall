@@ -158,7 +158,7 @@ export const CertificateEditor: React.FC<{ data: Dashboard; editing?: Award | nu
   const preview: Award | null = member ? {
     id: editing?.id || 'preview', number: '', uid: member.id, name: member.fullName, activityId: '', activityTitle: achievement, activityDate: '',
     statement: reason, issuedAt: '', signatoryName, signatoryTitle, signatureImage: signatoryName === data.signatory.name ? data.signatory.signatureImage : '',
-    verifyUrl: `https://17shubat.org.uk/appreciation/${editing?.id || 'XXXXXXXXXXXXXXXXXXXXXX'}`, status: 'draft', source: 'direct', kind,
+    verifyUrl: `https://mashkhall.com/appreciation/${editing?.id || 'XXXXXXXXXXXXXXXXXXXXXX'}`, status: 'draft', source: 'direct', kind,
     category, categoryLabel: cat?.label, achievement, reason, issueDate, memberNumber: member.memberNumber, positionTitle: member.position, councilName: member.council,
   } : null;
 

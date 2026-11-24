@@ -159,7 +159,7 @@ export const MembershipCards: React.FC<{ initialFilter?: Filter }> = ({ initialF
                 e.preventDefault();
                 const v = siteUrlDraft.trim().replace(/\/+$/, '');
                 if (!/^https:\/\/[^\s/]+\.[^\s/]+/.test(v)) {
-                  setMessage({ kind: 'error', text: 'Enter the full address starting with https://, for example https://17shubat.org.uk' });
+                  setMessage({ kind: 'error', text: 'Enter the full address starting with https://, for example https://mashkhall.com' });
                   return;
                 }
                 run(() => updateSiteSettings({ siteUrl: v }), `QR codes will now point to ${v}.`);
@@ -171,8 +171,8 @@ export const MembershipCards: React.FC<{ initialFilter?: Filter }> = ({ initialF
             </form>
             <div className="flex flex-wrap items-center gap-2 text-[0.9375rem]">
               <span className="text-ink-soft">QR code for the website itself, for posters and new printed cards:</span>
-              <button type="button" onClick={() => downloadQrPng(savedSiteUrl, '17-shubat-website-qr.png')} className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 font-semibold hover:border-ink/40"><Download className="h-4 w-4" aria-hidden="true" />PNG</button>
-              <button type="button" onClick={() => downloadQrSvg(savedSiteUrl, '17-shubat-website-qr.svg')} className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 font-semibold hover:border-ink/40"><Download className="h-4 w-4" aria-hidden="true" />SVG</button>
+              <button type="button" onClick={() => downloadQrPng(savedSiteUrl, 'mashkhally-zhyanawa-website-qr.png')} className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 font-semibold hover:border-ink/40"><Download className="h-4 w-4" aria-hidden="true" />PNG</button>
+              <button type="button" onClick={() => downloadQrSvg(savedSiteUrl, 'mashkhally-zhyanawa-website-qr.svg')} className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 font-semibold hover:border-ink/40"><Download className="h-4 w-4" aria-hidden="true" />SVG</button>
             </div>
           </div>
         </div>

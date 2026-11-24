@@ -22,7 +22,7 @@ const STATE_STYLE: Record<VerificationState, { box: string; icon: React.ReactNod
   active: {
     box: 'border-navy/40 bg-navy-tint',
     icon: <CheckCircle2 className="h-7 w-7 shrink-0 text-navy" aria-hidden="true" />,
-    message: 'A current member of 17 Shubat Organisation for Human Rights.',
+    message: 'A current member of Mashkhally Zhyanawa Organisation.',
   },
   expired: {
     box: 'border-amber bg-amber-tint',
@@ -192,7 +192,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({ memberId: 
 
       {profile && heldBy(assignments, profile.id).length > 0 && (
         <section aria-labelledby="positions-heading" className="mt-8">
-          <h2 id="positions-heading" className="font-sans text-[1rem] font-semibold">Positions in 17 Shubat</h2>
+          <h2 id="positions-heading" className="font-sans text-[1rem] font-semibold">Positions in Mashkhally Zhyanawa</h2>
           <ul className="mt-2 flex flex-wrap gap-2">
             {heldBy(assignments, profile.id).map((a) => (
               <li key={a.id}><a href="/structure" className="inline-block rounded-full border border-navy/40 bg-navy-tint px-3 py-1 text-[0.9375rem] font-semibold text-navy no-underline hover:underline">{seatLabel(a, (id) => chapters.find((c) => c.id === id)?.name || id)}</a></li>

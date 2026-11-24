@@ -97,7 +97,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({ onNavigate }) => (
         </Section>
         <Section title="Members are listed publicly">
           <p>
-            Once your membership is approved, you are listed on this website as a member of 17 Shubat. Your public
+            Once your membership is approved, you are listed on this website as a member of Mashkhally Zhyanawa. Your public
             profile shows:
           </p>
           <ul className="list-disc space-y-1.5 ps-6">
@@ -140,13 +140,13 @@ export const LegalPage: React.FC<LegalPageProps> = ({ onNavigate }) => (
         <Section title="Publication terms for contributors">
           <p>
             When you send work through Publish with Us, you confirm that it is your own work or that you have permission
-            to share it, and you give 17 Shubat permission to publish it on this website and share it on our channels
+            to share it, and you give Mashkhally Zhyanawa permission to publish it on this website and share it on our channels
             under your name. You keep your copyright.
           </p>
           <p>
             The publication fee is shown before you send your work and paid by bank transfer before editorial review
             starts. The editors may ask for changes or decide not to publish; if your work is not accepted, we refund the
-            fee. Paying does not guarantee publication or mean that 17 Shubat endorses your views. You can withdraw your
+            fee. Paying does not guarantee publication or mean that Mashkhally Zhyanawa endorses your views. You can withdraw your
             submission before you pay; after paying, contact us to withdraw it and receive a refund.
           </p>
           <p>

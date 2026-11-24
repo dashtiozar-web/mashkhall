@@ -68,7 +68,7 @@ const AwardDetail: React.FC<{ id: string }> = ({ id }) => {
             ) : (
               <>
                 <p className="flex items-center gap-2 font-semibold text-[#1E6B47]"><BadgeCheck className="h-5 w-5" aria-hidden="true" /> Genuine and valid</p>
-                <p className="mt-2 text-ink-soft">Issued by 17 Shubat Organisation for Human Rights on {longDate(award.issueDate || award.issuedAt)}.</p>
+                <p className="mt-2 text-ink-soft">Issued by Mashkhally Zhyanawa Organisation on {longDate(award.issueDate || award.issuedAt)}.</p>
               </>
             )}
             <dl className="mt-3 space-y-1 text-[0.9375rem]">

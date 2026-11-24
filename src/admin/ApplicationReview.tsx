@@ -209,7 +209,7 @@ export const ApplicationReview: React.FC<{
               <div><dt className="text-muted">Council</dt><dd className="font-semibold">{council}</dd></div>
               <div><dt className="text-muted">Country</dt><dd className="font-semibold">{app.country}</dd></div>
               <div>
-                <dt className="text-muted">Member of 17 Shubat since</dt>
+                <dt className="text-muted">Member of Mashkhally Zhyanawa since</dt>
                 <dd className="font-semibold">
                   {!app.involvement || app.involvement.period === 'new'
                     ? `New member (applied ${formatDate(app.createdAt)})`

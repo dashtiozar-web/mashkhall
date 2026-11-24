@@ -10,7 +10,7 @@ import { handleMeetings } from '../worker/meetings.js';
 let fake: Fake;
 const tokens: Record<string, string> = {};
 const call = async (path: string, body?: unknown, as = 'owner') => {
-  const res = await handleMeetings(new Request(`https://17shubat.org.uk/api/meetings/${path}`, {
+  const res = await handleMeetings(new Request(`https://mashkhall.com/api/meetings/${path}`, {
     method: body === undefined ? 'GET' : 'POST',
     headers: { authorization: `Bearer ${tokens[as] || ''}`, 'content-type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),

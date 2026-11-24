@@ -1,5 +1,5 @@
 /**
- * 17 Shubat website worker.
+ * Mashkhally Zhyanawa website worker.
  *
  * Serves the website (static files) and a privacy-friendly visitor counter:
  *   POST /api/visit     – counts this visit by country (and, in Iraq, region)
@@ -337,12 +337,12 @@ export default {
     // How to report a security problem (RFC 9116).
     if (url.pathname === '/.well-known/security.txt') {
       const expires = new Date(Date.now() + 180 * 86400000).toISOString().replace(/\.\d+Z$/, 'Z');
-      return new Response(`Contact: https://17shubat.org.uk/contact\nExpires: ${expires}\nPreferred-Languages: en, ckb, ar\nCanonical: https://17shubat.org.uk/.well-known/security.txt\nPolicy: https://17shubat.org.uk/legal\n`, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=86400' } });
+      return new Response(`Contact: https://mashkhall.com/contact\nExpires: ${expires}\nPreferred-Languages: en, ckb, ar\nCanonical: https://mashkhall.com/.well-known/security.txt\nPolicy: https://mashkhall.com/legal\n`, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=86400' } });
     }
     if (url.pathname.startsWith('/.well-known/')) return env.ASSETS.fetch(request);
 
     if (url.pathname.startsWith('/api/meetings/')) return handleMeetings(request, env);
-    if (url.pathname === '/api/logo') return logo();
+    if (url.pathname === '/api/logo') return logo(request, env);
     if (url.pathname.startsWith('/api/members/') || url.pathname.startsWith('/api/verify/')) return handleMembers(request, env);
     if (url.pathname.startsWith('/api/appreciation/')) return handleCertificates(request, env);
 
