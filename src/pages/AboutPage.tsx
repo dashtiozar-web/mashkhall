@@ -24,6 +24,14 @@ const PRINCIPLES = [
   { title: 'Openness', text: `We have no hidden side. Our programme is open and public, and we do not believe in deception.` },
 ];
 
+const BOOK_THEMES = [
+  { title: "Reading the situation: rule that behaves like occupation", text: "After the uprising, the book argues, those in power ruled with the mindset of occupiers and forgers instead of building national and democratic institutions. They have led the environment, the economy and society towards dependence and despair, producing a silenced, submissive individual and a culture of loss." },
+  { title: "Self-sickness, tribalism and hidden servitude", text: "The Kurdish problem is not only a matter of enemies outside. It is also bound up with what the author calls self-sickness: staying inside the mindset of the tribe, in a servitude of mind and spirit. Defeat has been repeated so often in history and literature that it has come to look like fate." },
+  { title: "Neoliberalism and “super-neoliberalism”", text: "Neoliberalism turns the basic rights to life, health and education into goods for sale, breaks society down to isolated individuals, takes the tools of politics away from people through money and companies, and numbs them with sport, art, sex and social media. In the Kurdistan Region it has merged with tribalism and kleptocracy into what the book calls super-neoliberalism, which produces a false consciousness." },
+  { title: "Self-knowledge, dignity and the politics of self-healing", text: "Liberation begins with self-knowledge and with owning oneself, rather than losing oneself in blind imitation, and dignity is guarded as the condition of being human and of resisting. From there the book sets out the politics of self-healing: society taking part directly in government and actively watching over it, so that politics comes back to life from below as an industry of the common good." },
+  { title: "Social media and a new horizon", text: "The book warns that online activity and careless likes cannot take the place of the street, organising on the ground and work in the field. It closes by stressing commitment to the manifesto and the roadmap, with the example of McDonald’s operating manual as Alain de Botton describes it, and names an organised movement, an economy of revival, and the protection of dignity and freedom as a new beginning." },
+];
+
 const QUESTIONS = [
   `Why is our people’s suffering so deep, and where does it come from?`,
   `Why were no good parties built in the past, why do the new ones turn bad, and why are parties run by families?`,
@@ -75,7 +83,27 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => (
           <h3 className="mt-10 text-[1.5rem] font-semibold">Method and outlook</h3>
           <div className="prose-article mt-4">
             <p>A distinctive feature of the book is that it uses Kurdish myth and heritage, above all the legend of the furnaces of Bawa Amra in southern Kurdistan and the land between the two rivers, as a heuristic and analytical tool for understanding the nature of tyranny and fragmentation and the ways to confront them. In the legend, a ghost-like dragon lives in the furnaces, ruining people’s lives and safety and drawing different responses, from flight and surrender to resistance, until Bawa Hora, Khanzada Khan and Dala unite wisdom and strength and found the system of the “Great Klura”, built on shared citizenship and on uniting wisdom, wealth and the sword. Together they destroy the dragon and lead society from tribalism to a shared order. The book reads this legend against fatalism: defeat is not the inevitable fate of the Kurds, and the power to change lies within.</p>
+            <p>On the theoretical side, the author brings the Kurds’ own history into conversation with the ideas of thinkers from Kurdistan and the wider world. The years after the 1991 uprising, the civil war, the salary crisis, and the words of the martyr Aram on the collapse of 1975 and the Algiers Agreement are read alongside Friedrich Nietzsche, Immanuel Kant, John Stuart Mill, Jean Baudrillard, Jacques Lacan, Marcus Aurelius, Ibn Khaldun, Machiavelli, Hannah Arendt, Václav Havel, Martin van Bruinessen, Jonathan Brown, Abbas Vali and Masud Muhammad.</p>
           </div>
+        </div>
+
+        <div className="mt-14">
+          <h3 className="text-[1.5rem] font-semibold">The book’s main themes</h3>
+          <p className="mt-2 max-w-[62ch] text-[1.0625rem] text-ink-soft">The book’s thinking rests on a chain of connected questions.</p>
+          <ol className="mt-8 grid gap-6 md:grid-cols-2">
+            {BOOK_THEMES.map((t, i) => (
+              <li key={t.title} className="rounded-2xl border border-line bg-surface p-6">
+                <span className="font-serif text-[1.5rem] font-semibold text-crimson" translate="no">{i + 1}</span>
+                <h4 className="mt-1 text-[1.1875rem] font-semibold">{t.title}</h4>
+                <p className="mt-2 text-[1rem] leading-relaxed text-ink-soft">{t.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="mt-14 max-w-[62ch] border-s-4 border-crimson ps-6">
+          <h3 className="text-[1.5rem] font-semibold">Why the book matters to the reader</h3>
+          <p className="mt-3 text-[1.125rem] leading-relaxed">Mashkhally Zhyanawa is a manifesto and an intellectual and political roadmap. Its main aim is to turn the reader from an indifferent onlooker, or an empty-handed victim of the situation, into an aware and responsible person who holds on to their dignity: someone who changes their own thinking, ethics and conscience at the root before waiting for change from outside, and who moves, through shared and organised work, towards a lasting revival.</p>
         </div>
       </Container>
     </section>
