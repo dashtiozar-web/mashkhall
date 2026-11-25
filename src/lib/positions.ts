@@ -135,6 +135,6 @@ export const positionOf = (r: { positionId?: string; designation?: string }): Po
 /** Council or department line for a member's card: "London Council", "Production Team"… */
 export const unitLine = (r: { positionId?: string; designation?: string; chapterId?: string }, councilName: (id?: string) => string) => {
   const p = positionById(positionOf(r));
-  if (!p || p.department === 'council' || p.department === 'membership') return r.chapterId ? `${councilName(r.chapterId)} Council` : '';
+  if (!p || p.department === 'council' || p.department === 'membership') return r.chapterId ? councilName(r.chapterId) : '';
   return departmentById(p.department)?.name || '';
 };
