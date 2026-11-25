@@ -30,6 +30,9 @@ const LIFE: { text: string; refs: number[] }[] = [
   { text: 'He also wrote history: he interviewed Safin Mala Qara, one of the field commanders of the Battle of Kore, and was writing his own memoirs, which remained unfinished and unpublished.', refs: [6, 1] },
 ];
 
+/** Titles written in Kurdish stay as they are; English ones are translated with the page. */
+const isKurdish = (t: string) => /[\u0600-\u06FF]/.test(t);
+
 const Refs: React.FC<{ refs: number[] }> = ({ refs }) => (
   <sup className="ms-1 whitespace-nowrap text-[0.75rem] font-semibold">
     {refs.map((r, i) => (
@@ -91,7 +94,9 @@ export const RebinShamamkiPage: React.FC<{ onNavigate: (tab: string) => void }> 
               <li key={s.n} id={`source-${s.n}`} className="scroll-mt-28 rounded-xl border border-line bg-surface p-4">
                 <p className="text-[0.875rem] font-semibold text-muted">[{s.n}] <span>{s.publisher}</span>{s.date && <> · <span>{s.date}</span></>}</p>
                 <a href={s.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-start gap-1.5 font-semibold text-navy underline-offset-2 hover:underline">
-                  <span dir="auto" lang={/[؀-ۿ]/.test(s.title) ? s.lang : undefined} translate={/[؀-ۿ]/.test(s.title) ? 'no' : undefined}>{s.title}</span>
+                  {isKurdish(s.title)
+                    ? <span dir="rtl" lang={s.lang} translate="no">{s.title}</span>
+                    : <span>{s.title}</span>}
                   <ExternalLink className="mt-1 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 </a>
               </li>
