@@ -117,6 +117,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('20190510 163435.Chamchamal.Sulaymaniyah.Kurdistan.jpg'),
   ] },
   { id: 'said-sadiq', name: 'Said Sadiq', ku: 'سەیدسادق', photos: [
+    { url: '/images/cities/said-sadiq.jpg', credit: '', source: '' },
     commons('Said Sadiq 00964, Iraq - panoramio.jpg'),
     commons('Saidsadiq.jpg'),
   ] },
