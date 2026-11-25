@@ -8,6 +8,7 @@ import { MemberCount } from '../components/MemberCount';
 import { VisitorAnalytics } from '../components/VisitorAnalytics';
 import { ReferendumCall, REFERENDUM_URL } from '../components/ReferendumCall';
 import { Facebook, Vote } from 'lucide-react';
+import { MZ_DEFINITION } from './AboutPage';
 import { KurdistanCover } from '../components/KurdistanCover';
 import { MembersByPlace } from '../components/MembersByPlace';
 import { FacebookFeed, facebookLink } from '../components/FacebookFeed';
@@ -74,16 +75,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <span className="font-medium">Welcome</span>
             </p>
             <h1 className="mt-5 max-w-[21ch] text-[2.5rem] leading-[1.1] font-semibold text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.35)] sm:text-[3.25rem]">
-              Standing up for human rights, together and peacefully.
+              Carrying the torch of revival, together.
             </h1>
             <p className="mt-6 max-w-[52ch] text-[1.1875rem] leading-relaxed text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.35)]">
-              Mashkhally Zhyanawa is an independent organisation founded by the Kurdish community in the United Kingdom. We
-              document abuses, support people who need help and work for accountability through non-violent means.
-              Everyone who shares these values is welcome.
+              A roadmap for restoring trust and self-confidence to our society, through self-education and self-organisation.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button size="lg" onClick={() => onNavigate('apply')}>Become a member</Button>
-              <Button size="lg" variant="inverse" onClick={() => onNavigate('about')}>Get to know us</Button>
+              <Button size="lg" variant="inverse" onClick={() => onNavigate('about')}>What Mashkhally Zhyanawa is</Button>
               <a href={REFERENDUM_URL} target="_blank" rel="noopener"
                 className="inline-flex items-center gap-2 rounded-lg bg-[#F2C14E] px-6 py-3.5 text-[1.0625rem] font-bold text-[#2A110A] no-underline hover:bg-[#FFD36B]">
                 <Vote className="h-5 w-5" aria-hidden="true" /> Civil Referendum 2026<span className="sr-only"> (opens in a new tab)</span>
@@ -102,39 +101,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       <section className="border-b border-line bg-surface">
         <Container className="grid gap-6 py-10 sm:py-12 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
           <h2 className="flex items-center gap-3 font-sans text-[0.875rem] font-semibold tracking-[0.08em] text-crimson uppercase">
-            <span className="h-[3px] w-8 bg-crimson" aria-hidden="true" /> Our mission
+            <span className="h-[3px] w-8 bg-crimson" aria-hidden="true" /> Our message
           </h2>
           <div className="border-s-4 border-navy ps-5 sm:ps-7">
-            <p className="font-serif text-[1.5rem] leading-snug text-ink sm:text-[1.875rem]">
-              {siteSettings.mission}
+            <p className="font-serif text-[1.375rem] leading-snug text-ink sm:text-[1.625rem]">
+              {MZ_DEFINITION}
             </p>
             <TextLink className="mt-5" onClick={() => onNavigate('about')}>
-              How we work and what we stand for
+              Read more about Mashkhally Zhyanawa
             </TextLink>
           </div>
-        </Container>
-      </section>
-
-      {/* Remembrance and press freedom: the 2011 memorial and Sherwan Sherwani */}
-      <section className="border-b border-white/10 bg-[#120A07] text-white">
-        <Container className="grid gap-5 py-10 md:grid-cols-2">
-          <a href="/memorial" className="group block rounded-xl border border-white/12 bg-white/[0.04] p-6 no-underline hover:border-white/30">
-            <p className="text-[0.8125rem] font-semibold tracking-[0.1em] text-[#F2C14E] uppercase">17 Shubat 2011 Memorial</p>
-            <p className="mt-2 font-serif text-[1.5rem] leading-snug font-semibold text-white">The Days of the Bloody Streets</p>
-            <p className="mt-2 text-white/75">The demonstrations that began in Sulaimani on 17 February 2011, the days that followed, and the martyrs we remember.</p>
-            <span className="mt-4 inline-block h-[2px] w-12 bg-[#B3261E]" aria-hidden="true" />
-            <p className="mt-3 font-semibold text-white group-hover:underline">Visit the memorial</p>
-          </a>
-          <a href="/sherwan-sherwani" className="group flex gap-5 rounded-xl border border-white/12 bg-white/[0.04] p-6 no-underline hover:border-white/30">
-            <img src="/images/sherwan-sherwani.jpg" alt="" width={96} height={120} loading="lazy" className="h-[120px] w-24 shrink-0 rounded-md object-cover object-top" />
-            <div className="min-w-0">
-            <p className="text-[0.8125rem] font-semibold tracking-[0.1em] text-[#F2C14E] uppercase">Press freedom</p>
-            <p className="mt-2 font-serif text-[1.5rem] leading-snug font-semibold text-white">Sherwan Sherwani</p>
-            <p className="mt-2 text-white/75">Journalist and former member of 17 Shubat, reportedly imprisoned in Erbil since October 2020. His case, the record of his arrests, and the sources.</p>
-            <span className="mt-4 inline-block h-[2px] w-12 bg-[#B3261E]" aria-hidden="true" />
-            <p className="mt-3 font-semibold text-white group-hover:underline">Read about his case</p>
-            </div>
-          </a>
         </Container>
       </section>
 

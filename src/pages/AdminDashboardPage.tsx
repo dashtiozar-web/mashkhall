@@ -59,7 +59,6 @@ import { TranslationsAdmin } from '../admin/TranslationsAdmin';
 import { AppearanceAdmin } from '../admin/AppearanceAdmin';
 import { VisitorAnalytics } from '../components/VisitorAnalytics';
 import { GuestSubmissionsAdmin } from '../admin/GuestSubmissionsAdmin';
-import { MemorialAdmin } from '../admin/MemorialAdmin';
 import { CommentsAdmin } from '../admin/CommentsAdmin';
 import { awardPoints as ledgerAwardPoints, PointsType } from '../lib/ledger';
 import { SocialSettings } from '../admin/SocialSettings';
@@ -175,7 +174,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     | 'enquiries' 
     | 'settings' 
     | 'audit'
-    | 'memorial'
     | 'translations'
     | 'appearance'
   >('overview');
@@ -812,7 +810,6 @@ Example Person,person@example.org,,London,,general_member,no,,`;
           { id: 'appearance', label: 'Appearance' },
           { id: 'meetings', label: 'Online meetings' },
           { id: 'appreciation', label: 'Appreciation' },
-          { id: 'memorial', label: '17 Shubat 2011 Memorial' },
           { id: 'visitors', label: 'Visitor analytics' },
           { id: 'security', label: 'Security' },
           { id: 'audit', label: 'Audit log' },
@@ -1372,7 +1369,6 @@ Example Person,person@example.org,,London,,general_member,no,,`;
       {activeTab === 'visitors' && <VisitorAnalytics mode="admin" />}
 
       {activeTab === 'publications' && <GuestSubmissionsAdmin />}
-      {activeTab === 'memorial' && <MemorialAdmin />}
       {activeTab === 'meetings' && <MeetingsAdmin />}
       {activeTab === 'appreciation' && <AppreciationAdmin />}
       {activeTab === 'translations' && <TranslationsAdmin />}
@@ -1733,7 +1729,7 @@ Example Person,person@example.org,,London,,general_member,no,,`;
               />
             </div>
             <div className="space-y-1">
-              <label className="font-semibold text-ink-soft">Founding Background & 17 February Inspiration</label>
+              <label className="font-semibold text-ink-soft">Background</label>
               <textarea
                 rows={5}
                 value={siteSettings.background}

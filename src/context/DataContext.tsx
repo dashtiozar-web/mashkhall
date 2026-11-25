@@ -77,8 +77,8 @@ interface DataContextType {
 
 const defaultSiteSettings: SiteSettings = {
   id: 'default',
-  mission: 'We inform, connect, and mobilise communities to challenge injustice peacefully, promote transparency, and uphold human rights worldwide.',
-  background: 'Mashkhally Zhyanawa Organisation describes its founding date as 17 February 2015, inspired by peaceful civil demonstrations in Kurdistan in February 2011 calling for institutional transparency, freedom of expression, and an end to systemic corruption. Our work is dedicated to peaceful human-rights advocacy, research, and grassroots solidarity.',
+  mission: 'A roadmap for restoring trust and self-confidence to our society, through self-education and self-organisation.',
+  background: 'Mashkhally Zhyanawa is a roadmap for restoring trust and self-confidence to the members of our society, through self-education and self-organisation in a new political movement.',
   history: INITIAL_TIMELINE,
   faqs: INITIAL_FAQS,
   areasOfWork: INITIAL_AREAS_OF_WORK,

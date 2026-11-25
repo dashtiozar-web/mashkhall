@@ -239,10 +239,8 @@ export const MemberCardBack: React.FC<CardProps> = ({ member }) => (
     ]} />
     <div className="absolute inset-x-[16%] text-center" style={{ top: '30.5%', fontSize: '3.7cqw', lineHeight: 1.25 }}>
       <p className="font-bold" style={{ fontSize: '4.7cqw' }}>Mashkhally Zhyanawa Organisation</p>
-      <p>Registered in England and Wales</p>
-      <p className="mt-[2.6cqw] font-bold">Nature of business:</p>
-      <p>Research and experimental development on social sciences and humanities</p>
-      <p className="mt-[2.6cqw]"><span className="font-bold">Company Registration Number:</span> 16809857</p>
+      <p className="font-kurdish" style={{ fontSize: '4.4cqw' }} lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</p>
+      <p className="mt-[2.6cqw]">The Torch of Revival</p>
       <p className="mt-[2.2cqw]"><span className="font-bold">Email:</span> info@mashkhall.com</p>
     </div>
     {member.joinedAt && (

@@ -15,7 +15,6 @@ interface NavbarProps {
 
 const NAV_LINKS: { id: string; label: string; activeFor: string[] }[] = [
   { id: 'about', label: 'About', activeFor: ['about', 'history'] },
-  { id: 'memorial', label: '17 Shubat 2011 Memorial', activeFor: ['memorial'] },
   { id: 'activities', label: 'Activities', activeFor: ['activities', 'activity'] },
   { id: 'appreciation', label: 'Appreciation', activeFor: ['appreciation'] },
   { id: 'structure', label: 'Structure', activeFor: ['structure'] },
@@ -61,7 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
     {/* Top bar: language and a short statement of who we are. */}
     <div className="border-b border-white/10 bg-[#120906] text-white">
       <Container className="flex h-10 items-center justify-between gap-3">
-        <p className="hidden truncate text-[0.8125rem] text-white/65 lg:block">Independent · Non-violent · Founded 17 February 2015</p>
+        <p className="hidden truncate text-[0.8125rem] text-white/65 lg:block">Independent · Peaceful · For the revival of our people</p>
         <a href={REFERENDUM_URL} target="_blank" rel="noopener"
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#F2C14E] px-3 py-1 text-[0.8125rem] font-bold text-[#2A110A] no-underline hover:bg-[#FFD36B]">
           <Vote className="h-3.5 w-3.5" aria-hidden="true" /><span className="sm:hidden">Referendum</span><span className="hidden sm:inline">Civil Referendum 2026</span><span className="sr-only"> (opens in a new tab)</span>
@@ -199,7 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
           <Container className="py-4">
             <LanguageSwitcher tone="light" className="mb-3" />
             <ul className="divide-y divide-line">
-              {[{ id: 'home', label: 'Home', activeFor: ['home'] }, ...NAV_LINKS.flatMap((l) => (l.id === 'memorial' ? [l, { id: 'sherwani', label: 'Sherwan Sherwani', activeFor: ['sherwani'] }] : [l])), ...(isMember ? [{ id: 'meetings', label: 'Online meetings', activeFor: ['meetings', 'meeting'] }] : []), ...(currentUser ? [{ id: 'notifications', label: 'Notifications', activeFor: ['notifications'] }] : [])].map((link) => (
+              {[{ id: 'home', label: 'Home', activeFor: ['home'] }, ...NAV_LINKS, ...(isMember ? [{ id: 'meetings', label: 'Online meetings', activeFor: ['meetings', 'meeting'] }] : []), ...(currentUser ? [{ id: 'notifications', label: 'Notifications', activeFor: ['notifications'] }] : [])].map((link) => (
                 <li key={link.id}>
                   <button
                     type="button"

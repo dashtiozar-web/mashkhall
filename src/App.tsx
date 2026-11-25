@@ -20,9 +20,6 @@ import { IdCheckPage } from './pages/IdCheckPage';
 // Pages
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
-import { HistoryPage } from './pages/HistoryPage';
-import { MemorialPage } from './pages/MemorialPage';
-import { SherwaniPage } from './pages/SherwaniPage';
 import { DirectoryPage } from './pages/DirectoryPage';
 import { ChapterDetailPage } from './pages/ChapterDetailPage';
 import { MemberProfilePage } from './pages/MemberProfilePage';
@@ -52,9 +49,7 @@ import { LegalPage } from './pages/LegalPage';
 const TAB_TO_PATH: Record<string, string> = {
   home: '',
   about: 'about',
-  history: 'history',
-  memorial: 'memorial',
-  sherwani: 'sherwan-sherwani',
+  history: 'about',
   directory: 'people',
   chapter: 'councils',
   'member-profile': 'people',
@@ -86,9 +81,10 @@ const PATH_TO_TAB: Record<string, [string, string]> = {
   // path -> [tab without param, tab with param]
   '': ['home', 'home'],
   about: ['about', 'about'],
-  history: ['history', 'history'],
-  memorial: ['memorial', 'memorial'],
-  'sherwan-sherwani': ['sherwani', 'sherwani'],
+  // Earlier pages now lead to About.
+  history: ['about', 'about'],
+  memorial: ['about', 'about'],
+  'sherwan-sherwani': ['about', 'about'],
   people: ['directory', 'member-profile'],
   councils: ['directory', 'chapter'],
   chapters: ['directory', 'chapter'], // old links keep working
@@ -115,9 +111,6 @@ const PATH_TO_TAB: Record<string, [string, string]> = {
 const PAGE_TITLES: Record<string, string> = {
   contribute: 'Publish with us',
   about: 'About us',
-  history: 'Our history',
-  memorial: '17 Shubat 2011 Memorial',
-  sherwani: 'Sherwan Sherwani',
   directory: 'Members and people',
   chapter: 'Members by place',
   'member-profile': 'Member',
@@ -263,12 +256,6 @@ const AppContent: React.FC = () => {
 
         {currentTab === 'about' && (
           <AboutPage onNavigate={handleNavigate} />
-        )}
-
-        {currentTab === 'memorial' && <MemorialPage onNavigate={handleNavigate} />}
-        {currentTab === 'sherwani' && <SherwaniPage />}
-        {currentTab === 'history' && (
-          <HistoryPage onNavigate={handleNavigate} />
         )}
 
         {currentTab === 'directory' && (

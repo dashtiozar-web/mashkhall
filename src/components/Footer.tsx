@@ -14,9 +14,6 @@ const COLUMNS: { heading: string; links: { id: string; label: string }[] }[] = [
     heading: 'Organisation',
     links: [
       { id: 'about', label: 'About us' },
-      { id: 'history', label: 'Our history' },
-      { id: 'memorial', label: '17 Shubat 2011 Memorial' },
-      { id: 'sherwani', label: 'Sherwan Sherwani' },
       { id: 'structure', label: 'Our structure' },
       { id: 'activities', label: 'Our activities' },
       { id: 'appreciation', label: 'Appreciation' },
@@ -56,11 +53,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => (
             <p className="font-serif text-[1.375rem] leading-tight font-semibold text-white">{ORG_NAME}</p>
           </div>
           <p className="mt-5 text-[0.9688rem] leading-relaxed">
-            An independent, non-violent human-rights organisation founded on 17 February 2015 by members of the
-            Kurdish community in the United Kingdom.
+            A roadmap for restoring trust and self-confidence to our society, through self-education and self-organisation.
           </p>
           <p className="mt-4 text-[0.9688rem] leading-relaxed">
-            We are not affiliated with any government or political party.
+            We are not a political party, and we are not affiliated with any government.
           </p>
         </div>
 
@@ -94,8 +90,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => (
       <InstallApp />
 
       <div className="mt-6 flex flex-col gap-3 border-t border-white/15 pt-6 text-[0.875rem] text-white/60 sm:flex-row sm:justify-between">
-        <p>© {new Date().getFullYear()} {ORG_NAME}. Registered in England and Wales, company number 16809857. <a href="mailto:info@mashkhall.com" translate="no" className="ltr-value text-white/80 underline underline-offset-2 hover:text-white">info@mashkhall.com</a>. <a href={facebookLink(useData().siteSettings?.facebookPageUrl)} target="_blank" rel="noopener noreferrer" className="text-white/80 underline underline-offset-2 hover:text-white">Facebook</a></p>
-        <p>Named after the peaceful protests that began in Sulaymaniyah on 17 February 2011.</p>
+        <p>© {new Date().getFullYear()} {ORG_NAME}. <a href="mailto:info@mashkhall.com" translate="no" className="ltr-value text-white/80 underline underline-offset-2 hover:text-white">info@mashkhall.com</a>. <a href={facebookLink(useData().siteSettings?.facebookPageUrl)} target="_blank" rel="noopener noreferrer" className="text-white/80 underline underline-offset-2 hover:text-white">Facebook</a></p>
+        <p className="font-kurdish" lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</p>
       </div>
     </Container>
   </footer>
