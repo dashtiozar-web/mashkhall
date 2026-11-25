@@ -77,6 +77,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Dukan Lake.jpg', 'Mhamadkorra'),
   ] },
   { id: 'choman', name: 'Choman', ku: 'چۆمان', photos: [
+    { url: '/images/cities/choman.jpg', credit: '', source: '' },
     commons('Choman Erbil Iraq.jpg', 'Kawasuurdawoody'),
     commons('Choman, Irbil, Kurdistan.jpg'),
   ] },
