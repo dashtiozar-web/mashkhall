@@ -19,6 +19,7 @@ import { IdCheckPage } from './pages/IdCheckPage';
 
 // Pages
 import { HomePage } from './pages/HomePage';
+import { SectionPage, SectionsIndex } from './pages/SectionPage';
 import { RebinShamamkiPage } from './pages/RebinShamamkiPage';
 import { AboutPage } from './pages/AboutPage';
 import { DirectoryPage } from './pages/DirectoryPage';
@@ -50,6 +51,8 @@ import { LegalPage } from './pages/LegalPage';
 const TAB_TO_PATH: Record<string, string> = {
   home: '',
   about: 'about',
+  sections: 'sections',
+  section: 'sections',
   rebin: 'rebin-shamamki',
   history: 'about',
   directory: 'people',
@@ -88,6 +91,7 @@ const PATH_TO_TAB: Record<string, [string, string]> = {
   memorial: ['about', 'about'],
   'sherwan-sherwani': ['rebin', 'rebin'],
   'rebin-shamamki': ['rebin', 'rebin'],
+  sections: ['sections', 'section'],
   people: ['directory', 'member-profile'],
   councils: ['directory', 'chapter'],
   chapters: ['directory', 'chapter'], // old links keep working
@@ -113,6 +117,8 @@ const PATH_TO_TAB: Record<string, [string, string]> = {
 
 const PAGE_TITLES: Record<string, string> = {
   rebin: 'Rebin Shamamki (1965–2026)',
+  sections: 'Sections',
+  section: 'Section',
   contribute: 'Publish with us',
   about: 'About us',
   directory: 'Members and people',
@@ -247,6 +253,7 @@ const AppContent: React.FC = () => {
 
       <Navbar 
         currentTab={currentTab} 
+        currentParam={currentParam}
         onNavigate={handleNavigate} 
         onOpenAuth={() => handleOpenAuth('signin')} 
       />
@@ -257,6 +264,9 @@ const AppContent: React.FC = () => {
         {currentTab === 'home' && (
           <HomePage onNavigate={handleNavigate} onOpenAuth={() => handleOpenAuth('signin')} />
         )}
+
+        {currentTab === 'sections' && <SectionsIndex onNavigate={handleNavigate} />}
+        {currentTab === 'section' && <SectionPage id={currentParam} onNavigate={handleNavigate} />}
 
         {currentTab === 'rebin' && <RebinShamamkiPage onNavigate={handleNavigate} />}
 

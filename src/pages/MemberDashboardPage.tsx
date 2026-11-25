@@ -1,3 +1,4 @@
+import { SECTION_CHOICES } from '../lib/sections';
 import { MyMeetingsPanel } from '../components/MyMeetingsPanel';
 import { MembershipCardPanel } from '../components/MembershipCardPanel';
 import { VoluntaryContribution } from '../components/BankTransferDetails';
@@ -798,15 +799,7 @@ export const MemberDashboardPage: React.FC<MemberDashboardPageProps> = ({
                       onChange={(e) => setPostCategory(e.target.value)}
                       className="w-full px-3.5 py-2 text-sm rounded-lg border border-line focus:ring-2 focus:ring-navy/30 text-ink bg-surface"
                     >
-                      <option value="political">Politics and governance</option>
-                      <option value="economic">Economy</option>
-                      <option value="social">Society and community</option>
-                      <option value="legal">Law and human rights</option>
-                      <option value="academic">Research</option>
-                      <option value="environmental">Environment</option>
-                      <option value="healthcare">Health</option>
-                      <option value="militia">Armed groups and security</option>
-                      <option value="class_inequality">Inequality</option>
+                      {SECTION_CHOICES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
                   </div>
 

@@ -1,3 +1,4 @@
+import { sectionOfCategory } from '../lib/sections';
 import React from 'react';
 import { localeOf } from '../i18n/lang';
 
@@ -151,6 +152,8 @@ export const formatDate = (iso?: string) => {
 
 export const categoryLabel = (category?: string) => {
   if (!category) return 'Article';
+  const section = sectionOfCategory(category);
+  if (section) return section.group === 'news' ? `News: ${section.name}` : section.name;
   const map: Record<string, string> = {
     political: 'Politics',
     human_rights: 'Human rights',

@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { Button, Container, PageHeader } from '../components/ui';
 import { BankTransferDetails, VoluntaryContribution } from '../components/BankTransferDetails';
-import { TOPICS } from '../data/initialData';
+import { SECTION_CHOICES } from '../lib/sections';
 import { uploadImage } from '../lib/media';
 import { videoEmbed, videoTags, VIDEO_HELP, SUBTITLE_LANGUAGES } from '../lib/video';
 import {
@@ -92,7 +92,7 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
-  const [topic, setTopic] = useState('legal');
+  const [topic, setTopic] = useState('political');
   const [language, setLanguage] = useState('en');
   const [sources, setSources] = useState('');
   const [topics, setTopics] = useState('');
@@ -198,7 +198,7 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
           title: title.trim(),
           excerpt: (excerpt.trim() || body.slice(0, 180)).slice(0, 2000),
           content: body,
-          category: kind === 'news' || kind === 'statement' ? 'political' : topic,
+          category: kind === 'statement' ? 'political' : kind === 'news' ? (topic.startsWith('news_') ? topic : 'news_kurdistan') : topic,
           tags: isVideo ? videoTags(topics, subtitles, videosOnly) : kind === 'statement' ? ['statement'] : kind === 'news' ? ['news'] : [],
           contentType: isVideo ? 'video_speech' : kind === 'report' ? 'monitoring_report' : 'article',
           videoUrl: videoUrl.trim() || undefined,
@@ -295,7 +295,7 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
                     const Icon = KIND_ICON[k.id];
                     return (
                       <label key={k.id} className={`flex cursor-pointer gap-3 rounded-lg border p-3 ${kind === k.id ? 'border-navy bg-navy-tint' : 'border-line hover:border-ink/40'}`}>
-                        <input type="radio" name="kind" checked={kind === k.id} onChange={() => setKind(k.id)} className="mt-1 h-4 w-4 accent-[var(--c-navy)]" />
+                        <input type="radio" name="kind" checked={kind === k.id} onChange={() => { setKind(k.id); if (k.id === 'news' && !topic.startsWith('news_')) setTopic('news_kurdistan'); }} className="mt-1 h-4 w-4 accent-[var(--c-navy)]" />
                         <span><span className="flex items-center gap-1.5 font-semibold"><Icon className="h-4 w-4" aria-hidden="true" />{k.label}</span><span className="block text-[0.8438rem] text-muted">{k.help}</span></span>
                       </label>
                     );
@@ -308,10 +308,10 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
                 <legend className="text-[1.25rem] font-semibold"><span className="text-crimson tabular-nums">2.</span> Your work</legend>
                 <label className={label}>Title<input dir="auto" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={300} className={field} required /></label>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {kind !== 'news' && kind !== 'statement' && (
-                    <label className={label}>Category
+                  {kind !== 'statement' && (
+                    <label className={label}>Section
                       <select value={topic} onChange={(e) => setTopic(e.target.value)} className={field}>
-                        {TOPICS.filter((t) => t.id !== 'all').map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+                        {SECTION_CHOICES.filter((c) => kind !== 'news' || c.value.startsWith('news_')).map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                       </select>
                     </label>
                   )}

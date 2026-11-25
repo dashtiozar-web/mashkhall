@@ -3,12 +3,14 @@ import { Menu, X, ChevronDown, Vote } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Container, Logo, ORG_SHORT } from './ui';
 import { REFERENDUM_URL } from './ReferendumCall';
+import { SectionsBar } from './SectionsBar';
 import { ThemeToggle } from './ThemeToggle';
 import { NotificationBell } from './Notifications';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface NavbarProps {
   currentTab: string;
+  currentParam?: string;
   onNavigate: (tab: string, param?: string) => void;
   onOpenAuth: () => void;
 }
@@ -18,13 +20,14 @@ const NAV_LINKS: { id: string; label: string; activeFor: string[] }[] = [
   { id: 'activities', label: 'Activities', activeFor: ['activities', 'activity'] },
   { id: 'appreciation', label: 'Appreciation', activeFor: ['appreciation'] },
   { id: 'structure', label: 'Structure', activeFor: ['structure'] },
+  { id: 'sections', label: 'Sections', activeFor: ['sections', 'section'] },
   { id: 'news', label: 'News and reports', activeFor: ['news', 'article', 'resources'] },
   { id: 'videos', label: 'Videos', activeFor: ['videos'] },
   { id: 'directory', label: 'Members', activeFor: ['directory', 'chapter', 'member-profile'] },
   { id: 'contact', label: 'Contact', activeFor: ['contact', 'faqs'] },
 ];
 
-export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAuth }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentTab, currentParam, onNavigate, onOpenAuth }) => {
   const { currentUser, userProfile, isAdmin, isMember, hasPermission, signOut } = useAuth();
   const canManageNotifications = Boolean(currentUser) && hasPermission('manage_notifications');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -192,6 +195,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
           </div>
         </div>
       </Container>
+
+      <SectionsBar currentTab={currentTab} currentParam={currentParam} onNavigate={(t, p) => { setMobileOpen(false); onNavigate(t, p); }} />
 
       {mobileOpen && (
         <div id="mobile-menu" className="max-h-[calc(100dvh-68px)] overflow-y-auto border-t border-white/10 bg-surface text-ink min-[1680px]:hidden">

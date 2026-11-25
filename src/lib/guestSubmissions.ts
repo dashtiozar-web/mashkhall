@@ -472,7 +472,7 @@ export const publishGuestWork = async (s: GuestSubmission, me: { uid: string }) 
     slug: slugify(s.title, s.id),
     excerpt: (s.excerpt || s.content.slice(0, 180)).slice(0, 2000),
     content: `${s.content}${extraImages}`,
-    category: s.kind === 'news' || s.kind === 'statement' ? 'political' : s.topic || 'human_rights',
+    category: s.kind === 'statement' ? 'political' : s.kind === 'news' ? (s.topic?.startsWith('news_') ? s.topic : 'news_kurdistan') : s.topic || 'political',
     tags: [...(s.kind === 'statement' ? ['statement'] : s.kind === 'news' ? ['news'] : []), ...(Array.isArray(s.tags) ? s.tags.slice(0, 12) : [])],
     authorUid: `guest:${s.id}`,
     authorDisplayName: s.contact.name,
