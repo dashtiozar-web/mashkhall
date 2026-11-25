@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, Vote } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Container, Logo, ORG_SHORT } from './ui';
+import { REFERENDUM_URL } from './ReferendumCall';
 import { ThemeToggle } from './ThemeToggle';
 import { NotificationBell } from './Notifications';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -60,7 +61,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
     {/* Top bar: language and a short statement of who we are. */}
     <div className="border-b border-white/10 bg-[#120906] text-white">
       <Container className="flex h-10 items-center justify-between gap-3">
-        <p className="hidden truncate text-[0.8125rem] text-white/65 sm:block">Independent · Non-violent · Founded 17 February 2015</p>
+        <p className="hidden truncate text-[0.8125rem] text-white/65 lg:block">Independent · Non-violent · Founded 17 February 2015</p>
+        <a href={REFERENDUM_URL} target="_blank" rel="noopener"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#F2C14E] px-3 py-1 text-[0.8125rem] font-bold text-[#2A110A] no-underline hover:bg-[#FFD36B]">
+          <Vote className="h-3.5 w-3.5" aria-hidden="true" /><span className="sm:hidden">Referendum</span><span className="hidden sm:inline">Civil Referendum 2026</span><span className="sr-only"> (opens in a new tab)</span>
+        </a>
         <LanguageSwitcher className="ms-auto" />
       </Container>
     </div>

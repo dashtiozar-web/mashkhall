@@ -6,6 +6,8 @@ import { Article } from '../types';
 import { CouncilRanking, UKCouncilMap } from '../components/UKCouncilMap';
 import { MemberCount } from '../components/MemberCount';
 import { VisitorAnalytics } from '../components/VisitorAnalytics';
+import { ReferendumCall, REFERENDUM_URL } from '../components/ReferendumCall';
+import { Vote } from 'lucide-react';
 import { KurdistanCover } from '../components/KurdistanCover';
 import { MembersByPlace } from '../components/MembersByPlace';
 import { FacebookFeed } from '../components/FacebookFeed';
@@ -82,12 +84,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             <div className="mt-9 flex flex-wrap gap-3">
               <Button size="lg" onClick={() => onNavigate('apply')}>Become a member</Button>
               <Button size="lg" variant="inverse" onClick={() => onNavigate('about')}>Get to know us</Button>
+              <a href={REFERENDUM_URL} target="_blank" rel="noopener"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#F2C14E] px-6 py-3.5 text-[1.0625rem] font-bold text-[#2A110A] no-underline hover:bg-[#FFD36B]">
+                <Vote className="h-5 w-5" aria-hidden="true" /> Civil Referendum 2026<span className="sr-only"> (opens in a new tab)</span>
+              </a>
             </div>
           </div>
           <Emblem />
         </Container>
         <div className="rule-fire relative z-10" aria-hidden="true" />
       </section>
+
+      {/* Civil Referendum 2026: the first thing under the cover */}
+      <ReferendumCall />
 
       {/* Mission */}
       <section className="border-b border-line bg-surface">
