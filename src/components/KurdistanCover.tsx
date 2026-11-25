@@ -199,7 +199,7 @@ export const KurdistanCover: React.FC = () => {
               className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-white/15">
               <ChevronLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
             </button>
-            <span className="min-w-[3.25rem] text-center text-[0.75rem] tabular-nums text-white/85" translate="no">{at + 1} / {scenes.length}</span>
+            <span className="min-w-[3.25rem] text-center text-[0.75rem] tabular-nums text-white/85" dir="ltr" translate="no">{at + 1} / {scenes.length}</span>
             <button type="button" onClick={() => go(1)} aria-label="Next place"
               className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-white/15">
               <ChevronRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />

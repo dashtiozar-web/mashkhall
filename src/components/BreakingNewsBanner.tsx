@@ -62,7 +62,7 @@ export const BreakingNewsStrip: React.FC<{ banner?: StripItem; banners?: StripIt
         <span className="breaking-news-dot h-2 w-2 rounded-full bg-white" aria-hidden="true" />
         Breaking news
       </span>
-      <div className="relative min-w-0 flex-1 overflow-hidden py-2 text-[0.9375rem] sm:text-[1rem]">
+      <div dir="ltr" className="relative min-w-0 flex-1 overflow-hidden py-2 text-start text-[0.9375rem] sm:text-[1rem]">
         {/* Screen readers get each item once, without the moving copies. */}
         <span className="sr-only" data-i18n-skip="">{allText}</span>
         <div dir="ltr" translate="no" data-i18n-skip="" className="breaking-news-track whitespace-nowrap" style={{ animationDuration: `${duration}s` }} aria-hidden="true">
