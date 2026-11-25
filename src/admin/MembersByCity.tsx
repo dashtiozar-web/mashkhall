@@ -24,7 +24,10 @@ export const MembersByCity: React.FC<{ applications: MemberApplication[] }> = ({
       m.set(city, row);
     }
     const make = (id: string, name: string, region: string) => {
-      const cities = [...(byGroup.get(id) || new Map()).entries()]
+      // Every city of a province is listed, even before anyone joins from it.
+      const rows = new Map(byGroup.get(id) || new Map());
+      for (const c of PROVINCES.find((p) => p.id === id)?.cities || []) if (!rows.has(c)) rows.set(c, { approved: 0, waiting: 0 });
+      const cities = [...rows.entries()]
         .map(([city, r]) => ({ city, ...r, total: r.approved + r.waiting }))
         .sort((x, y) => y.total - x.total || x.city.localeCompare(y.city));
       return { id, name, region, cities, total: cities.reduce((s, c) => s + c.total, 0) };

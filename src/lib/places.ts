@@ -23,10 +23,10 @@ export const COUNTRIES: Country[] = [
 
 /** The five provinces, with the main cities and towns offered as suggestions. */
 export const PROVINCES: Province[] = [
-  { id: 'sulaymaniyah', name: 'Sulaymaniyah', ku: 'سلێمانی', cities: ['Sulaymaniyah', 'Ranya', 'Qaladiza', 'Chamchamal', 'Kalar', 'Darbandikhan', 'Dukan', 'Penjwen', 'Said Sadiq', 'Mawat', 'Sharbazher', 'Qaradagh', 'Kifri', 'Khanaqin'] },
+  { id: 'sulaymaniyah', name: 'Sulaymaniyah', ku: 'سلێمانی', cities: ['Sulaymaniyah', 'Ranya', 'Qaladiza', 'Chamchamal', 'Kalar', 'Darbandikhan', 'Dukan', 'Penjwen', 'Said Sadiq', 'Sharazur', 'Mawat', 'Sharbazher', 'Qaradagh', 'Kifri', 'Khanaqin'] },
   { id: 'erbil', name: 'Erbil', ku: 'هەولێر', cities: ['Erbil', 'Koya', 'Shaqlawa', 'Soran', 'Rawanduz', 'Choman', 'Mergasor', 'Khabat', 'Makhmur', 'Dashti Hawler', 'Harir'] },
   { id: 'duhok', name: 'Duhok', ku: 'دهۆک', cities: ['Duhok', 'Zakho', 'Amedi', 'Akre', 'Semel', 'Shekhan', 'Bardarash', 'Sarsing', 'Deraluk'] },
-  { id: 'halabja', name: 'Halabja', ku: 'هەڵەبجە', cities: ['Halabja', 'Khurmal', 'Byara', 'Sirwan', 'Tawella'] },
+  { id: 'halabja', name: 'Halabja', ku: 'هەڵەبجە', cities: ['Halabja', 'Hawraman', 'Khurmal', 'Byara', 'Sirwan', 'Tawella'] },
   { id: 'kirkuk', name: 'Kirkuk', ku: 'کەرکووک', cities: ['Kirkuk', 'Dibis', 'Daquq', 'Hawija', 'Prde (Altun Kupri)', 'Shwan', 'Qara Hanjir'] },
 ];
 
@@ -49,6 +49,32 @@ export const provinceName = (id?: string) => PROVINCES.find((p) => p.id === id)?
 export const groupLabel = (g?: Pick<CityChapter, 'id' | 'name'>) =>
   !g ? '' : isProvince(g.id) ? `${g.name}, Kurdistan` : g.name;
 
-/** A tidy form of a city name, so "  ranya" and "Ranya" count as one city. */
-export const normaliseCity = (raw?: string) =>
-  (raw || '').trim().replace(/\s+/g, ' ').replace(/(^|[\s-])(\p{Ll})/gu, (_m, a: string, b: string) => a + b.toUpperCase());
+/** Other spellings of Kurdistan's cities, so each city is counted once. */
+const CITY_SPELLINGS: Record<string, string> = {
+  rania: 'Ranya', raniya: 'Ranya', ranya: 'Ranya', ranye: 'Ranya',
+  qaladiza: 'Qaladiza', qalladiza: 'Qaladiza', qaladze: 'Qaladiza', qaladize: 'Qaladiza', qalatdiza: 'Qaladiza',
+  rawanduz: 'Rawanduz', rwandiz: 'Rawanduz', rawandiz: 'Rawanduz', rewanduz: 'Rawanduz', rowanduz: 'Rawanduz', rwanduz: 'Rawanduz',
+  soran: 'Soran', diana: 'Soran', diyana: 'Soran',
+  dukan: 'Dukan', dwkan: 'Dukan', dokan: 'Dukan',
+  choman: 'Choman', chuman: 'Choman',
+  darbandikhan: 'Darbandikhan', derbendikhan: 'Darbandikhan', darbandixan: 'Darbandikhan', darbandkhan: 'Darbandikhan',
+  kalar: 'Kalar', kelar: 'Kalar',
+  kifri: 'Kifri', kfry: 'Kifri', kifry: 'Kifri', kfri: 'Kifri',
+  akre: 'Akre', akri: 'Akre', aqrah: 'Akre', akra: 'Akre', akrê: 'Akre',
+  zakho: 'Zakho', zaxo: 'Zakho', zakhu: 'Zakho',
+  chamchamal: 'Chamchamal', chemchemal: 'Chamchamal', chamchemal: 'Chamchamal',
+  saidsadiq: 'Said Sadiq', saydsadiq: 'Said Sadiq', sayidsadiq: 'Said Sadiq', seyidsadiq: 'Said Sadiq',
+  sharazur: 'Sharazur', sharazwr: 'Sharazur', sharazoor: 'Sharazur', shahrizor: 'Sharazur', shahrazur: 'Sharazur',
+  penjwen: 'Penjwen', penjwin: 'Penjwen', penjween: 'Penjwen', panjwen: 'Penjwen',
+  hawraman: 'Hawraman', horaman: 'Hawraman', hewraman: 'Hawraman', uraman: 'Hawraman',
+  sulaymaniyah: 'Sulaymaniyah', sulaimani: 'Sulaymaniyah', slemani: 'Sulaymaniyah', sulaimaniya: 'Sulaymaniyah', sulaymaniya: 'Sulaymaniyah', silemani: 'Sulaymaniyah',
+  erbil: 'Erbil', hawler: 'Erbil', hewler: 'Erbil', arbil: 'Erbil', irbil: 'Erbil',
+  duhok: 'Duhok', dohuk: 'Duhok', dihok: 'Duhok',
+  amedi: 'Amedi', amadiya: 'Amedi', amadiyah: 'Amedi', amedy: 'Amedi',
+};
+
+/** A tidy form of a city name, so "  ranya", "Rania" and "Ranya" count as one city. */
+export const normaliseCity = (raw?: string) => {
+  const tidy = (raw || '').trim().replace(/\s+/g, ' ').replace(/(^|[\s-])(\p{Ll})/gu, (_m, a: string, b: string) => a + b.toUpperCase());
+  return CITY_SPELLINGS[tidy.toLowerCase().replace(/[\s'’.-]/g, '')] || tidy;
+};
