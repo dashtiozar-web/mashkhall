@@ -55,6 +55,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Sarkapkan mountain, Rania, Kurdistan- Iraq.jpg', 'Wary Abdullah'),
   ] },
   { id: 'qaladiza', name: 'Qaladiza', ku: 'قەڵادزێ', photos: [
+    { url: '/images/cities/qaladiza.jpg', credit: 'Photo: Hiwa Mahmood', source: '' },
     commons('Qaladze17.jpg', 'Saman.h.m'),
     commons('Qaladze14.jpg', 'Saman.h.m'),
     commons('Qaladze.jpg', 'Saman11'),
@@ -189,7 +190,10 @@ export const KurdistanCover: React.FC = () => {
           <p className="min-w-0 text-end text-[0.8125rem] leading-snug text-white/85" aria-live="polite">
             <span className="block font-semibold text-white">{current.name}</span>
             <span className="ku-sub block font-kurdish text-[0.9375rem] text-[#F2C14E]" lang="ckb" dir="rtl" translate="no">{current.ku}</span>
-            {photo?.credit && (
+            {photo?.credit && !photo.source && (
+              <span className="mt-0.5 block truncate text-[0.6875rem] text-white/60">{photo.credit}</span>
+            )}
+            {photo?.credit && photo.source && (
               <a href={photo.source} target="_blank" rel="noopener noreferrer" className="mt-0.5 block truncate text-[0.6875rem] text-white/60 underline-offset-2 hover:text-white hover:underline">
                 {photo.credit}
               </a>
