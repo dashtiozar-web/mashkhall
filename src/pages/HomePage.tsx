@@ -1,16 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { Suspense, lazy, useMemo } from 'react';
 import { HandHeart, Landmark, Scale, BookOpen, Users } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { Button, Container, EmptyState, SectionHeading, TextLink, categoryLabel, formatDate } from '../components/ui';
 import { Article } from '../types';
-import { CouncilRanking, UKCouncilMap } from '../components/UKCouncilMap';
+import { CouncilRanking } from '../components/UKCouncilMap';
+
+const MembersMaps = lazy(() => import('../components/MembersMaps'));
 import { MemberCount } from '../components/MemberCount';
 import { VisitorAnalytics } from '../components/VisitorAnalytics';
 import { ReferendumCall, REFERENDUM_PUBLIC, REFERENDUM_URL } from '../components/ReferendumCall';
 import { Facebook, Vote } from 'lucide-react';
 import { MZ_DEFINITION } from './AboutPage';
 import { KurdistanCover } from '../components/KurdistanCover';
-import { MembersByPlace } from '../components/MembersByPlace';
 import { FacebookFeed, facebookLink } from '../components/FacebookFeed';
 import { MediaImage } from '../components/MediaImage';
 import { TorchEmblem } from '../components/TorchEmblem';
@@ -256,13 +257,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             intro="Members join from the five provinces of Kurdistan and from Britain, Australia, Canada, Germany and the USA. Choose a place to see its members."
             action={<Button variant="secondary" onClick={() => onNavigate('directory')}>All members</Button>}
           />
-          <MembersByPlace onOpen={(slug) => onNavigate('chapter', slug)} />
-          <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-line bg-navy-tint p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-[1.375rem] font-semibold">Our structure</h2>
-              <p className="mt-1 text-ink-soft">The Board of Directors, the leaders and teams of each province and country, and the Production Team.</p>
+          <Suspense fallback={<div className="h-[32rem] animate-pulse rounded-3xl bg-stone-deep" aria-hidden="true" />}>
+            <MembersMaps onOpen={(slug) => onNavigate('chapter', slug)} />
+          </Suspense>
+          <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
+            <CouncilRanking />
+            <div className="flex flex-col gap-4 rounded-3xl border border-line bg-navy-tint p-6">
+              <div>
+                <h2 className="text-[1.375rem] font-semibold">Our structure</h2>
+                <p className="mt-1 text-ink-soft">The Board of Directors, the leaders and teams of each province and country, and the Production Team.</p>
+              </div>
+              <div><Button onClick={() => onNavigate('structure')}>See the organisation chart</Button></div>
             </div>
-            <div className="shrink-0"><Button onClick={() => onNavigate('structure')}>See the organisation chart</Button></div>
           </div>
         </Container>
       </section>

@@ -195,7 +195,7 @@ export const UKCouncilMap: React.FC<{ onOpen?: (councilId: string) => void }> = 
   );
 };
 
-/** Live league of councils by approved members, with growth and recognition. */
+/** Live league of the provinces and countries by approved members, with growth and recognition. */
 export const CouncilRanking: React.FC<{ compact?: boolean }> = ({ compact }) => {
   const { chapters, publicProfiles } = useData();
   const stats = useMemo(() => councilStats(chapters, publicProfiles), [chapters, publicProfiles]);
@@ -208,11 +208,11 @@ export const CouncilRanking: React.FC<{ compact?: boolean }> = ({ compact }) => 
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <p className="text-[0.9375rem] font-semibold text-navy">Growing together</p>
-          <h2 id="council-league" className="text-[1.625rem] leading-tight font-semibold">Council membership league</h2>
+          <h2 id="council-league" className="text-[1.625rem] leading-tight font-semibold">Membership league</h2>
         </div>
-        <p className="text-[0.9375rem] text-ink-soft"><strong className="tabular-nums text-ink">{total}</strong> members nationally</p>
+        <p className="text-[0.9375rem] text-ink-soft"><strong className="tabular-nums text-ink">{total}</strong> members in total</p>
       </div>
-      {!compact && <p className="mt-2 max-w-[62ch] text-[0.9375rem] text-ink-soft">Every council counts. The league updates by itself as members are approved, and celebrates both the largest councils and those growing fastest.</p>}
+      {!compact && <p className="mt-2 max-w-[62ch] text-[0.9375rem] text-ink-soft">Every province and country counts. The league updates by itself as members are approved, and celebrates both the largest and the fastest growing.</p>}
       <ol className="mt-5 space-y-3">
         {stats.map((s) => (
           <li key={s.council.id} className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3">
@@ -220,7 +220,7 @@ export const CouncilRanking: React.FC<{ compact?: boolean }> = ({ compact }) => 
             <div className="min-w-0">
               <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                 <a href={`/councils/${encodeURIComponent(s.council.slug || s.council.id)}`} className="font-semibold text-ink hover:underline">{s.council.name}</a>
-                {s.rank === 1 && s.members > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-amber-tint px-2 py-0.5 text-[0.75rem] font-semibold text-[#8a5b00]"><Crown className="h-3 w-3" aria-hidden="true" /> Largest council</span>}
+                {s.rank === 1 && s.members > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-amber-tint px-2 py-0.5 text-[0.75rem] font-semibold text-[#8a5b00]"><Crown className="h-3 w-3" aria-hidden="true" /> Most members</span>}
                 {topGrowth > 0 && s.growth === topGrowth && <span className="inline-flex items-center gap-1 rounded-full bg-navy-tint px-2 py-0.5 text-[0.75rem] font-semibold text-navy"><TrendingUp className="h-3 w-3" aria-hidden="true" /> Fastest growing</span>}
               </p>
               <span className="mt-1 block h-2 overflow-hidden rounded-full bg-stone" aria-hidden="true">

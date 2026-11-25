@@ -1,0 +1,264 @@
+import React, { useMemo, useState } from 'react';
+import { ArrowRight, Globe2, MapPin, Users } from 'lucide-react';
+import { useData } from '../context/DataContext';
+import { councilStats, CouncilStat, GROWTH_DAYS, HEAT_LEGEND } from '../lib/councilStats';
+import { ABROAD_IDS, COUNTRIES, PROVINCES, PROVINCE_IDS } from '../lib/places';
+import {
+  KURDISTAN_NEIGHBOURS, KURDISTAN_REGIONS, KURDISTAN_VIEWBOX, MapShape,
+  WORLD_CODES, WORLD_COUNTRIES, WORLD_POINTS, WORLD_VIEWBOX,
+} from '../data/geoMaps';
+
+/*
+ * Two live maps of where our members are: the five provinces of Kurdistan,
+ * and the world, with the five countries abroad joined to Kurdistan. Colours
+ * run from green (fewest members) to red (most) on each map.
+ */
+
+interface Node { stat: CouncilStat; x: number; y: number }
+
+const kuName = (id: string) => PROVINCES.find((p) => p.id === id)?.ku || COUNTRIES.find((c) => c.id === id)?.ku || '';
+
+const curve = (a: { x: number; y: number }, b: { x: number; y: number }, bend = 0.12) => {
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  return `M${a.x},${a.y} Q${mx - dy * bend},${my + dx * bend} ${b.x},${b.y}`;
+};
+
+const useGroupStats = (ids: string[]) => {
+  const { chapters, publicProfiles } = useData();
+  return useMemo(() => {
+    const groups = ids.map((id) => chapters.find((c) => c.id === id)).filter(Boolean) as typeof chapters;
+    return councilStats(groups, publicProfiles);
+  }, [chapters, publicProfiles, ids]);
+};
+
+const Legend: React.FC<{ note: React.ReactNode }> = ({ note }) => (
+  <figcaption className="mt-3 flex flex-col gap-3 px-2 pb-1 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <p className="text-[0.8125rem] font-semibold text-ink-soft">Members</p>
+      <div className="mt-1 h-2.5 w-56 max-w-full rounded-full" style={{ background: `linear-gradient(90deg, ${HEAT_LEGEND.join(', ')})` }} aria-hidden="true" />
+      <div className="mt-1 flex w-56 max-w-full justify-between text-[0.75rem] text-muted"><span>Fewest (green)</span><span>Most (red)</span></div>
+    </div>
+    <p className="max-w-[44ch] text-[0.75rem] text-muted">{note} Map data: <a href="https://www.amcharts.com/" target="_blank" rel="noopener noreferrer" className="underline">amCharts</a>.</p>
+  </figcaption>
+);
+
+/** A circle with the number of members, and the place's name beside it. */
+const Marker: React.FC<{
+  n: Node; r: number; on: boolean; labelLeft: boolean; font: number; below?: boolean;
+  onHover: (id: string | null) => void; onPick: (id: string) => void; picked: boolean;
+}> = ({ n, r, on, labelLeft, font, below, onHover, onPick, picked }) => {
+  const id = n.stat.council.id;
+  return (
+    <g role="button" tabIndex={0} aria-label={`${n.stat.council.name}: ${n.stat.members} members, ranked ${n.stat.rank}`}
+      aria-pressed={picked} className="cursor-pointer focus:outline-none"
+      onMouseEnter={() => onHover(id)} onMouseLeave={() => onHover(null)} onFocus={() => onHover(id)} onBlur={() => onHover(null)}
+      onClick={() => onPick(id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(id); } }}>
+      {on && <circle cx={n.x} cy={n.y} r={r + r * 0.6} fill={n.stat.colour} fillOpacity={0.25} />}
+      <circle cx={n.x} cy={n.y} r={r} fill={n.stat.colour} stroke="#fff" strokeWidth={r * 0.2} filter="url(#mm-shadow)" />
+      <text x={n.x} y={n.y + font * 0.36} textAnchor="middle" className="pointer-events-none fill-white font-sans font-bold" style={{ fontSize: font, paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.35)', strokeWidth: 2 }}>{n.stat.members}</text>
+      <text x={below ? n.x : labelLeft ? n.x - r - font * 0.4 : n.x + r + font * 0.4} y={below ? n.y + r + font * 1.3 : n.y + font * 0.42} textAnchor={below ? 'middle' : labelLeft ? 'end' : 'start'}
+        className="pointer-events-none fill-[#1F2622] font-sans font-semibold dark:fill-white"
+        style={{ fontSize: font * 1.25, paintOrder: 'stroke', stroke: 'var(--map-halo, #ffffff)', strokeWidth: font * 0.3, strokeLinejoin: 'round' }}>
+        {n.stat.council.name}
+      </text>
+    </g>
+  );
+};
+
+/** The side panel: a total, and the details of the place chosen on the map. */
+const Panel: React.FC<{
+  icon: React.ReactNode; label: string; total: number; of: string; focus?: CouncilStat; count: number;
+  hint: string; onOpen?: (slug: string) => void;
+}> = ({ icon, label, total, of, focus, count, hint, onOpen }) => (
+  <aside className="space-y-5" aria-live="polite">
+    <div className="rounded-3xl bg-navy p-5 text-white">
+      <p className="flex items-center gap-2 text-[0.9375rem] font-semibold text-white/85">{icon} {label}</p>
+      <p className="mt-1 font-serif text-[3rem] leading-none font-semibold tabular-nums">{total.toLocaleString('en-GB')}</p>
+      <p className="mt-1 text-white/85">{of}</p>
+    </div>
+    {focus ? (
+      <div className="rounded-3xl border border-line bg-surface p-5">
+        <p className="flex items-center gap-2 text-[0.875rem] font-semibold" style={{ color: focus.colour }}><MapPin className="h-4 w-4" aria-hidden="true" /> Ranked {focus.rank} of {count}</p>
+        <h3 className="mt-1 text-[1.5rem] font-semibold">
+          {focus.council.name}
+          <span className="ku-sub ms-2 font-kurdish text-[1.125rem] font-normal text-muted" lang="ckb" dir="rtl" translate="no">{kuName(focus.council.id)}</span>
+        </h3>
+        <dl className="mt-3 grid grid-cols-2 gap-3 text-[0.9375rem]">
+          <div><dt className="text-muted">Members</dt><dd className="text-[1.375rem] font-semibold tabular-nums">{focus.members}</dd></div>
+          <div><dt className="text-muted">Last {GROWTH_DAYS} days</dt><dd className="text-[1.375rem] font-semibold tabular-nums">{focus.growth ? `+${focus.growth}` : '0'}</dd></div>
+        </dl>
+        <a href={`/councils/${encodeURIComponent(focus.council.slug || focus.council.id)}`}
+          onClick={(e) => { if (onOpen) { e.preventDefault(); onOpen(focus.council.slug || focus.council.id); } }}
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-navy px-4 py-2 font-semibold text-white no-underline hover:bg-navy-deep">
+          See the members <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+        </a>
+      </div>
+    ) : (
+      <p className="rounded-3xl border border-dashed border-line p-5 text-ink-soft">{hint}</p>
+    )}
+  </aside>
+);
+
+/** The five provinces of Kurdistan, coloured by members, with their numbers. */
+export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({ onOpen }) => {
+  const stats = useGroupStats(PROVINCE_IDS);
+  const [hover, setHover] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const focusId = hover || selected;
+  const byId = new Map(stats.map((s) => [s.council.id, s]));
+  const nodes: Node[] = KURDISTAN_REGIONS.filter((r) => r.province && byId.has(r.id))
+    .map((r) => ({ stat: byId.get(r.id)!, x: r.c![0], y: r.c![1] }));
+  // Halabja is small: its circle sits on the province itself, Sulaymaniyah's a little apart.
+  const place = (n: Node) => (n.stat.council.id === 'sulaymaniyah' ? { ...n, x: n.x - 40, y: n.y - 10 } : n);
+  const placed = nodes.map(place);
+  const order = ['duhok', 'erbil', 'sulaymaniyah', 'halabja', 'kirkuk'];
+  const links: [string, string][] = [['duhok', 'erbil'], ['erbil', 'sulaymaniyah'], ['erbil', 'kirkuk'], ['kirkuk', 'sulaymaniyah'], ['sulaymaniyah', 'halabja']];
+  const at = (id: string) => placed.find((n) => n.stat.council.id === id);
+  const max = Math.max(1, ...stats.map((s) => s.members));
+  const radius = (n: number) => 20 + 14 * Math.sqrt(n / max);
+  const total = stats.reduce((a, s) => a + s.members, 0);
+  const label = (s: MapShape) => s.name.replace(/[ʾʿ’‘]/g, '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
+      <figure className="relative m-0 rounded-3xl border border-line bg-[#EAF1F4] p-2 dark:bg-[#1b2a31] sm:p-4">
+        <svg viewBox={`0 0 ${KURDISTAN_VIEWBOX.width} ${KURDISTAN_VIEWBOX.height}`} role="group" aria-label="Map of the five provinces of Kurdistan showing our members" className="mx-auto block h-auto max-h-[78vh] w-full">
+          <defs>
+            <filter id="mm-shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" floodOpacity="0.35" /></filter>
+            <clipPath id="mm-k-clip"><rect width={KURDISTAN_VIEWBOX.width} height={KURDISTAN_VIEWBOX.height} /></clipPath>
+          </defs>
+          <g clipPath="url(#mm-k-clip)">
+            {KURDISTAN_NEIGHBOURS.map((r) => (
+              <path key={r.id} d={r.d} fill="var(--map-empty, #D9D6CF)" fillOpacity={0.45} stroke="#ffffff" strokeWidth={1.5}><title>{r.name}</title></path>
+            ))}
+            {KURDISTAN_REGIONS.map((r) => {
+              const s = r.province ? byId.get(r.id) : undefined;
+              const on = s && focusId === s.council.id;
+              return (
+                <path key={r.id} d={r.d}
+                  fill={s ? s.colour : 'var(--map-land, #F4F2EE)'} fillOpacity={s ? (on ? 0.95 : 0.72) : 1}
+                  stroke="#ffffff" strokeWidth={on ? 3 : 1.5} strokeLinejoin="round"
+                  className={s ? 'cursor-pointer transition-[fill-opacity]' : ''}
+                  onMouseEnter={() => s && setHover(s.council.id)} onMouseLeave={() => setHover(null)}
+                  onClick={() => s && setSelected(s.council.id)}>
+                  <title>{s ? `${s.council.name}: ${s.members} members` : label(r)}</title>
+                </path>
+              );
+            })}
+            {/* The provinces joined together */}
+            {links.map(([a, b]) => {
+              const A = at(a); const B = at(b);
+              if (!A || !B) return null;
+              const lit = focusId === a || focusId === b;
+              return <path key={`${a}-${b}`} d={curve(A, B)} fill="none" stroke={lit ? '#1F2622' : '#7A2414'}
+                strokeOpacity={focusId && !lit ? 0.25 : 0.8} strokeWidth={lit ? 4 : 2.5} strokeLinecap="round" className="map-flow" />;
+            })}
+            {order.map((id) => {
+              const n = at(id);
+              if (!n) return null;
+              return <Marker key={id} n={n} r={radius(n.stat.members)} on={focusId === id} picked={selected === id}
+                labelLeft={id === 'duhok' || id === 'kirkuk'} below={id === 'halabja'} font={22} onHover={setHover} onPick={setSelected} />;
+            })}
+          </g>
+        </svg>
+        <Legend note="Numbers on the circles are members in each province." />
+      </figure>
+      <Panel icon={<Users className="h-4 w-4" aria-hidden="true" />} label="Members in Kurdistan" total={total} of="approved members in five provinces"
+        focus={focusId ? byId.get(focusId) : undefined} count={stats.length} onOpen={onOpen}
+        hint="Choose a province on the map to see its members." />
+    </div>
+  );
+};
+
+/** The world, with our five countries abroad joined to Kurdistan. */
+export const WorldMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({ onOpen }) => {
+  const stats = useGroupStats(ABROAD_IDS);
+  const kurdistanTotal = useGroupStats(PROVINCE_IDS).reduce((a, s) => a + s.members, 0);
+  const [hover, setHover] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const focusId = hover || selected;
+  const byId = new Map(stats.map((s) => [s.council.id, s]));
+  const byCode = new Map(Object.entries(WORLD_CODES).map(([id, code]) => [code, byId.get(id)]));
+  const home = { x: WORLD_POINTS.kurdistan[0], y: WORLD_POINTS.kurdistan[1] };
+  const nodes: Node[] = ABROAD_IDS.filter((id) => byId.has(id) && WORLD_POINTS[id])
+    .map((id) => ({ stat: byId.get(id)!, x: WORLD_POINTS[id][0], y: WORLD_POINTS[id][1] }));
+  const max = Math.max(1, ...stats.map((s) => s.members));
+  const radius = (n: number) => 11 + 8 * Math.sqrt(n / max);
+  const total = stats.reduce((a, s) => a + s.members, 0);
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
+      <figure className="relative m-0 rounded-3xl border border-line bg-[#EAF1F4] p-2 dark:bg-[#1b2a31] sm:p-4">
+        <svg viewBox={`0 0 ${WORLD_VIEWBOX.width} ${WORLD_VIEWBOX.height}`} role="group" aria-label="World map showing our members abroad, joined to Kurdistan" className="mx-auto block h-auto w-full">
+          <defs>
+            <filter id="mw-shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="1.5" stdDeviation="1.8" floodOpacity="0.35" /></filter>
+          </defs>
+          {WORLD_COUNTRIES.map((c) => {
+            const s = byCode.get(c.id);
+            const on = s && focusId === s.council.id;
+            const isHome = c.id === 'IQ';
+            return (
+              <path key={c.id} d={c.d}
+                fill={s ? s.colour : isHome ? '#F2C14E' : 'var(--map-land, #F4F2EE)'} fillOpacity={s ? (on ? 0.95 : 0.75) : isHome ? 0.9 : 1}
+                stroke="#ffffff" strokeWidth={on ? 1.6 : 0.6} strokeLinejoin="round"
+                className={s ? 'cursor-pointer' : ''}
+                onMouseEnter={() => s && setHover(s.council.id)} onMouseLeave={() => setHover(null)}
+                onClick={() => s && setSelected(s.council.id)}>
+                <title>{s ? `${s.council.name}: ${s.members} members` : c.name}</title>
+              </path>
+            );
+          })}
+          {/* Every country abroad is joined to Kurdistan */}
+          {nodes.map((n) => {
+            const lit = focusId === n.stat.council.id;
+            return <path key={`l-${n.stat.council.id}`} d={curve(home, n, n.x < home.x ? -0.22 : 0.22)} fill="none"
+              stroke={lit ? '#1F2622' : '#7A2414'} strokeOpacity={focusId && !lit ? 0.25 : 0.8}
+              strokeWidth={lit ? 2.2 : 1.4} strokeLinecap="round" className="map-flow" />;
+          })}
+          {nodes.map((n) => {
+            const id = n.stat.council.id;
+            const r = radius(n.stat.members);
+            return (
+              <g key={id}>
+                <circle cx={n.x} cy={n.y} r={r} fill="transparent" />
+                <Marker n={n} r={r} on={focusId === id} picked={selected === id} labelLeft={id === 'canada' || id === 'usa' || id === 'britain'}
+                  font={12} onHover={setHover} onPick={setSelected} />
+              </g>
+            );
+          })}
+          {/* Kurdistan */}
+          <g>
+            <circle cx={home.x} cy={home.y} r={13} fill="#7A2414" fillOpacity={0.18} />
+            <circle cx={home.x} cy={home.y} r={8.5} fill="#7A2414" stroke="#F2C14E" strokeWidth={2} filter="url(#mw-shadow)" />
+            <text x={home.x} y={home.y + 3.2} textAnchor="middle" className="pointer-events-none fill-white font-sans font-bold" style={{ fontSize: 8 }}>{kurdistanTotal}</text>
+            <text x={home.x} y={home.y + 24} textAnchor="middle" className="pointer-events-none fill-[#7A2414] font-sans font-bold dark:fill-[#F2C14E]"
+              style={{ fontSize: 12.5, paintOrder: 'stroke', stroke: 'var(--map-halo, #ffffff)', strokeWidth: 3.5, strokeLinejoin: 'round' }}>Kurdistan</text>
+          </g>
+        </svg>
+        <Legend note="Numbers on the circles are members in each country; Kurdistan shows its total. Lines join each country to Kurdistan." />
+      </figure>
+      <Panel icon={<Globe2 className="h-4 w-4" aria-hidden="true" />} label="Members abroad" total={total} of="approved members in five countries"
+        focus={focusId ? byId.get(focusId) : undefined} count={stats.length} onOpen={onOpen}
+        hint="Choose a country on the map to see its members." />
+    </div>
+  );
+};
+
+/** Both maps, as shown on the home page. */
+const MembersMaps: React.FC<{ onOpen?: (slug: string) => void }> = ({ onOpen }) => (
+  <div className="space-y-10">
+    <div>
+      <h3 className="mb-4 text-[1.5rem] font-semibold">Kurdistan <span className="ku-sub ms-2 font-kurdish text-[1.25rem] font-normal text-muted" lang="ckb" dir="rtl" translate="no">کوردستان</span></h3>
+      <KurdistanMembersMap onOpen={onOpen} />
+    </div>
+    <div>
+      <h3 className="mb-4 text-[1.5rem] font-semibold">Around the world</h3>
+      <WorldMembersMap onOpen={onOpen} />
+    </div>
+  </div>
+);
+
+export default MembersMaps;
