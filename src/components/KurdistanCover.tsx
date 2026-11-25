@@ -66,6 +66,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Rowanduz Gorge.jpg', 'CymbalStone'),
   ] },
   { id: 'soran', name: 'Soran', ku: 'سۆران', photos: [
+    { url: '/images/cities/soran.jpg', credit: '', source: '' },
     commons('.Soran City 01.jpg', 'Khoshhat'),
     commons('Iraq Kurdistan Erbil Soran.jpg'),
   ] },
