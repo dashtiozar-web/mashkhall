@@ -25,6 +25,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('View of Sulaymaniyah (Sulaimani) City , Kurdistan.jpg', 'Diyar Muhammed'),
   ] },
   { id: 'halabja', name: 'Halabja', ku: 'هەڵەبجە', photos: [
+    { url: '/images/cities/halabja.jpg', credit: '', source: '' },
     commons('Halabja Monument Museum (15947763505).jpg', 'Enno Lenze'),
     commons('Khurmal, Halabja.jpg', 'Hiwa Sherzad'),
   ] },
