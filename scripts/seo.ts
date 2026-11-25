@@ -25,6 +25,7 @@ interface Page { path: string; title: string; description: string; changefreq: s
 
 const STATIC: Page[] = [
   { path: '/', title: ORG, description: 'Mashkhally Zhyanawa (مەشخەڵی ژیانەوە): a roadmap for restoring trust and self-confidence to our society, through self-education and self-organisation.', changefreq: 'daily', priority: 1 },
+  { path: '/rebin-shamamki', title: 'Rebin Shamamki (1965–2026)', description: 'In memory of Rebin Shamamki: veteran Peshmerga, lawyer for the wronged, and committed writer. His life, with sources.', changefreq: 'monthly', priority: 0.6 },
   { path: '/about', title: 'About us', description: 'What Mashkhally Zhyanawa is: a roadmap for restoring trust and self-confidence to our society, through self-education and self-organisation in a new political movement.', changefreq: 'monthly', priority: 0.8 },
   { path: '/activities', title: 'Our activities', description: 'Demonstrations, workshops, commemorations, online meetings and community work by Mashkhally Zhyanawa members and councils.', changefreq: 'daily', priority: 0.9 },
   { path: '/appreciation', title: 'Appreciation', description: 'Members of Mashkhally Zhyanawa Organisation recognised for taking part in its official activities, with verifiable Letters of Appreciation.', changefreq: 'weekly', priority: 0.7 },

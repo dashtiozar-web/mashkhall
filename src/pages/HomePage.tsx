@@ -114,6 +114,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         </Container>
       </section>
 
+      {/* In memory of Rebin Shamamki */}
+      <section className="border-b border-white/10 bg-[#120A07] text-white">
+        <Container className="py-10">
+          <a href="/rebin-shamamki" className="group mx-auto flex max-w-3xl flex-col gap-6 rounded-xl border border-white/12 bg-white/[0.04] p-6 no-underline hover:border-white/30 sm:flex-row sm:items-center">
+            <img src="/images/rebin-shamamki.jpg" alt="" width={120} height={136} loading="lazy" className="h-[136px] w-[120px] shrink-0 rounded-lg object-cover object-top" />
+            <div className="min-w-0">
+              <p className="text-[0.8125rem] font-semibold tracking-[0.1em] text-[#F2C14E] uppercase">In memory</p>
+              <p className="mt-1 font-serif text-[1.625rem] leading-snug font-semibold text-white">Rebin Shamamki</p>
+              <p className="mt-2 text-white/75">Rebin Shamamki (1965–2026): veteran Peshmerga, lawyer for the wronged, and committed writer.</p>
+              <span className="mt-4 inline-block h-[2px] w-12 bg-[#B3261E]" aria-hidden="true" />
+              <p className="mt-2 font-semibold text-white group-hover:underline">Read about his life</p>
+            </div>
+          </a>
+        </Container>
+      </section>
+
       {/* Our Membership: live count of approved members */}
       <section>
         <Container className="pt-12 sm:pt-16">

@@ -198,7 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
           <Container className="py-4">
             <LanguageSwitcher tone="light" className="mb-3" />
             <ul className="divide-y divide-line">
-              {[{ id: 'home', label: 'Home', activeFor: ['home'] }, ...NAV_LINKS, ...(isMember ? [{ id: 'meetings', label: 'Online meetings', activeFor: ['meetings', 'meeting'] }] : []), ...(currentUser ? [{ id: 'notifications', label: 'Notifications', activeFor: ['notifications'] }] : [])].map((link) => (
+              {[{ id: 'home', label: 'Home', activeFor: ['home'] }, ...NAV_LINKS, { id: 'rebin', label: 'In memory: Rebin Shamamki', activeFor: ['rebin'] }, ...(isMember ? [{ id: 'meetings', label: 'Online meetings', activeFor: ['meetings', 'meeting'] }] : []), ...(currentUser ? [{ id: 'notifications', label: 'Notifications', activeFor: ['notifications'] }] : [])].map((link) => (
                 <li key={link.id}>
                   <button
                     type="button"

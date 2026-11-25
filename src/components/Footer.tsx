@@ -14,6 +14,7 @@ const COLUMNS: { heading: string; links: { id: string; label: string }[] }[] = [
     heading: 'Organisation',
     links: [
       { id: 'about', label: 'About us' },
+      { id: 'rebin', label: 'In memory: Rebin Shamamki' },
       { id: 'structure', label: 'Our structure' },
       { id: 'activities', label: 'Our activities' },
       { id: 'appreciation', label: 'Appreciation' },
