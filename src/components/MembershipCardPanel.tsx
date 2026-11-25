@@ -4,6 +4,7 @@ import { LevelBadge } from './LevelBadge';
 import React, { useState } from 'react';
 import { Printer, Link2, Check, RotateCcw } from 'lucide-react';
 import { MemberCardBack, MemberCardFront } from './MemberCard';
+import { CardDownloads } from './CardDownloads';
 import { Button, formatDate } from './ui';
 import { STATE_LABEL, verificationState } from '../lib/membership';
 import { MemberRecord } from '../types';
@@ -63,6 +64,7 @@ export const MembershipCardPanel: React.FC<{ member: MemberRecord | null; onNavi
             <div className={`mx-auto w-full max-w-[340px] ${side === 'front' ? '' : 'hidden sm:block'}`}><MemberCardFront member={member} unit={unitLine(member, councilName)} /></div>
             <div className={`mx-auto w-full max-w-[340px] ${side === 'back' ? '' : 'hidden sm:block'}`}><MemberCardBack member={member} /></div>
           </div>
+          {issued && <CardDownloads className="mt-5" member={member} unit={unitLine(member, councilName)} />}
         </div>
 
         {/* Print view: both sides at real card size (54 × 85.6 mm) */}

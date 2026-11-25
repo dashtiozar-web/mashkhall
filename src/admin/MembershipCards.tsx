@@ -5,6 +5,7 @@ import { downloadQrPng, downloadQrSvg } from '../lib/qrDownload';
 import { db } from '../firebase';
 import { useData } from '../context/DataContext';
 import { MemberCardBack, MemberCardFront } from '../components/MemberCard';
+import { CardDownloads } from '../components/CardDownloads';
 import { unitLine } from '../lib/positions';
 import { cardDate, DEFAULT_SITE_URL, defaultCardDates, issueCredential, setMembershipStatus, STATE_LABEL, verificationState } from '../lib/membership';
 import { MemberRecord, VerificationState } from '../types';
@@ -312,6 +313,7 @@ export const MembershipCards: React.FC<{ initialFilter?: Filter }> = ({ initialF
               <div className="mx-auto w-full max-w-[300px]"><MemberCardFront member={viewing} unit={unitLine(viewing, (id) => chapters.find((c) => c.id === id)?.name || id || '')} /></div>
               <div className="mx-auto w-full max-w-[300px]"><MemberCardBack member={viewing} /></div>
             </div>
+            <CardDownloads className="mt-5" member={viewing} unit={unitLine(viewing, (id) => chapters.find((c) => c.id === id)?.name || id || '')} />
             {viewing.verifyUrl && (
               <div className="mt-5 space-y-3">
                 <p className="break-all text-[0.875rem] text-muted">Verification link: <a href={viewing.verifyUrl} target="_blank" rel="noopener noreferrer" className="text-navy underline">{viewing.verifyUrl}</a></p>
