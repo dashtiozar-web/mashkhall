@@ -6,8 +6,7 @@ import { MemberRecord } from '../types';
 
 /**
  * Digital membership card, reproduced from the printed plastic card:
- * crimson and dark waves, 35 coloured flames behind everything (35 years),
- * the large colour torch, the photo, name, member ID, a navy role badge and red validity dates on the
+ * crimson and dark waves, the large colour logo, the photo, name, member ID, a navy role badge and red validity dates on the
  * front; organisation details and the QR code on the back.
  *
  * The card keeps the printed proportions (54 × 85.6 mm) and scales with its
@@ -95,71 +94,20 @@ const CardFrame: React.FC<{ id: string; children: React.ReactNode; label: string
     style={{ aspectRatio: '54 / 85.6', containerType: 'inline-size', fontFamily: CARD_FONT, color: INK }}
   >
     <Waves id={id} />
-    <Flames id={id} />
     {children}
   </div>
 );
 
-/**
- * 35 flames, one for each year of anger at the failures of the Kurdish
- * authorities, set in a 5 × 7 grid behind everything on the card.
- */
-const FLAME_COLS = [10, 30, 50, 70, 90];
-const FLAME_ROWS = [6.5, 20.3, 34.1, 47.9, 61.7, 75.5, 89.3];
-export const FLAME_COUNT = FLAME_COLS.length * FLAME_ROWS.length; // 35
-
-const FlameMark: React.FC<{ id: string; size: string; tilt: number }> = ({ id, size, tilt }) => (
-  <svg viewBox="0 0 40 60" style={{ width: size, height: `calc(${size} * 1.5)`, transform: `rotate(${tilt}deg)` }} aria-hidden="true">
-    <path
-      d="M20 1 C25 13 37 21 37 38 C37 51 29.5 59 20 59 C10.5 59 3 51 3 38 C3 27 11 21 13.5 10 C17 19 18.5 23 20 25.5 C21.5 17 23 9 20 1 Z"
-      fill={`url(#${id})`}
-    />
-    <path
-      d="M20 29 C24 35 29 40 29 47.5 C29 54 25 58 20 58 C15 58 11 54 11 47.5 C11 42 15 38 16.5 32.5 C18 37 19 38.5 20 39.5 C20.6 36 21 33 20 29 Z"
-      fill="#FFE07A"
-    />
-  </svg>
-);
-
-const Flames: React.FC<{ id: string }> = ({ id }) => (
-  <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-    <svg width="0" height="0" className="absolute">
-      <defs>
-        <linearGradient id={`${id}-flame`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#C4161C" />
-          <stop offset="0.55" stopColor="#F2631C" />
-          <stop offset="1" stopColor="#FFB21F" />
-        </linearGradient>
-      </defs>
-    </svg>
-    {FLAME_ROWS.map((y, r) => FLAME_COLS.map((x, c) => (
-      <span
-        key={`${r}-${c}`}
-        className="absolute"
-        style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)', opacity: 0.62 }}
-      >
-        <FlameMark id={`${id}-flame`} size="8.5cqw" tilt={(r + c) % 2 ? 7 : -7} />
-      </span>
-    )))}
-  </div>
-);
-
-/** Soft light plate so text stays readable over the flames. */
-const plate: React.CSSProperties = { background: 'radial-gradient(closest-side, rgba(255,255,255,0.92), rgba(255,255,255,0.75) 70%, rgba(255,255,255,0))' };
-
-const TopLogo: React.FC = () => (
-  <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white p-[0.7cqw] shadow-sm" style={{ top: '10.6%' }}>
-    <Logo size="20.5cqw" />
-  </span>
-);
+/** Text panels sit straight on the card. */
+const plate: React.CSSProperties = {};
 
 /** The full-colour logo, large and clear on the front of the card. */
-const BigLogo: React.FC = () => (
+const BigLogo: React.FC<{ size?: string }> = ({ size = '38cqw' }) => (
   <span
     className="absolute left-1/2 -translate-x-1/2 rounded-full bg-white p-[1cqw]"
     style={{ top: '2.2%', boxShadow: '0 0 0 0.6cqw #F2A93B, 0 0 3.5cqw rgba(255,170,40,0.75), 0 1cqw 2cqw rgba(0,0,0,0.35)' }}
   >
-    <Logo size="33cqw" />
+    <Logo size={size} />
   </span>
 );
 
@@ -201,7 +149,7 @@ export const MemberCardFront: React.FC<CardProps> = ({ member, unit }) => {
       <BigLogo />
 
       {/* photo */}
-      <div className="absolute left-1/2 -translate-x-1/2 overflow-hidden border-[0.8cqw] border-white bg-[#E9EAF0] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.25)]" style={{ top: '26.6%', width: '28%', aspectRatio: '1 / 1.27' }}>
+      <div className="absolute left-1/2 -translate-x-1/2 overflow-hidden border-[0.8cqw] border-white bg-[#E9EAF0] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.25)]" style={{ top: '29%', width: '26%', aspectRatio: '1 / 1.27' }}>
         {member.photoUrl ? (
           <img src={member.photoUrl} alt="" className="h-full w-full object-cover" />
         ) : (
@@ -211,7 +159,7 @@ export const MemberCardFront: React.FC<CardProps> = ({ member, unit }) => {
         )}
       </div>
 
-      <div className="absolute inset-x-[4%] py-[1.5cqw] text-center" style={{ ...plate, top: unit ? '49.8%' : '50.5%' }}>
+      <div className="absolute inset-x-[4%] py-[1.5cqw] text-center" style={{ ...plate, top: unit ? '51.3%' : '52%' }}>
         <p className="font-bold leading-tight" style={{ fontSize: '5.9cqw', padding: '0 7cqw' }}>{member.fullName}</p>
         <p style={{ fontSize: '4.3cqw', marginTop: '1.4cqw' }}>Member ID: {member.memberNumber}</p>
         <span
@@ -223,7 +171,7 @@ export const MemberCardFront: React.FC<CardProps> = ({ member, unit }) => {
         {unit && <p className="font-bold" style={{ fontSize: '3.5cqw', marginTop: '1.1cqw', color: NAVY }}>{unit}</p>}
       </div>
 
-      <div className="absolute" style={{ ...plate, top: unit ? '74%' : '72.5%', left: '28%', padding: '1.5cqw 4cqw', fontSize: '4.1cqw' }}>
+      <div className="absolute" style={{ ...plate, top: unit ? '75.2%' : '74%', left: '28%', padding: '1.5cqw 4cqw', fontSize: '4.1cqw' }}>
         <div className="flex items-center gap-[3cqw]">
           <CalendarIcon />
           <div className="leading-[1.15]">
@@ -274,13 +222,12 @@ export const MemberQr: React.FC<{ url: string; size?: string }> = ({ url, size =
 
 export const MemberCardBack: React.FC<CardProps> = ({ member }) => (
   <CardFrame id="back" label={`Back of membership card ${member.memberNumber}, with verification QR code`}>
-    <TopLogo />
-    <div className="absolute inset-x-[8%] py-[2cqw] text-center" style={{ ...plate, top: '29%', fontSize: '3.7cqw', lineHeight: 1.25 }}>
+    <BigLogo size="42cqw" />
+    <div className="absolute inset-x-[8%] py-[2cqw] text-center" style={{ ...plate, top: '37%', fontSize: '3.7cqw', lineHeight: 1.25 }}>
       <p className="font-bold" style={{ fontSize: '4.7cqw' }}>Mashkhally Zhyanawa Organisation</p>
       <p className="font-kurdish" style={{ fontSize: '4.4cqw' }} lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</p>
       <p className="mt-[2.6cqw]">The Torch of Revival</p>
       <p className="mt-[2.2cqw]"><span className="font-bold">Email:</span> info@mashkhall.com</p>
-      <p className="mt-[2.6cqw] italic" style={{ fontSize: '3.1cqw', color: NAVY }}>35 flames for 35 years</p>
     </div>
     {member.joinedAt && (
       <p className="absolute inset-x-[20%] text-center" style={{ ...plate, top: '66.3%', fontSize: '3.4cqw', padding: '0.6cqw 0' }}>
