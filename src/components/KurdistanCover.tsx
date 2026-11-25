@@ -31,6 +31,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Khurmal, Halabja.jpg', 'Hiwa Sherzad'),
   ] },
   { id: 'duhok', name: 'Duhok', ku: 'دهۆک', photos: [
+    { url: '/images/cities/duhok.jpg', credit: '', source: '' },
     commons('Panorama of Duhok.jpg', 'Ahmadkurdi44'),
     commons('Duhok, Kurdistan, Iraq.JPG', 'Kovan kurdish'),
   ] },
