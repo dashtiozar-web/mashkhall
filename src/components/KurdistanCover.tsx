@@ -94,6 +94,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Darbandikhan - panoramio.jpg'),
   ] },
   { id: 'kalar', name: 'Kalar', ku: 'کەلار', photos: [
+    { url: '/images/cities/kalar.jpg', credit: '', source: '' },
     commons('Kalar View from Sherwana Castle.jpg'),
     commons('Kalar city - panoramio.jpg'),
   ] },
