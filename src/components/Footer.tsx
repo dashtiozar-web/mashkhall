@@ -53,7 +53,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => (
             <Logo size={48} className="rounded-md ring-1 ring-white/20" />
             <p className="font-serif text-[1.375rem] leading-tight font-semibold text-white">{ORG_NAME}</p>
           </div>
-          <p className="mt-5 text-[0.9688rem] leading-relaxed">
+          <p className="mt-5 text-[1rem] font-semibold text-[#F2C14E]">Good character, good movement, good governance</p>
+          <p className="mt-3 text-[0.9688rem] leading-relaxed">
             A roadmap for restoring trust and self-confidence to our society, through self-education and self-organisation.
           </p>
           <p className="mt-4 text-[0.9688rem] leading-relaxed">

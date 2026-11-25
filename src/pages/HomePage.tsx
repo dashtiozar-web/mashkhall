@@ -77,6 +77,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             <h1 className="mt-5 max-w-[21ch] text-[2.5rem] leading-[1.1] font-semibold text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.35)] sm:text-[3.25rem]">
               Carrying the torch of revival, together.
             </h1>
+            <p className="mt-4 text-[1.1875rem] font-semibold text-[#F2C14E] [text-shadow:0_1px_10px_rgba(0,0,0,0.45)]">Good character, good movement, good governance</p>
             <p className="mt-6 max-w-[52ch] text-[1.1875rem] leading-relaxed text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.35)]">
               A roadmap for restoring trust and self-confidence to our society, through self-education and self-organisation.
             </p>

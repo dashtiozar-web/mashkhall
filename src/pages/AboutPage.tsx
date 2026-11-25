@@ -58,7 +58,25 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => (
           <p className="mt-4 text-center font-serif text-[1.5rem] font-semibold text-ink" translate="no">Mashkhally Zhyanawa</p>
           <p className="mt-1 text-center font-kurdish text-[1.375rem] text-crimson" lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</p>
           <p className="ku-sub mt-4 text-center text-[0.9688rem] text-ink-soft">The Torch of Revival</p>
+          <p className="mt-5 border-t border-line pt-4 text-center text-[0.8125rem] font-semibold tracking-[0.08em] text-muted uppercase">Our motto</p>
+          <p className="mt-1.5 text-center font-serif text-[1.25rem] font-semibold leading-snug text-crimson">Good character, good movement, good governance</p>
         </aside>
+      </Container>
+    </section>
+
+    {/* The book: its author, aim and method */}
+    <section className="border-t border-line">
+      <Container className="py-16 sm:py-20">
+        <div className="max-w-[62ch]">
+          <h2 className="text-[2rem] font-semibold">About the book</h2>
+          <div className="prose-article mt-6">
+            <p>The book Mashkhally Zhyanawa, written and published in 2025 by Abdullah Mala Nuri, is an intellectual, political and social text that offers, in a critical and educational way, a deep reading of the reality of society and of the system of government in the Kurdistan Region. It does not stop at describing the crises: it identifies the structural and internal sources of Kurdish fragmentation and weakness, and sets out a roadmap the author calls “self-healing” and “the politics of self-healing”: returning will, awareness and responsibility to the individual and to society itself, instead of waiting in vain for a solution from outside or repeating old tactics that lead nowhere.</p>
+          </div>
+          <h3 className="mt-10 text-[1.5rem] font-semibold">Method and outlook</h3>
+          <div className="prose-article mt-4">
+            <p>A distinctive feature of the book is that it uses Kurdish myth and heritage, above all the legend of the furnaces of Bawa Amra in southern Kurdistan and the land between the two rivers, as a heuristic and analytical tool for understanding the nature of tyranny and fragmentation and the ways to confront them. In the legend, a ghost-like dragon lives in the furnaces, ruining people’s lives and safety and drawing different responses, from flight and surrender to resistance, until Bawa Hora, Khanzada Khan and Dala unite wisdom and strength and found the system of the “Great Klura”, built on shared citizenship and on uniting wisdom, wealth and the sword. Together they destroy the dragon and lead society from tribalism to a shared order. The book reads this legend against fatalism: defeat is not the inevitable fate of the Kurds, and the power to change lies within.</p>
+          </div>
+        </div>
       </Container>
     </section>
 

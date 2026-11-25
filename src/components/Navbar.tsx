@@ -60,10 +60,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, currentParam, onNavi
 
   return (
     <>
-    {/* Top bar: language and a short statement of who we are. */}
+    {/* Top bar: the organisation's motto, the referendum and language. */}
     <div className="border-b border-white/10 bg-[#120906] text-white">
       <Container className="flex h-10 items-center justify-between gap-3">
-        <p className="hidden truncate text-[0.8125rem] text-white/65 lg:block">Independent · Peaceful · For the revival of our people</p>
+        <p className="hidden truncate text-[0.8125rem] font-semibold text-[#F2C14E] lg:block">Good character, good movement, good governance</p>
         <a href={REFERENDUM_URL} target="_blank" rel="noopener"
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#F2C14E] px-3 py-1 text-[0.8125rem] font-bold text-[#2A110A] no-underline hover:bg-[#FFD36B]">
           <Vote className="h-3.5 w-3.5" aria-hidden="true" /><span className="sm:hidden">Referendum</span><span className="hidden sm:inline">Civil Referendum 2026</span><span className="sr-only"> (opens in a new tab)</span>
