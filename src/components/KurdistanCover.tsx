@@ -127,6 +127,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('1. The Neolithic site of Bestansur, October 11, 2021. Shahrizor Plane, Sulaymaniyah, Iraqi Kurdistan.jpg'),
   ] },
   { id: 'penjwen', name: 'Penjwen', ku: 'پێنجوێن', photos: [
+    { url: '/images/cities/penjwen.jpg', credit: '', source: '' },
     commons('Penjwen, Iraq - panoramio (1).jpg'),
     commons('Galoz village in Nalparez district-Penjwen district Kurdistan-Iraq.jpg', 'Dana Jamal'),
   ] },
