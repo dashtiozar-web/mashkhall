@@ -39,6 +39,10 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Amedi in Dohuk Governorate, Kurdistan Region of Iraq 01.jpg'),
     commons('Amedi, Iraq - panoramio (5).jpg'),
   ] },
+  { id: 'lalish', name: 'Lalish Temple', ku: 'پەرستگای لالش', photos: [
+    { url: '/images/cities/lalish.jpg', credit: '', source: '' },
+    commons('Lalish temple.jpg'),
+  ] },
   { id: 'qandil', name: 'The Qandil Mountains', ku: 'چیای قەندیل', photos: [
     commons('Qandil mountain, Hajiawa, Kurdistan- Iraq.jpg', 'Wary Abdullah'),
     commons('Qandil Mountain- Raniya.jpg'),
