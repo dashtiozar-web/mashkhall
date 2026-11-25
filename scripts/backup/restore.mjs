@@ -6,7 +6,7 @@
  *
  * Real disaster recovery into a Firebase project (overwrites documents with
  * the backed-up version; documents created after the backup are left alone):
- *   FIREBASE_SERVICE_ACCOUNT='{…}' node scripts/backup/restore.mjs backup-out/ --confirm-project=gen-lang-client-0463043065
+ *   FIREBASE_SERVICE_ACCOUNT='{…}' node scripts/backup/restore.mjs backup-out/ --confirm-project=mashkhall-8206b
  */
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';

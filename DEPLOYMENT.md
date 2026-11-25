@@ -8,8 +8,8 @@ This guide documents the architecture, administrative onboarding, security polic
 
 This website uses its **own** Firebase project and database, never 17 Shubat's:
 
-- Project: `gen-lang-client-0463043065`
-- Database: `ai-studio-remix17shubatorg-27d86fe6-a92d-407e-a0cc-1271c19605f6`
+- Project: `mashkhall-8206b`
+- Database: `(default)`
   (both in `firebase-applet-config.json`; the website, the worker, the backups
   and the rules deployment all read them from there)
 

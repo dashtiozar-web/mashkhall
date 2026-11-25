@@ -11,7 +11,7 @@ is strong protection, early warning and fast recovery.
 | Part | Where it runs | Notes |
 | --- | --- | --- |
 | Website and server code | Cloudflare Workers (`worker/`, `dist/`) | No origin server: Cloudflare serves everything, so there is no server address to discover or attack directly. |
-| Database and sign-in | Google Firebase (project `gen-lang-client-0463043065`) | Protected by `firestore.rules` (tested in CI). |
+| Database and sign-in | Google Firebase (project `mashkhall-8206b`) | Protected by `firestore.rules` (tested in CI). |
 | Video meetings | Cloudflare Realtime SFU | Only people the meeting room has admitted can use it. |
 | Code | GitHub `dashtiozar-web/mashkhall` (private) | Every change is built and tested before it goes live. |
 
@@ -54,7 +54,7 @@ so a compromised website administrator account cannot delete them.
 3. Check first, into a local emulator:
    `npx firebase-tools emulators:exec --only firestore "node scripts/backup/restore.mjs restore"`
 4. Restore into the live project (overwrites documents with their backed-up
-   version): `FIREBASE_SERVICE_ACCOUNT='…' node scripts/backup/restore.mjs restore --confirm-project=gen-lang-client-0463043065`
+   version): `FIREBASE_SERVICE_ACCOUNT='…' node scripts/backup/restore.mjs restore --confirm-project=mashkhall-8206b`
 
 Code is in Git (every version recoverable). Cloudflare settings and DNS should
 be exported from the Cloudflare dashboard after any change and kept offline.

@@ -67,4 +67,4 @@ jobs:
 
       - name: Deploy Firestore rules and indexes
         if: env.HAS_KEY == 'true'
-        run: npx -y firebase-tools@15 deploy --config firebase.deploy.json --only firestore --project gen-lang-client-0463043065 --non-interactive
+        run: npx -y firebase-tools@15 deploy --config firebase.deploy.json --only firestore --project mashkhall-8206b --non-interactive
