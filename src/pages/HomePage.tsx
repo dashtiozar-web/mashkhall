@@ -7,10 +7,10 @@ import { CouncilRanking, UKCouncilMap } from '../components/UKCouncilMap';
 import { MemberCount } from '../components/MemberCount';
 import { VisitorAnalytics } from '../components/VisitorAnalytics';
 import { ReferendumCall, REFERENDUM_URL } from '../components/ReferendumCall';
-import { Vote } from 'lucide-react';
+import { Facebook, Vote } from 'lucide-react';
 import { KurdistanCover } from '../components/KurdistanCover';
 import { MembersByPlace } from '../components/MembersByPlace';
-import { FacebookFeed } from '../components/FacebookFeed';
+import { FacebookFeed, facebookLink } from '../components/FacebookFeed';
 import { MediaImage } from '../components/MediaImage';
 import { TorchEmblem } from '../components/TorchEmblem';
 
@@ -178,10 +178,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <p className="text-[0.9375rem] font-semibold text-navy">Our activities</p>
               <h2 className="mt-2 text-[2rem] leading-tight font-semibold sm:text-[2.5rem]">What we’ve been doing</h2>
               <p className="mt-4 max-w-[52ch] text-[1.0625rem] text-ink-soft">
-                Demonstrations, workshops, commemorations and online meetings, shared as they happen. Every new post on our
-                Facebook Page appears here automatically.
+                Demonstrations, workshops, commemorations and online meetings, shared as they happen on our Facebook Page.
+                Follow the Page to see every new post.
               </p>
-              <Button className="mt-7" onClick={() => onNavigate('activities')}>See all activities</Button>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Button onClick={() => onNavigate('activities')}>See all activities</Button>
+                <a href={facebookLink(siteSettings.facebookPageUrl)} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#1877F2] px-5 py-2.5 font-semibold text-white no-underline hover:bg-[#0f63d4]">
+                  <Facebook className="h-5 w-5" aria-hidden="true" /> Follow us on Facebook
+                </a>
+              </div>
             </div>
             <FacebookFeed height={700} />
           </div>

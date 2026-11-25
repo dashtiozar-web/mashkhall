@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Facebook } from 'lucide-react';
 import { useData } from '../context/DataContext';
-import { DEFAULT_FACEBOOK_PAGE, normaliseFacebookUrl } from '../components/FacebookFeed';
+import { embeddablePage, normaliseFacebookUrl } from '../components/FacebookFeed';
 
 /** Where the Activities feed comes from: the organisation's Facebook Page. */
 export const SocialSettings: React.FC<{ onNavigate: (tab: string) => void }> = ({ onNavigate }) => {
   const { siteSettings, updateSiteSettings } = useData();
-  const [value, setValue] = useState(siteSettings.facebookPageUrl || DEFAULT_FACEBOOK_PAGE);
+  const [value, setValue] = useState(embeddablePage(siteSettings.facebookPageUrl));
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  useEffect(() => { setValue(siteSettings.facebookPageUrl || DEFAULT_FACEBOOK_PAGE); }, [siteSettings.facebookPageUrl]);
+  useEffect(() => { setValue(embeddablePage(siteSettings.facebookPageUrl)); }, [siteSettings.facebookPageUrl]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();

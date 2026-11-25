@@ -4,8 +4,27 @@ import { useData } from '../context/DataContext';
 
 const CONSENT_KEY = '17shubat_show_facebook';
 
-/** Mashkhally Zhyanawa's Facebook Page, used until an administrator sets another one. */
-export const DEFAULT_FACEBOOK_PAGE = 'https://www.facebook.com/61555753452199';
+/**
+ * Mashkhally Zhyanawa's Facebook Page, as Facebook's share link: it opens the
+ * Page for visitors. Facebook only shows a Page's posts on other websites
+ * from the Page's own address (facebook.com/<name> or profile.php?id=…);
+ * once an administrator saves that address (Administration → Site text and
+ * Facebook), the posts appear here too.
+ */
+export const FACEBOOK_LINK = 'https://www.facebook.com/share/1EEMb4UGk5/';
+/** No built-in Page whose posts are shown (the copied 17 Shubat Page is not used). */
+export const DEFAULT_FACEBOOK_PAGE = '';
+/** 17 Shubat's Page, copied with the website: never shown here. */
+const OTHER_ORGANISATION = /61555753452199|facebook\.com\/17shubat\b/i;
+
+/** The Page's own address saved by an administrator, if it can show posts. */
+export const embeddablePage = (saved?: string) => {
+  const url = normaliseFacebookUrl(saved);
+  return url && !OTHER_ORGANISATION.test(url) && !/\/share\//.test(url) ? url : '';
+};
+
+/** The link that opens the Page: the saved address, or the share link. */
+export const facebookLink = (saved?: string) => embeddablePage(saved) || FACEBOOK_LINK;
 
 const readConsent = () => {
   try { return localStorage.getItem(CONSENT_KEY) === 'yes'; } catch { return false; }
@@ -38,7 +57,7 @@ export const normaliseFacebookUrl = (raw?: string) => {
  */
 export const FacebookFeed: React.FC<{ height?: number; className?: string }> = ({ height = 900, className }) => {
   const { siteSettings } = useData();
-  const pageUrl = normaliseFacebookUrl(siteSettings.facebookPageUrl || DEFAULT_FACEBOOK_PAGE);
+  const pageUrl = embeddablePage(siteSettings.facebookPageUrl);
   const [show, setShow] = useState(readConsent);
   const [width, setWidth] = useState(500);
   const box = useRef<HTMLDivElement>(null);
@@ -55,10 +74,14 @@ export const FacebookFeed: React.FC<{ height?: number; className?: string }> = (
 
   if (!pageUrl) {
     return (
-      <div className={`rounded-2xl border border-dashed border-line bg-surface p-8 text-center ${className || ''}`}>
-        <Facebook className="mx-auto h-8 w-8 text-[#1877F2]" aria-hidden="true" />
-        <p className="mt-3 font-semibold">Our activity feed is being set up</p>
-        <p className="mt-1 text-ink-soft">Our latest activities will appear here soon.</p>
+      <div className={`rounded-2xl border border-line bg-surface p-8 text-center ${className || ''}`}>
+        <Facebook className="mx-auto h-10 w-10 text-[#1877F2]" aria-hidden="true" />
+        <p className="mt-3 text-[1.25rem] font-semibold">Mashkhally Zhyanawa on Facebook</p>
+        <p className="mx-auto mt-2 max-w-[44ch] text-ink-soft">Our events, statements and campaigns are posted on our Facebook Page. Follow the Page to see them first.</p>
+        <a href={FACEBOOK_LINK} target="_blank" rel="noopener noreferrer"
+          className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#1877F2] px-6 py-3 text-[1.0625rem] font-semibold text-white no-underline hover:bg-[#0f63d4]">
+          <Facebook className="h-5 w-5" aria-hidden="true" /> Follow us on Facebook <ExternalLink className="h-4 w-4" aria-hidden="true" />
+        </a>
       </div>
     );
   }
