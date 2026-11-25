@@ -2,7 +2,11 @@
  * Shared by the backup scripts: signing in with a Firebase service account
  * and talking to the Firestore REST API (or the local emulator).
  */
-export const PROJECT = process.env.FIREBASE_PROJECT || 'shubat-ac738';
+import { readFileSync } from 'node:fs';
+
+const config = JSON.parse(readFileSync(new URL('../../firebase-applet-config.json', import.meta.url), 'utf8'));
+export const PROJECT = process.env.FIREBASE_PROJECT || config.projectId;
+export const DATABASE = process.env.FIRESTORE_DATABASE || config.firestoreDatabaseId || '(default)';
 
 const b64url = (buf) => Buffer.from(buf).toString('base64url');
 
@@ -30,7 +34,7 @@ export const serviceToken = async (json = process.env.FIREBASE_SERVICE_ACCOUNT) 
 /** A client for one Firestore database: the real project, or the emulator. */
 export const client = ({ project = PROJECT, token, emulator = process.env.FIRESTORE_EMULATOR_HOST } = {}) => {
   const host = emulator ? `http://${emulator}` : 'https://firestore.googleapis.com';
-  const root = `projects/${project}/databases/(default)/documents`;
+  const root = `projects/${project}/databases/${emulator ? '(default)' : DATABASE}/documents`;
   const base = `${host}/v1/${root}`;
   const auth = emulator ? 'Bearer owner' : `Bearer ${token}`;
   const call = async (url, init = {}, attempt = 0) => {

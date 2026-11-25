@@ -4,9 +4,9 @@
  * Firebase sign-in keys), so the server code in worker/ can be tested end to
  * end without a real database. Installed by replacing global fetch.
  */
-import { fromFields, PROJECT, toFields } from '../../worker/firestore.js';
+import { DATABASE, fromFields, PROJECT, toFields } from '../../worker/firestore.js';
 
-const ROOT = `projects/${PROJECT}/databases/(default)/documents`;
+const ROOT = `projects/${PROJECT}/databases/${DATABASE}/documents`;
 const BASE = `https://firestore.googleapis.com/v1/${ROOT}`;
 
 export interface Fake {

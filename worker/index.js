@@ -15,6 +15,7 @@ import { handleMeetings, runSchedule } from './meetings.js';
 import { logo } from './appreciation.js';
 import { handleMembers } from './members.js';
 import { handleCertificates } from './certificates.js';
+import { PROJECT, DATABASE } from './firestore.js';
 
 export { MeetingRoom } from './meetingRoom.js';
 
@@ -24,7 +25,6 @@ const KURDISTAN_NAMES = /erbil|arbil|irbil|hawler|hewl[eê]r|sulay|sulaim|sleman
 // Provinces of Iran with large Kurdish populations (approximate: West
 // Azerbaijan is only partly Kurdish).
 const IRAN_KURDISH = /kurdistan|kordestan|kordestān|kermanshah|kermānshāh|ilam|īlām|west azarbaijan|west azerbaijan|azarbayjan-e gharbi|azarbaijan-e gharbi|azerbaijan, west|western azerbaijan/i;
-const PROJECT = 'shubat-ac738';
 // Public figures smaller than this are grouped, so few visitors are never singled out.
 /** Listed separately from the rest of Iraq (ISO 3166-2 code). */
 const KURDISTAN_REGION = 'IQ-KR';
@@ -264,7 +264,7 @@ const isAdminRequest = async (request) => {
     uid = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).user_id || '';
   } catch { return false; }
   if (!/^[A-Za-z0-9]{6,128}$/.test(uid)) return false;
-  const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/admins/${uid}`, {
+  const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/${DATABASE}/documents/admins/${uid}`, {
     headers: { authorization: `Bearer ${token}` },
   });
   return res.ok;

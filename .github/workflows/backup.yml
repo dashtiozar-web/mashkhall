@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      HAS_KEYS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' && secrets.BACKUP_PASSPHRASE != '' }}
+      HAS_KEYS: ${{ secrets.MASHKHALL_FIREBASE_SERVICE_ACCOUNT != '' && secrets.BACKUP_PASSPHRASE != '' }}
     steps:
       - name: Skip when the backup secrets are missing
         if: env.HAS_KEYS != 'true'
@@ -43,7 +43,7 @@ jobs:
       - name: Export the database
         if: env.HAS_KEYS == 'true'
         env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.MASHKHALL_FIREBASE_SERVICE_ACCOUNT }}
         run: node scripts/backup/export.mjs backup-out
 
       - name: Encrypt (AES-256, passphrase never stored with the backup)

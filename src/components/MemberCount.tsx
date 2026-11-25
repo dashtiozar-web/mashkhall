@@ -34,7 +34,7 @@ export const MemberCount: React.FC<{ onNavigate?: (tab: string) => void }> = ({ 
         </div>
         <div>
           <p className="max-w-[52ch] text-[1.0625rem] leading-relaxed text-white/90">
-            People across the United Kingdom who stand together for human rights, transparency and freedom of expression, organised in {chapters.length} councils.
+            People in the five provinces of Kurdistan and in Britain, Australia, Canada, Germany and the USA who stand together for human rights, transparency and freedom of expression.
             The number updates by itself whenever a membership is approved.
           </p>
           {byCouncil.length > 0 && (
@@ -48,8 +48,8 @@ export const MemberCount: React.FC<{ onNavigate?: (tab: string) => void }> = ({ 
           )}
           {onNavigate && (
             <div className="mt-6 flex flex-wrap gap-3">
-              <button type="button" onClick={() => onNavigate('apply')} className="cursor-pointer rounded-lg bg-white px-5 py-2.5 font-semibold text-navy hover:bg-white/90">Become a member</button>
-              <button type="button" onClick={() => onNavigate('directory')} className="cursor-pointer rounded-lg px-3 py-2.5 font-semibold text-white underline underline-offset-4">See our councils on the UK map</button>
+              <button type="button" onClick={() => onNavigate('apply')} className="cursor-pointer rounded-lg bg-[#F2C14E] px-6 py-3 text-[1.0625rem] font-bold text-[#2A110A] hover:bg-[#FFD36B]">Become a member</button>
+              <button type="button" onClick={() => onNavigate('directory')} className="cursor-pointer rounded-lg px-3 py-2.5 font-semibold text-white underline underline-offset-4">Members by province and country</button>
             </div>
           )}
         </div>

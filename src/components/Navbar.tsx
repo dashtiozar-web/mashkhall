@@ -71,15 +71,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
     </div>
     <header className="sticky top-0 z-50 bg-band text-white shadow-[0_1px_0_rgba(255,255,255,0.06),0_8px_24px_-16px_rgba(0,0,0,0.6)]">
       <Container>
-        <div className="flex h-[68px] items-center justify-between gap-4">
+        <div className="flex h-[68px] items-center justify-between gap-2 sm:gap-4">
           <a
             href="/"
             onClick={(e) => { e.preventDefault(); go('home'); }}
-            className="flex shrink-0 items-center gap-3 no-underline"
+            className="flex min-w-0 items-center gap-2.5 no-underline sm:shrink-0 sm:gap-3"
           >
-            <Logo size={42} className="rounded-md ring-1 ring-white/20" />
-            <span className="leading-tight">
-              <span className="block font-serif text-[1.1875rem] font-semibold text-white">{ORG_SHORT}</span>
+            <Logo size={42} className="shrink-0 rounded-md ring-1 ring-white/20" />
+            <span className="min-w-0 leading-tight">
+              <span className="block truncate font-serif text-[1.0625rem] font-semibold text-white sm:text-[1.1875rem]">{ORG_SHORT}</span>
               <span className="ku-sub block w-fit font-kurdish text-[0.875rem] text-white/70" lang="ckb" dir="rtl" translate="no">مەشخەڵی ژیانەوە</span>
             </span>
           </a>
@@ -106,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
             </ul>
           </nav>
 
-          <div className={`flex items-center gap-1 sm:gap-2 ${iconBtns}`}>
+          <div className={`flex shrink-0 items-center gap-1 sm:gap-2 ${iconBtns}`}>
             <NotificationBell onNavigate={(t) => go(t)} />
             <ThemeToggle />
 
@@ -124,7 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
                   onClick={() => go('apply')}
                   className="cursor-pointer rounded-lg bg-crimson px-4 py-2 text-[0.9375rem] font-semibold whitespace-nowrap text-white hover:brightness-110"
                 >
-                  Join us
+                  Become a member
                 </button>
               )}
 
@@ -168,6 +168,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenAu
                 </button>
               )}
             </div>
+
+            {/* "Become a member" stays in view on every screen size. */}
+            {!isMember && (
+              <button
+                type="button"
+                onClick={() => go('apply')}
+                className="shrink-0 cursor-pointer rounded-lg bg-crimson px-3 py-2 text-[0.875rem] font-semibold whitespace-nowrap !text-white hover:brightness-110 sm:px-4 sm:text-[0.9375rem] min-[1680px]:hidden"
+              >
+                <span className="sm:hidden">Join</span><span className="hidden sm:inline">Become a member</span>
+              </button>
+            )}
 
             <button
               type="button"

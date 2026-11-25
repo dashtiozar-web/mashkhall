@@ -35,19 +35,22 @@ jobs:
       - name: Firestore security rules tests
         run: npm run test:rules
 
-  # Deploys the database rules and indexes after the tests pass on main.
-  # Optional: it only runs once a FIREBASE_SERVICE_ACCOUNT secret exists
-  # (Settings > Secrets and variables > Actions in this repository).
+  # Deploys the database rules and indexes after the tests pass on main, to
+  # Mashkhally Zhyanawa's own Firebase project and database (the ones in
+  # firebase-applet-config.json, listed in firebase.deploy.json) — never to
+  # another organisation's project. Optional: it only runs once a
+  # MASHKHALL_FIREBASE_SERVICE_ACCOUNT secret exists (a key for that project;
+  # Settings > Secrets and variables > Actions in this repository).
   deploy-firestore-rules:
     needs: build-and-test-rules
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
-      HAS_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+      HAS_KEY: ${{ secrets.MASHKHALL_FIREBASE_SERVICE_ACCOUNT != '' }}
     steps:
       - name: Skip when no Firebase key is configured
         if: env.HAS_KEY != 'true'
-        run: echo "No FIREBASE_SERVICE_ACCOUNT secret; deploy the rules manually (see DEPLOYMENT.md)."
+        run: echo "No MASHKHALL_FIREBASE_SERVICE_ACCOUNT secret; deploy the rules manually (see DEPLOYMENT.md)."
 
       - uses: actions/checkout@v4
         if: env.HAS_KEY == 'true'
@@ -55,7 +58,7 @@ jobs:
       - uses: google-github-actions/auth@v2
         if: env.HAS_KEY == 'true'
         with:
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.MASHKHALL_FIREBASE_SERVICE_ACCOUNT }}
 
       - uses: actions/setup-node@v4
         if: env.HAS_KEY == 'true'
@@ -64,4 +67,4 @@ jobs:
 
       - name: Deploy Firestore rules and indexes
         if: env.HAS_KEY == 'true'
-        run: npx -y firebase-tools@15 deploy --only firestore:rules,firestore:indexes --project shubat-ac738 --non-interactive
+        run: npx -y firebase-tools@15 deploy --config firebase.deploy.json --only firestore --project gen-lang-client-0463043065 --non-interactive

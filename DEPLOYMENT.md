@@ -4,6 +4,38 @@ This guide documents the architecture, administrative onboarding, security polic
 
 ---
 
+## 0. Mashkhally Zhyanawa's own Firebase project (read first)
+
+This website uses its **own** Firebase project and database, never 17 Shubat's:
+
+- Project: `gen-lang-client-0463043065`
+- Database: `ai-studio-remix17shubatorg-27d86fe6-a92d-407e-a0cc-1271c19605f6`
+  (both in `firebase-applet-config.json`; the website, the worker, the backups
+  and the rules deployment all read them from there)
+
+One-time set-up, in the Firebase console for that project:
+
+1. **Authentication → Sign-in method**: enable **Email/Password** and
+   **Google** (choose a support email). Enable **Anonymous** too ("Publish
+   with Us" uses it).
+2. **Authentication → Settings → Authorized domains**: add `mashkhall.com`,
+   `www.mashkhall.com` and the Cloudflare address
+   `mashkhall.<your-subdomain>.workers.dev`.
+3. **Project settings → Service accounts → Generate new private key**. Put
+   the whole JSON file in:
+   - Cloudflare → Workers & Pages → **mashkhall** → Settings → Variables and
+     Secrets → secret `FIREBASE_SERVICE_ACCOUNT` (membership approvals,
+     cards, meetings, letters);
+   - GitHub → this repository → Settings → Secrets and variables → Actions →
+     secret `MASHKHALL_FIREBASE_SERVICE_ACCOUNT` (publishes the database
+     rules after every change). Remove any old `FIREBASE_SERVICE_ACCOUNT`
+     secret copied from 17 Shubat.
+
+The owner account is `dashtiozar@gmail.com`: signing in with it makes it the
+website owner and administrator automatically.
+
+---
+
 ## 1. System Architecture & Tech Stack
 
 - **Frontend Runtime**: React 19 SPA, TypeScript, Vite.

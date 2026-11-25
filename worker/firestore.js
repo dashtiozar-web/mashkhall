@@ -9,9 +9,13 @@
  * keys, so every request is tied to a real, signed-in account.
  */
 
-export const PROJECT = 'shubat-ac738';
-const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
-const ROOT = `projects/${PROJECT}/databases/(default)/documents`;
+import firebaseConfig from '../firebase-applet-config.json';
+
+/** Mashkhally Zhyanawa's own Firebase project and database (the same ones the website uses). */
+export const PROJECT = firebaseConfig.projectId;
+export const DATABASE = firebaseConfig.firestoreDatabaseId || '(default)';
+const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/${DATABASE}/documents`;
+const ROOT = `projects/${PROJECT}/databases/${DATABASE}/documents`;
 
 export class SetupError extends Error {
   constructor(what) { super(what); this.setup = true; }
