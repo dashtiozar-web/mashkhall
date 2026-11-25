@@ -49,6 +49,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Zagros Mountains from above.jpg', 'Chrisrabinson'),
   ] },
   { id: 'ranya', name: 'Ranya', ku: 'ڕانیە', photos: [
+    { url: '/images/cities/ranya.jpg', credit: '', source: '' },
     commons('Hajiawa Mountain, Rania, Kurdistan- Iraq.jpg', 'Wary Abdullah'),
     commons('Darband-i Rania. Sulaymaniyah Governorate, Iraqi Kurdistan.jpg'),
     commons('Sarkapkan mountain, Rania, Kurdistan- Iraq.jpg', 'Wary Abdullah'),
@@ -188,7 +189,7 @@ export const KurdistanCover: React.FC = () => {
           <p className="min-w-0 text-end text-[0.8125rem] leading-snug text-white/85" aria-live="polite">
             <span className="block font-semibold text-white">{current.name}</span>
             <span className="ku-sub block font-kurdish text-[0.9375rem] text-[#F2C14E]" lang="ckb" dir="rtl" translate="no">{current.ku}</span>
-            {photo && (
+            {photo?.credit && (
               <a href={photo.source} target="_blank" rel="noopener noreferrer" className="mt-0.5 block truncate text-[0.6875rem] text-white/60 underline-offset-2 hover:text-white hover:underline">
                 {photo.credit}
               </a>
