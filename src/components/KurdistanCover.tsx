@@ -61,6 +61,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Qaladze.jpg', 'Saman11'),
   ] },
   { id: 'rawanduz', name: 'Rawanduz', ku: 'ڕەواندز', photos: [
+    { url: '/images/cities/rawanduz.jpg', credit: '', source: '' },
     commons('Rawanduz, Kurdistan Regional Government.jpg', 'Levi Clancy'),
     commons('Rawanduz - Kurdistan.jpg', 'Claus Weinberg'),
     commons('Rowanduz Gorge.jpg', 'CymbalStone'),
