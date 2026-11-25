@@ -21,6 +21,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('View of the Erbil citadel in Erbil (Hawler, Arbil, Irbil) in the Kurdistan Region of Iraq.jpg', 'Levi Clancy'),
   ] },
   { id: 'sulaymaniyah', name: 'Sulaymaniyah', ku: 'سلێمانی', photos: [
+    { url: '/images/cities/sulaymaniyah.jpg', credit: 'Photo: Shafaq News', source: '' },
     commons('Sulaymaniyah at Night.jpg', 'Sarbast T. Hameed'),
     commons('View of Sulaymaniyah (Sulaimani) City , Kurdistan.jpg', 'Diyar Muhammed'),
   ] },
