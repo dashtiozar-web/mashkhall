@@ -27,7 +27,7 @@ One-time set-up, in the Firebase console for that project:
      Secrets → secret `FIREBASE_SERVICE_ACCOUNT` (membership approvals,
      cards, meetings, letters);
    - GitHub → this repository → Settings → Secrets and variables → Actions →
-     secret `MASHKHALL_FIREBASE_SERVICE_ACCOUNT` (publishes the database
+     secret `FIREBASE_SERVICE_ACCOUNT` (publishes the database
      rules after every change). Remove any old `FIREBASE_SERVICE_ACCOUNT`
      secret copied from 17 Shubat.
 
