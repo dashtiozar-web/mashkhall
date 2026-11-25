@@ -79,6 +79,7 @@ export const KURDISTAN_SCENES: Scene[] = [
     commons('Iraq Kurdistan Erbil Soran.jpg'),
   ] },
   { id: 'dukan', name: 'Dukan', ku: 'دوکان', photos: [
+    { url: '/images/cities/dukan.jpg', credit: '', source: '' },
     commons('Dukan lake- Dukan, Slemani.jpg', 'Hiwa Sherzad'),
     commons('5. Lake Dukan, Sulaymaniyah Governorate, Iraqi Kurdistan.jpg', 'Osama Shukir Muhammed Amin'),
     commons('Dukan Lake.jpg', 'Mhamadkorra'),
