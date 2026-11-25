@@ -2,15 +2,23 @@ import React from 'react';
 import { ArrowUpRight, Vote } from 'lucide-react';
 import { Container } from './ui';
 
+/**
+ * The Civil Referendum 2026 is kept private until the organisation announces
+ * it. While REFERENDUM_PUBLIC is false nothing about it is shown anywhere on
+ * the website, and its address is left out of the website's code.
+ * To publish it: set REFERENDUM_PUBLIC to true.
+ */
+export const REFERENDUM_PUBLIC = false;
+
 /** The Civil Referendum 2026 questionnaire. Answers are sent from its own page, straight to its source. */
-export const REFERENDUM_URL = 'https://civil-referendum.pages.dev/';
+export const REFERENDUM_URL = REFERENDUM_PUBLIC ? 'https://civil-referendum.pages.dev/' : '';
 
 /**
  * Invitation to the Civil Referendum on the home page, directly under the
  * cover so it is the first thing visitors see. The questionnaire opens on its
  * own page (in a new tab), where it is answered and submitted.
  */
-export const ReferendumCall: React.FC = () => (
+export const ReferendumCall: React.FC = () => (!REFERENDUM_PUBLIC ? null : (
   <section aria-labelledby="referendum-heading" className="border-b border-[#F2C14E]/30 bg-[linear-gradient(100deg,#3A140C_0%,#5A1A0E_55%,#7A2414_100%)] text-white">
     <Container className="flex flex-col gap-6 py-8 sm:py-10 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex items-start gap-5">
@@ -42,4 +50,4 @@ export const ReferendumCall: React.FC = () => (
       </a>
     </Container>
   </section>
-);
+));

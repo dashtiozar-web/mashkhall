@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X, ChevronDown, Vote } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Container, Logo, ORG_SHORT } from './ui';
-import { REFERENDUM_URL } from './ReferendumCall';
+import { REFERENDUM_PUBLIC, REFERENDUM_URL } from './ReferendumCall';
 import { SectionsBar } from './SectionsBar';
 import { ThemeToggle } from './ThemeToggle';
 import { NotificationBell } from './Notifications';
@@ -64,10 +64,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, currentParam, onNavi
     <div className="border-b border-white/10 bg-[#120906] text-white">
       <Container className="flex h-10 items-center justify-between gap-3">
         <p className="hidden truncate text-[0.8125rem] font-semibold text-[#F2C14E] lg:block">Good character, good movement, good governance</p>
+        {REFERENDUM_PUBLIC && (
         <a href={REFERENDUM_URL} target="_blank" rel="noopener"
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#F2C14E] px-3 py-1 text-[0.8125rem] font-bold text-[#2A110A] no-underline hover:bg-[#FFD36B]">
           <Vote className="h-3.5 w-3.5" aria-hidden="true" /><span className="sm:hidden">Referendum</span><span className="hidden sm:inline">Civil Referendum 2026</span><span className="sr-only"> (opens in a new tab)</span>
         </a>
+        )}
         <LanguageSwitcher className="ms-auto" />
       </Container>
     </div>
