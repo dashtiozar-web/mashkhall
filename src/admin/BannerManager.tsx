@@ -7,7 +7,7 @@ import { ActivityAttendees } from './ActivityAttendees';
 import { VideoPlayer } from '../components/VideoEmbed';
 import { VIDEO_HELP, videoEmbed } from '../lib/video';
 import {
-  bannerPhase, BannerPhase, currentBanner, DEFAULT_BANNER_MESSAGE, deleteNewsBanner, formatEventDate,
+  bannerPhase, BannerPhase, currentBanners, DEFAULT_BANNER_MESSAGE, deleteNewsBanner, formatEventDate,
   saveNewsBanner, setNewsBannerStatus, useNewsBanners,
 } from '../lib/newsBanner';
 
@@ -48,7 +48,8 @@ export const BannerManager: React.FC = () => {
   const [notice, setNotice] = useState<string | null>(null);
   const [attendees, setAttendees] = useState<NewsBanner | null>(null);
 
-  const showing = currentBanner(banners, clock);
+  const showing = currentBanners(banners, clock);
+  const showingIds = new Set(showing.map((b) => b.id));
   const sorted = [...banners].sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
   const set = (patch: Partial<Draft>) => setDraft((d) => (d ? { ...d, ...patch } : d));
 
@@ -113,9 +114,9 @@ export const BannerManager: React.FC = () => {
 
       <section aria-labelledby="now-heading" className="rounded-2xl border border-line bg-surface p-5">
         <h3 id="now-heading" className="mb-3 text-[0.9375rem] font-semibold text-ink-soft">Showing on the website now</h3>
-        <div className="overflow-hidden rounded-lg"><BreakingNewsStrip banner={showing} preview /></div>
+        <div className="overflow-hidden rounded-lg"><BreakingNewsStrip banners={showing} preview /></div>
         <p className="mt-2 text-[0.875rem] text-muted">
-          {showing.id === 'default' ? 'The everyday message.' : `${MODES.find((m) => m.value === showing.mode)?.label}${showing.endAt ? `, until ${when(showing.endAt)}` : ''}.`}
+          {showing[0]?.id === 'default' ? 'The everyday message.' : `${showing.length} ${showing.length === 1 ? 'item, shown' : 'items, shown one after another'} until each is switched off or reaches its end time.`}
         </p>
       </section>
 
@@ -241,7 +242,7 @@ export const BannerManager: React.FC = () => {
                     <p className="flex flex-wrap items-center gap-2 text-[0.8125rem]">
                       <span className={`rounded-full px-2.5 py-0.5 font-semibold ${PHASE[phase].cls}`}>{PHASE[phase].label}</span>
                       <span className="text-muted">{MODES.find((m) => m.value === b.mode)?.label}</span>
-                      {showing.id === b.id && <span className="font-semibold text-[#C2361A]">On the website now</span>}
+                      {showingIds.has(b.id) && <span className="font-semibold text-[#C2361A]">On the website now</span>}
                     </p>
                     <p className="mt-1.5 font-semibold">{b.message}</p>
                     <p className="text-[0.875rem] text-muted">

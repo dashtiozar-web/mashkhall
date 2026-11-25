@@ -21,12 +21,24 @@ export const bannerPhase = (b: NewsBanner, now = new Date().toISOString()): Bann
  * Announcements end on their own at their end time, so the banner returns to
  * the default message without anyone having to switch it off.
  */
-export const currentBanner = (banners: NewsBanner[], now = new Date().toISOString()) => {
+export const currentBanner = (banners: NewsBanner[], now = new Date().toISOString()) => currentBanners(banners, now)[0];
+
+/**
+ * Everything the banner shows right now, one after another: every live
+ * breaking news item and activity announcement (newest first), each staying
+ * on until it is switched off or reaches its end time. With none, the
+ * everyday message.
+ */
+export const currentBanners = (banners: NewsBanner[], now = new Date().toISOString()): NewsBanner[] => {
   const live = banners
     .filter((b) => bannerPhase(b, now) === 'live')
     .sort((a, b) => (b.startAt || b.updatedAt || '').localeCompare(a.startAt || a.updatedAt || ''));
-  const pick = live.find((b) => b.mode === 'breaking') || live.find((b) => b.mode === 'announcement');
-  if (pick) return pick;
+  const news = [...live.filter((b) => b.mode === 'breaking'), ...live.filter((b) => b.mode === 'announcement')];
+  if (news.length) return news;
+  return [everydayBanner(live)];
+};
+
+const everydayBanner = (live: NewsBanner[]): NewsBanner => {
   const custom = live.find((b) => b.mode === 'default');
   return {
     id: 'default',
