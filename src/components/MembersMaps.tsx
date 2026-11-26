@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTiers } from '../lib/useTiers';
 import placesConfig from '../config/administrations.json';
+import { Globe3D } from './Globe3D';
+
+const GLOBE_POINTS: Record<string, [number, number]> = { britain: [-1.8, 53.2], germany: [10.4, 51.1], usa: [-98, 39.5], canada: [-100, 56.5], australia: [134, -25.5] };
+const GLOBE_ISO: Record<string, string> = { britain: '826', germany: '276', usa: '840', canada: '124', australia: '036' };
 
 const ADMINISTRATIONS = placesConfig.administrations;
 import { ArrowRight, Globe2, MapPin, Users } from 'lucide-react';
@@ -10,7 +14,6 @@ import { ABROAD_IDS, COUNTRIES, PROVINCES, PROVINCE_IDS } from '../lib/places';
 import { TIERS } from '../lib/tiers';
 import {
   KURDISTAN_NEIGHBOURS, KURDISTAN_POINTS, KURDISTAN_REGIONS, KURDISTAN_VIEWBOX, MapShape,
-  WORLD_CODES, WORLD_COUNTRIES, WORLD_POINTS, WORLD_VIEWBOX,
 } from '../data/geoMaps';
 
 /*
@@ -109,14 +112,14 @@ const TierRow: React.FC<{ c: TierCount; dark?: boolean }> = ({ c, dark }) => (
   </div>
 );
 
-const Legend: React.FC<{ note: React.ReactNode }> = ({ note }) => (
+const Legend: React.FC<{ note: React.ReactNode; dark?: boolean }> = ({ note, dark }) => (
   <figcaption className="mt-3 flex flex-col gap-3 px-2 pb-1 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <p className="text-[0.8125rem] font-semibold text-ink-soft">Members</p>
+      <p className={`text-[0.8125rem] font-semibold ${dark ? 'text-white/85' : 'text-ink-soft'}`}>Members</p>
       <div className="mt-1 h-2.5 w-56 max-w-full rounded-full" style={{ background: `linear-gradient(90deg, ${HEAT_LEGEND.join(', ')})` }} aria-hidden="true" />
-      <div className="mt-1 flex w-56 max-w-full justify-between text-[0.75rem] text-muted"><span>Fewest (green)</span><span>Most (red)</span></div>
+      <div className={`mt-1 flex w-56 max-w-full justify-between text-[0.75rem] ${dark ? 'text-white/65' : 'text-muted'}`}><span>Fewest (green)</span><span>Most (red)</span></div>
     </div>
-    <p className="max-w-[44ch] text-[0.75rem] text-muted">{note} Map data: <a href="https://www.amcharts.com/" target="_blank" rel="noopener noreferrer" className="underline">amCharts</a>.</p>
+    <p className={`max-w-[44ch] text-[0.75rem] ${dark ? 'text-white/65' : 'text-muted'}`}>{note} {dark ? null : <>Map data: <a href="https://www.amcharts.com/" target="_blank" rel="noopener noreferrer" className="underline">amCharts</a>.</>}</p>
   </figcaption>
 );
 
@@ -131,8 +134,10 @@ const Marker: React.FC<{
       aria-pressed={picked} className="cursor-pointer focus:outline-none"
       onMouseEnter={() => onHover(id)} onMouseLeave={() => onHover(null)} onFocus={() => onHover(id)} onBlur={() => onHover(null)}
       onClick={() => onPick(id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(id); } }}>
-      {on && <circle cx={n.x} cy={n.y} r={r + r * 0.6} fill={n.stat.colour} fillOpacity={0.25} />}
-      <circle cx={n.x} cy={n.y} r={r} fill={n.stat.colour} stroke="#fff" strokeWidth={r * 0.2} filter="url(#mm-shadow)" />
+      <ellipse cx={n.x} cy={n.y + r * 0.95} rx={r * 0.95} ry={r * 0.32} fill="#000" opacity={0.28} />
+      {on && <circle cx={n.x} cy={n.y} r={r + r * 0.6} fill={n.stat.colour} fillOpacity={0.3} />}
+      <circle cx={n.x} cy={n.y} r={r} fill={n.stat.colour} stroke="#fff" strokeWidth={r * 0.16} filter="url(#mm-shadow)" />
+      <circle cx={n.x} cy={n.y} r={r} fill="url(#mm-pin)" />
       <text x={n.x} y={n.y + font * 0.36} textAnchor="middle" className="pointer-events-none fill-white font-sans font-bold" style={{ fontSize: font, paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.35)', strokeWidth: 2 }}>{n.stat.members}</text>
       <text x={below ? n.x : labelLeft ? n.x - r - font * 0.4 : n.x + r + font * 0.4} y={below ? n.y + r + font * 1.3 : n.y + font * 0.42} textAnchor={below ? 'middle' : labelLeft ? 'end' : 'start'}
         className="pointer-events-none fill-[#1F2622] font-sans font-semibold dark:fill-white"
@@ -208,30 +213,62 @@ export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> 
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
-      <figure className="relative m-0 rounded-3xl border border-line bg-[#EAF1F4] p-2 dark:bg-[#1b2a31] sm:p-4">
-        <svg viewBox={`0 0 ${KURDISTAN_VIEWBOX.width} ${KURDISTAN_VIEWBOX.height}`} role="group" aria-label="Map of the five provinces of Kurdistan showing our members" className="mx-auto block h-auto max-h-[78vh] w-full">
+      <figure className="relative m-0 overflow-hidden rounded-3xl border border-line bg-[linear-gradient(180deg,#cfe0ea_0%,#e9e4d6_55%,#d9cfb8_100%)] p-2 dark:bg-[linear-gradient(180deg,#14222c_0%,#1d1a14_100%)] sm:p-4" style={{ perspective: '1300px' }}>
+        {/* The map is tilted like a relief model on a table, with depth and light. */}
+        <div style={{ transform: 'rotateX(24deg) scale(1.04)', transformOrigin: '50% 62%', transformStyle: 'preserve-3d' }}>
+        <svg viewBox={`0 0 ${KURDISTAN_VIEWBOX.width} ${KURDISTAN_VIEWBOX.height}`} role="group" aria-label="Map of the five provinces of Kurdistan showing our members" className="mx-auto block h-auto max-h-[78vh] w-full overflow-visible">
           <defs>
-            <filter id="mm-shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" floodOpacity="0.35" /></filter>
+            <filter id="mm-shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="3" floodOpacity="0.45" /></filter>
             <clipPath id="mm-k-clip"><rect width={KURDISTAN_VIEWBOX.width} height={KURDISTAN_VIEWBOX.height} /></clipPath>
+            {/* Mountains and valleys, lit from the north-west */}
+            <filter id="mm-relief" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="5" seed="11" result="n" />
+              <feDiffuseLighting in="n" surfaceScale="3.4" diffuseConstant="1.1" lightingColor="#ffffff" result="l">
+                <feDistantLight azimuth="225" elevation="40" />
+              </feDiffuseLighting>
+              <feComposite in="l" in2="SourceGraphic" operator="arithmetic" k1="1.2" k2="0" k3="0" k4="0" result="lit" />
+              <feComposite in="lit" in2="SourceGraphic" operator="in" />
+            </filter>
+            <radialGradient id="mm-pin" cx="35%" cy="30%" r="70%">
+              <stop offset="0" stopColor="#ffffff" stopOpacity="0.75" />
+              <stop offset="0.35" stopColor="#ffffff" stopOpacity="0.08" />
+              <stop offset="1" stopColor="#000000" stopOpacity="0.35" />
+            </radialGradient>
+            <linearGradient id="mm-sun" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#ffffff" stopOpacity="0.22" />
+              <stop offset="0.6" stopColor="#ffffff" stopOpacity="0" />
+              <stop offset="1" stopColor="#000000" stopOpacity="0.18" />
+            </linearGradient>
           </defs>
           <g clipPath="url(#mm-k-clip)">
-            {KURDISTAN_NEIGHBOURS.map((r) => (
-              <path key={r.id} d={r.d} fill="var(--map-empty, #D9D6CF)" fillOpacity={0.45} stroke="#ffffff" strokeWidth={1.5}><title>{r.name}</title></path>
+            <g filter="url(#mm-relief)">
+              {KURDISTAN_NEIGHBOURS.map((r) => (
+                <path key={r.id} d={r.d} fill="#c9bf9f" stroke="#a89c78" strokeWidth={1}><title>{r.name}</title></path>
+              ))}
+            </g>
+            {/* The land's thickness: the provinces stand up from the ground */}
+            {[10, 8, 6, 4, 2].map((dy) => (
+              <g key={dy} transform={`translate(0 ${dy})`} aria-hidden="true">
+                {KURDISTAN_REGIONS.map((r) => <path key={r.id} d={r.d} fill={r.province ? '#3b2416' : '#8e8160'} opacity={r.province ? 0.9 : 0.5} />)}
+              </g>
             ))}
-            {KURDISTAN_REGIONS.map((r) => {
-              const s = r.province ? byId.get(r.id) : undefined;
-              const on = s && focusId === s.council.id;
-              return (
-                <path key={r.id} d={r.d}
-                  fill={s ? s.colour : 'var(--map-land, #F4F2EE)'} fillOpacity={s ? (on ? 0.95 : 0.72) : 1}
-                  stroke="#ffffff" strokeWidth={on ? 3 : 1.5} strokeLinejoin="round"
-                  className={s ? 'cursor-pointer transition-[fill-opacity]' : ''}
-                  onMouseEnter={() => s && setHover(s.council.id)} onMouseLeave={() => setHover(null)}
-                  onClick={() => s && setSelected(s.council.id)}>
-                  <title>{s ? `${s.council.name}: ${s.members} members` : label(r)}</title>
-                </path>
-              );
-            })}
+            <g filter="url(#mm-relief)">
+              {KURDISTAN_REGIONS.map((r) => {
+                const s = r.province ? byId.get(r.id) : undefined;
+                const on = s && focusId === s.council.id;
+                return (
+                  <path key={r.id} d={r.d}
+                    fill={s ? s.colour : '#ddd2b0'} fillOpacity={s ? (on ? 1 : 0.92) : 1}
+                    stroke={s ? '#fff8e8' : '#b5a77f'} strokeWidth={on ? 3.5 : s ? 2 : 1} strokeLinejoin="round"
+                    className={s ? 'cursor-pointer' : ''}
+                    onMouseEnter={() => s && setHover(s.council.id)} onMouseLeave={() => setHover(null)}
+                    onClick={() => s && setSelected(s.council.id)}>
+                    <title>{s ? `${s.council.name}: ${s.members} members` : label(r)}</title>
+                  </path>
+                );
+              })}
+            </g>
+            <rect width={KURDISTAN_VIEWBOX.width} height={KURDISTAN_VIEWBOX.height} fill="url(#mm-sun)" pointerEvents="none" />
             {/* The provinces joined together */}
             {links.map(([a, b]) => {
               const A = at(a); const B = at(b);
@@ -264,6 +301,7 @@ export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> 
             })}
           </g>
         </svg>
+        </div>
         <Legend note="Circles show the members in each province; diamonds show the independent administrations of Raparin, Garmiyan, Zakho and Soran." />
         {focusAdm && (() => {
           const a = ADMINISTRATIONS.find((x) => x.id === focusAdm)!;
@@ -299,64 +337,18 @@ export const WorldMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({
   const [selected, setSelected] = useState<string | null>(null);
   const focusId = hover || selected;
   const byId = new Map(stats.map((s) => [s.council.id, s]));
-  const byCode = new Map(Object.entries(WORLD_CODES).map(([id, code]) => [code, byId.get(id)]));
-  const home = { x: WORLD_POINTS.kurdistan[0], y: WORLD_POINTS.kurdistan[1] };
-  const nodes: Node[] = ABROAD_IDS.filter((id) => byId.has(id) && WORLD_POINTS[id])
-    .map((id) => ({ stat: byId.get(id)!, x: WORLD_POINTS[id][0], y: WORLD_POINTS[id][1] }));
-  const max = Math.max(1, ...stats.map((s) => s.members));
-  const radius = (n: number) => 11 + 8 * Math.sqrt(n / max);
+  const nodes: Node[] = ABROAD_IDS.filter((id) => byId.has(id) && GLOBE_POINTS[id])
+    .map((id) => ({ stat: byId.get(id)!, x: 0, y: 0 }));
   const total = stats.reduce((a, s) => a + s.members, 0);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
-      <figure className="relative m-0 rounded-3xl border border-line bg-[#EAF1F4] p-2 dark:bg-[#1b2a31] sm:p-4">
-        <svg viewBox={`0 0 ${WORLD_VIEWBOX.width} ${WORLD_VIEWBOX.height}`} role="group" aria-label="World map showing our members abroad, joined to Kurdistan" className="mx-auto block h-auto w-full">
-          <defs>
-            <filter id="mw-shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="1.5" stdDeviation="1.8" floodOpacity="0.35" /></filter>
-          </defs>
-          {WORLD_COUNTRIES.map((c) => {
-            const s = byCode.get(c.id);
-            const on = s && focusId === s.council.id;
-            const isHome = c.id === 'IQ';
-            return (
-              <path key={c.id} d={c.d}
-                fill={s ? s.colour : isHome ? '#F2C14E' : 'var(--map-land, #F4F2EE)'} fillOpacity={s ? (on ? 0.95 : 0.75) : isHome ? 0.9 : 1}
-                stroke="#ffffff" strokeWidth={on ? 1.6 : 0.6} strokeLinejoin="round"
-                className={s ? 'cursor-pointer' : ''}
-                onMouseEnter={() => s && setHover(s.council.id)} onMouseLeave={() => setHover(null)}
-                onClick={() => s && setSelected(s.council.id)}>
-                <title>{s ? `${s.council.name}: ${s.members} members` : c.name}</title>
-              </path>
-            );
-          })}
-          {/* Every country abroad is joined to Kurdistan */}
-          {nodes.map((n) => {
-            const lit = focusId === n.stat.council.id;
-            return <path key={`l-${n.stat.council.id}`} d={curve(home, n, n.x < home.x ? -0.22 : 0.22)} fill="none"
-              stroke={lit ? '#1F2622' : '#7A2414'} strokeOpacity={focusId && !lit ? 0.25 : 0.8}
-              strokeWidth={lit ? 2.2 : 1.4} strokeLinecap="round" className="map-flow" />;
-          })}
-          {nodes.map((n) => {
-            const id = n.stat.council.id;
-            const r = radius(n.stat.members);
-            return (
-              <g key={id}>
-                <circle cx={n.x} cy={n.y} r={r} fill="transparent" />
-                <Marker n={n} r={r} on={focusId === id} picked={selected === id} labelLeft={id === 'canada' || id === 'usa' || id === 'britain'}
-                  font={12} onHover={setHover} onPick={setSelected} />
-              </g>
-            );
-          })}
-          {/* Kurdistan */}
-          <g>
-            <circle cx={home.x} cy={home.y} r={13} fill="#7A2414" fillOpacity={0.18} />
-            <circle cx={home.x} cy={home.y} r={8.5} fill="#7A2414" stroke="#F2C14E" strokeWidth={2} filter="url(#mw-shadow)" />
-            <text x={home.x} y={home.y + 3.2} textAnchor="middle" className="pointer-events-none fill-white font-sans font-bold" style={{ fontSize: 8 }}>{kurdistanTotal}</text>
-            <text x={home.x} y={home.y + 24} textAnchor="middle" className="pointer-events-none fill-[#7A2414] font-sans font-bold dark:fill-[#F2C14E]"
-              style={{ fontSize: 12.5, paintOrder: 'stroke', stroke: 'var(--map-halo, #ffffff)', strokeWidth: 3.5, strokeLinejoin: 'round' }}>Kurdistan</text>
-          </g>
-        </svg>
-        <Legend note="Numbers on the circles are members in each country; Kurdistan shows its total. Lines join each country to Kurdistan." />
+      <figure className="relative m-0 overflow-hidden rounded-3xl border border-line bg-[radial-gradient(ellipse_at_center,#13263a_0%,#07111c_70%)] p-2 text-white sm:p-4">
+        <Globe3D
+          places={nodes.map((n) => ({ id: n.stat.council.id, name: n.stat.council.name, lng: GLOBE_POINTS[n.stat.council.id][0], lat: GLOBE_POINTS[n.stat.council.id][1], iso: GLOBE_ISO[n.stat.council.id], members: n.stat.members, colour: n.stat.colour }))}
+          home={{ name: 'Kurdistan', lng: 44.4, lat: 36.2, members: kurdistanTotal }}
+          focusId={focusId} onHover={setHover} onPick={(id) => setSelected((v) => (v === id ? null : id))} />
+        <Legend dark note="Drag the globe to turn it. Numbers are members in each country; Kurdistan shows its total. Lines join each country to Kurdistan. Natural Earth data." />
       </figure>
       <Panel icon={<Globe2 className="h-4 w-4" aria-hidden="true" />} label="Members abroad" total={total} of="approved members in five countries"
         focus={focusId ? byId.get(focusId) : undefined} count={stats.length} onOpen={onOpen}

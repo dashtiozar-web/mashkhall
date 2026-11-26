@@ -402,3 +402,8 @@ html:not([lang^="en"]) .ku-sub { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .torch-flame, .torch-glow, .sunburst-spin { animation: none; }
 }
+
+/* Kurdistan on the globe: a gentle pulse. */
+@keyframes map-pulse { 0%, 100% { transform: scale(1); opacity: 0.55; } 50% { transform: scale(1.5); opacity: 0.15; } }
+.map-pulse { transform-box: fill-box; transform-origin: center; animation: map-pulse 2.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .map-pulse { animation: none; } }
