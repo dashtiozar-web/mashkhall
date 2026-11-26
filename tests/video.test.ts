@@ -26,3 +26,12 @@ describe('Videos', () => {
     expect(parseTags('aa,bb,cc,dd,ee,ff,gg,hh,ii,jj').length).toBe(8);
   });
 });
+
+describe('Facebook share links', () => {
+  it('accepts the links from Facebook’s Share button', async () => {
+    const { videoEmbed } = await import('../src/lib/video');
+    expect(videoEmbed('https://www.facebook.com/share/v/19pgqkrcdh/')?.provider).toBe('facebook');
+    expect(videoEmbed('https://www.facebook.com/share/r/1AbCdEf/')?.vertical).toBe(true);
+    expect(videoEmbed('https://www.facebook.com/share/p/1AbCdEf/')).toBeNull();
+  });
+});

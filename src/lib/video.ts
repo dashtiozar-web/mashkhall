@@ -27,12 +27,13 @@ export const videoEmbed = (raw?: string): VideoEmbed | null => {
   const vm = url.match(/vimeo\.com\/(?:video\/|channels\/[\w-]+\/|groups\/[\w-]+\/videos\/)?(\d+)/i);
   if (vm) return { provider: 'vimeo', src: `https://player.vimeo.com/video/${vm[1]}?dnt=1`, vertical: false };
 
-  // Facebook videos and reels, e.g. our own Page's videos.
-  if (/^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|fb\.watch)\//i.test(url) && /\/(videos?|reel|watch)\b|fb\.watch/i.test(url)) {
+  // Facebook videos and reels, including the short links from Facebook's
+  // Share button (facebook.com/share/v/… and /share/r/…).
+  if (/^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|fb\.watch)\//i.test(url) && /\/(videos?|reel|watch)\b|\/share\/(v|r)\/|fb\.watch/i.test(url)) {
     return {
       provider: 'facebook',
       src: `https://www.facebook.com/plugins/video.php?${new URLSearchParams({ href: url.replace(/^https?:\/\/(m|web)\./i, 'https://www.'), show_text: 'false' })}`,
-      vertical: /\/reel\//i.test(url),
+      vertical: /\/reel\/|\/share\/r\//i.test(url),
     };
   }
   return null;
