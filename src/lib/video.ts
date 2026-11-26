@@ -12,6 +12,16 @@ export interface VideoEmbed {
   vertical: boolean;
 }
 
+/** A Facebook video address without app tracking (e.g. ?mibextid=…), as Facebook's player expects. */
+const facebookHref = (url: string) => {
+  const u = url.replace(/^https?:\/\/(m|web)\./i, 'https://www.');
+  try {
+    const p = new URL(u);
+    const v = p.searchParams.get('v');
+    return `https://www.facebook.com${p.pathname}${v ? `?v=${v}` : ''}`;
+  } catch { return u; }
+};
+
 export const videoEmbed = (raw?: string): VideoEmbed | null => {
   const url = (raw || '').trim();
   if (!url) return null;
@@ -32,7 +42,7 @@ export const videoEmbed = (raw?: string): VideoEmbed | null => {
   if (/^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|fb\.watch)\//i.test(url) && /\/(videos?|reel|watch)\b|\/share\/(v|r)\/|fb\.watch/i.test(url)) {
     return {
       provider: 'facebook',
-      src: `https://www.facebook.com/plugins/video.php?${new URLSearchParams({ href: url.replace(/^https?:\/\/(m|web)\./i, 'https://www.'), show_text: 'false' })}`,
+      src: `https://www.facebook.com/plugins/video.php?${new URLSearchParams({ href: facebookHref(url), show_text: 'false' })}`,
       vertical: /\/reel\/|\/share\/r\//i.test(url),
     };
   }
