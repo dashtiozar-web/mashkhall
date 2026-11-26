@@ -289,8 +289,10 @@ const resolveVideoLink = async (request) => {
   if (!/^https:\/\/(www\.|m\.|web\.)?facebook\.com\/share\/(v|r)\/[\w-]+\/?$/i.test(raw)) return json({ error: 'Not a Facebook share link' }, 400);
   const cache = caches.default;
   const key = new Request(`https://cache.mashkhall/video-link?u=${encodeURIComponent(raw)}`);
-  const hit = await cache.match(key);
+  const hit = new URL(request.url).searchParams.get('debug') === '1' ? null : await cache.match(key);
   if (hit) return hit;
+  const debug = new URL(request.url).searchParams.get('debug') === '1';
+  const trace = [];
   let next = raw.replace(/^https:\/\/(m|web)\./i, 'https://www.');
   let found = '';
   for (let hop = 0; hop < 6 && !found; hop++) {
@@ -299,9 +301,11 @@ const resolveVideoLink = async (request) => {
       res = await fetch(next, { redirect: 'manual', headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36', 'accept-language': 'en-GB,en;q=0.9' } });
     } catch { break; }
     const loc = res.headers.get('location');
+    trace.push({ url: next, status: res.status, location: loc });
     if (!loc) {
       // Some answers carry the address in the page instead of a redirect.
       const html = res.status === 200 ? (await res.text()).slice(0, 400000) : '';
+      if (debug) trace.push({ title: (html.match(/<title>([^<]*)/i) || [])[1] || '', canon: (html.match(/rel="canonical"[^>]*>/i) || [])[0] || '', og: (html.match(/og:url[^>]*>/i) || [])[0] || '', len: html.length });
       const m = html.match(/<link[^>]+rel="canonical"[^>]+href="([^"]+)"/i) || html.match(/property="og:url"[^>]+content="([^"]+)"/i);
       if (m && FB_VIDEO.test(m[1].replace(/&amp;/g, '&'))) found = m[1].replace(/&amp;/g, '&');
       break;
@@ -313,6 +317,7 @@ const resolveVideoLink = async (request) => {
     if (inner && FB_VIDEO.test(inner)) { found = inner; break; }
     next = abs;
   }
+  if (debug) return json({ found, trace });
   const out = found
     ? json({ url: found.split('#')[0] }, 200, { 'cache-control': 'public, max-age=86400' })
     : json({ error: 'The video address could not be found' }, 404, { 'cache-control': 'public, max-age=600' });
