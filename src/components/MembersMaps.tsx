@@ -1,11 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTiers } from '../lib/useTiers';
+import placesConfig from '../config/administrations.json';
+
+const ADMINISTRATIONS = placesConfig.administrations;
 import { ArrowRight, Globe2, MapPin, Users } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { councilStats, CouncilStat, GROWTH_DAYS, HEAT_LEGEND } from '../lib/councilStats';
 import { ABROAD_IDS, COUNTRIES, PROVINCES, PROVINCE_IDS } from '../lib/places';
-import { TIERS, isTier } from '../lib/tiers';
+import { TIERS } from '../lib/tiers';
 import {
-  KURDISTAN_NEIGHBOURS, KURDISTAN_REGIONS, KURDISTAN_VIEWBOX, MapShape,
+  KURDISTAN_NEIGHBOURS, KURDISTAN_POINTS, KURDISTAN_REGIONS, KURDISTAN_VIEWBOX, MapShape,
   WORLD_CODES, WORLD_COUNTRIES, WORLD_POINTS, WORLD_VIEWBOX,
 } from '../data/geoMaps';
 
@@ -35,20 +39,62 @@ const useGroupStats = (ids: string[]) => {
   }, [chapters, publicProfiles, ids]);
 };
 
-/** How many of each kind of membership, per province or country (public profiles). */
+/** How many of each kind of membership, per province or country: only for Pêşeng members and staff. */
 type TierCount = Record<'peshang' | 'pishtiwan' | 'komar', number>;
 const useTierCounts = () => {
   const { publicProfiles } = useData();
+  const { canSee, tiers } = useTiers();
   return useMemo(() => {
     const m = new Map<string, TierCount>();
+    if (!canSee) return { canSee, m };
     for (const p of publicProfiles) {
-      if ((p as { membershipStatus?: string }).membershipStatus === 'suspended' || !isTier(p.tier)) continue;
+      const t = tiers.get(p.id);
+      if (p.membershipStatus === 'suspended' || !t) continue;
       const row = m.get(p.chapterId) || { peshang: 0, pishtiwan: 0, komar: 0 };
-      row[p.tier] += 1;
+      row[t] += 1;
       m.set(p.chapterId, row);
     }
-    return m;
-  }, [publicProfiles]);
+    return { canSee, m };
+  }, [publicProfiles, canSee, tiers]);
+};
+
+/** Public totals by city and by independent administration (no names, no kinds). */
+interface PlaceStats { total: number; byChapter: Record<string, number>; byCity: Record<string, Record<string, number>>; byAdministration: Record<string, number> }
+let statsCache: Promise<PlaceStats | null> | null = null;
+const usePlaceStats = () => {
+  const [stats, setStats] = useState<PlaceStats | null>(null);
+  useEffect(() => {
+    let alive = true;
+    statsCache = statsCache || fetch('/api/place-stats').then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    statsCache.then((d) => { if (alive) setStats(d); });
+    return () => { alive = false; };
+  }, []);
+  return stats;
+};
+const useAllMembers = () => {
+  const { publicProfiles } = useData();
+  return publicProfiles.filter((p) => p.membershipStatus !== 'suspended').length;
+};
+const pct = (n: number, total: number) => (total ? `${Math.round((n / total) * 1000) / 10}%` : '0%');
+
+/** Members by city or town in one place, with each city's share. */
+const CityList: React.FC<{ cities?: Record<string, number>; total: number }> = ({ cities, total }) => {
+  const rows = Object.entries(cities || {}).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  if (!rows.length) return null;
+  return (
+    <div className="mt-4">
+      <p className="text-[0.875rem] font-semibold text-muted">By city or town</p>
+      <ul className="mt-1.5 space-y-1">
+        {rows.map(([city, n]) => (
+          <li key={city} className="flex items-center gap-2 text-[0.9375rem]">
+            <span className="min-w-0 flex-1 truncate" dir="auto">{city}</span>
+            <span className="tabular-nums font-semibold">{n}</span>
+            <span className="w-14 text-end text-[0.8125rem] tabular-nums text-muted">{pct(n, total)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 const sumTiers = (rows: (TierCount | undefined)[]): TierCount => rows.reduce<TierCount>((t, r) => ({ peshang: t.peshang + (r?.peshang || 0), pishtiwan: t.pishtiwan + (r?.pishtiwan || 0), komar: t.komar + (r?.komar || 0) }), { peshang: 0, pishtiwan: 0, komar: 0 });
 
@@ -101,12 +147,13 @@ const Marker: React.FC<{
 const Panel: React.FC<{
   icon: React.ReactNode; label: string; total: number; of: string; focus?: CouncilStat; count: number;
   hint: string; onOpen?: (slug: string) => void; tiers?: TierCount; focusTiers?: TierCount;
-}> = ({ icon, label, total, of, focus, count, hint, onOpen, tiers, focusTiers }) => (
+  allMembers?: number; cities?: Record<string, number>;
+}> = ({ icon, label, total, of, focus, count, hint, onOpen, tiers, focusTiers, allMembers = 0, cities }) => (
   <aside className="space-y-5" aria-live="polite">
     <div className="rounded-3xl bg-navy p-5 text-white">
       <p className="flex items-center gap-2 text-[0.9375rem] font-semibold text-white/85">{icon} {label}</p>
       <p className="mt-1 font-serif text-[3rem] leading-none font-semibold tabular-nums">{total.toLocaleString('en-GB')}</p>
-      <p className="mt-1 text-white/85">{of}</p>
+      <p className="mt-1 text-white/85">{of}{allMembers ? ` · ${pct(total, allMembers)} of all members` : ''}</p>
       {tiers && <TierRow c={tiers} dark />}
     </div>
     {focus ? (
@@ -119,7 +166,9 @@ const Panel: React.FC<{
         <dl className="mt-3 grid grid-cols-2 gap-3 text-[0.9375rem]">
           <div><dt className="text-muted">Members</dt><dd className="text-[1.375rem] font-semibold tabular-nums">{focus.members}</dd></div>
           <div><dt className="text-muted">Last {GROWTH_DAYS} days</dt><dd className="text-[1.375rem] font-semibold tabular-nums">{focus.growth ? `+${focus.growth}` : '0'}</dd></div>
+          <div className="col-span-2"><dt className="text-muted">Share of all members</dt><dd className="text-[1.375rem] font-semibold tabular-nums">{pct(focus.members, allMembers)}</dd></div>
         </dl>
+        <CityList cities={cities} total={focus.members} />
         {focusTiers && <TierRow c={focusTiers} />}
         <a href={`/councils/${encodeURIComponent(focus.council.slug || focus.council.id)}`}
           onClick={(e) => { if (onOpen) { e.preventDefault(); onOpen(focus.council.slug || focus.council.id); } }}
@@ -136,7 +185,10 @@ const Panel: React.FC<{
 /** The five provinces of Kurdistan, coloured by members, with their numbers. */
 export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({ onOpen }) => {
   const stats = useGroupStats(PROVINCE_IDS);
+  const [focusAdm, setFocusAdm] = useState<string | null>(null);
   const tierCounts = useTierCounts();
+  const placeStats = usePlaceStats();
+  const allMembers = useAllMembers();
   const [hover, setHover] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const focusId = hover || selected;
@@ -188,19 +240,49 @@ export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> 
               return <path key={`${a}-${b}`} d={curve(A, B)} fill="none" stroke={lit ? '#1F2622' : '#7A2414'}
                 strokeOpacity={focusId && !lit ? 0.25 : 0.8} strokeWidth={lit ? 4 : 2.5} strokeLinecap="round" className="map-flow" />;
             })}
+            {/* Independent administrations: Raparin, Garmiyan, Zakho and Soran */}
+            {ADMINISTRATIONS.map((a) => {
+              const [x, y] = KURDISTAN_POINTS[a.id] || [0, 0];
+              const n = placeStats?.byAdministration?.[a.id] || 0;
+              const on = focusAdm === a.id;
+              return (
+                <g key={a.id} role="button" tabIndex={0} className="cursor-pointer focus:outline-none" aria-label={`${a.name} independent administration: ${n} members`}
+                  onMouseEnter={() => setFocusAdm(a.id)} onMouseLeave={() => setFocusAdm(null)} onFocus={() => setFocusAdm(a.id)} onBlur={() => setFocusAdm(null)}
+                  onClick={() => setFocusAdm(a.id)}>
+                  <rect x={x - 15} y={y - 15} width={30} height={30} rx={7} transform={`rotate(45 ${x} ${y})`} fill="#1F100B" stroke={on ? '#F2C14E' : '#ffffff'} strokeWidth={on ? 4 : 3} filter="url(#mm-shadow)" />
+                  <text x={x} y={y + 6} textAnchor="middle" className="pointer-events-none fill-white font-sans font-bold" style={{ fontSize: 16 }}>{n}</text>
+                  <text x={a.id === 'raparin' ? x + 24 : x} y={a.id === 'raparin' ? y + 6 : a.id === 'zakho' ? y + 40 : y - 26} textAnchor={a.id === 'raparin' ? 'start' : 'middle'} className="pointer-events-none fill-[#1F100B] font-sans font-semibold italic dark:fill-white"
+                    style={{ fontSize: 17, paintOrder: 'stroke', stroke: 'var(--map-halo, #ffffff)', strokeWidth: 5, strokeLinejoin: 'round' }}>{a.name}</text>
+                </g>
+              );
+            })}
             {order.map((id) => {
               const n = at(id);
               if (!n) return null;
               return <Marker key={id} n={n} r={radius(n.stat.members)} on={focusId === id} picked={selected === id}
-                labelLeft={id === 'duhok' || id === 'kirkuk'} below={id === 'halabja'} font={22} onHover={setHover} onPick={setSelected} />;
+                labelLeft={id === 'kirkuk'} below={id === 'halabja'} font={22} onHover={setHover} onPick={setSelected} />;
             })}
           </g>
         </svg>
-        <Legend note="Numbers on the circles are members in each province." />
+        <Legend note="Circles show the members in each province; diamonds show the independent administrations of Raparin, Garmiyan, Zakho and Soran." />
+        {focusAdm && (() => {
+          const a = ADMINISTRATIONS.find((x) => x.id === focusAdm)!;
+          const n = placeStats?.byAdministration?.[a.id] || 0;
+          const prov = placeStats?.byCity?.[a.province] || {};
+          const cities: Record<string, number> = Object.fromEntries(Object.entries(prov).filter(([c]) => a.cities.some((x) => x.toLowerCase() === c.toLowerCase())));
+          return (
+            <div className="mx-2 mt-3 rounded-2xl border border-line bg-surface p-4">
+              <p className="font-semibold">{a.name} <span className="ku-sub ms-1 font-kurdish font-normal text-muted" lang="ckb" dir="rtl" translate="no">{a.ku}</span> <span className="font-normal text-ink-soft">· independent administration in {placeStats ? PROVINCES.find((p) => p.id === a.province)?.name : ''}</span></p>
+              <p className="mt-1 text-ink-soft"><strong className="text-ink tabular-nums">{n}</strong> members · {pct(n, allMembers)} of all members</p>
+              <CityList cities={cities} total={n} />
+            </div>
+          );
+        })()}
       </figure>
       <Panel icon={<Users className="h-4 w-4" aria-hidden="true" />} label="Members in Kurdistan" total={total} of="approved members in five provinces"
         focus={focusId ? byId.get(focusId) : undefined} count={stats.length} onOpen={onOpen}
-        tiers={sumTiers(PROVINCE_IDS.map((id) => tierCounts.get(id)))} focusTiers={focusId ? (tierCounts.get(focusId) || sumTiers([])) : undefined}
+        tiers={tierCounts.canSee ? sumTiers(PROVINCE_IDS.map((id) => tierCounts.m.get(id))) : undefined} focusTiers={tierCounts.canSee && focusId ? (tierCounts.m.get(focusId) || sumTiers([])) : undefined}
+        allMembers={allMembers} cities={focusId ? placeStats?.byCity?.[focusId] : undefined}
         hint="Choose a province on the map to see its members." />
     </div>
   );
@@ -210,6 +292,8 @@ export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> 
 export const WorldMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({ onOpen }) => {
   const stats = useGroupStats(ABROAD_IDS);
   const tierCounts = useTierCounts();
+  const placeStats = usePlaceStats();
+  const allMembers = useAllMembers();
   const kurdistanTotal = useGroupStats(PROVINCE_IDS).reduce((a, s) => a + s.members, 0);
   const [hover, setHover] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -276,7 +360,8 @@ export const WorldMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({
       </figure>
       <Panel icon={<Globe2 className="h-4 w-4" aria-hidden="true" />} label="Members abroad" total={total} of="approved members in five countries"
         focus={focusId ? byId.get(focusId) : undefined} count={stats.length} onOpen={onOpen}
-        tiers={sumTiers(ABROAD_IDS.map((id) => tierCounts.get(id)))} focusTiers={focusId ? (tierCounts.get(focusId) || sumTiers([])) : undefined}
+        tiers={tierCounts.canSee ? sumTiers(ABROAD_IDS.map((id) => tierCounts.m.get(id))) : undefined} focusTiers={tierCounts.canSee && focusId ? (tierCounts.m.get(focusId) || sumTiers([])) : undefined}
+        allMembers={allMembers} cities={focusId ? placeStats?.byCity?.[focusId] : undefined}
         hint="Choose a country on the map to see its members." />
     </div>
   );

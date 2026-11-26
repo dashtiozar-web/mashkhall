@@ -1,0 +1,13 @@
+{
+  "_comment": "Independent administrations of the Kurdistan Region, shown on the home page's Kurdistan map. Members are counted by the city or town they joined from.",
+  "administrations": [
+    { "id": "raparin", "name": "Raparin", "ku": "ڕاپەڕین", "province": "sulaymaniyah", "lng": 44.88, "lat": 36.25,
+      "cities": ["Ranya", "Qaladiza", "Chwarqurna", "Hajiawa", "Sangasar", "Bingird", "Pishdar", "Zharawa", "Betwata"] },
+    { "id": "garmiyan", "name": "Garmiyan", "ku": "گەرمیان", "province": "sulaymaniyah", "lng": 45.32, "lat": 34.63,
+      "cities": ["Kalar", "Kifri", "Khanaqin", "Rizgari", "Bawanur", "Shex Tawil"] },
+    { "id": "zakho", "name": "Zakho", "ku": "زاخۆ", "province": "duhok", "lng": 42.68, "lat": 37.14,
+      "cities": ["Zakho", "Batifa", "Darkar", "Derabun"] },
+    { "id": "soran", "name": "Soran", "ku": "سۆران", "province": "erbil", "lng": 44.55, "lat": 36.65,
+      "cities": ["Soran", "Rawanduz", "Choman", "Sidakan", "Mergasor", "Barzan", "Diana", "Khalifan"] }
+  ]
+}

@@ -15,7 +15,10 @@ import { handleMeetings, runSchedule } from './meetings.js';
 import { logo } from './appreciation.js';
 import { handleMembers } from './members.js';
 import { handleCertificates } from './certificates.js';
-import { PROJECT, DATABASE } from './firestore.js';
+import { PROJECT, DATABASE, queryDocs, commit } from './firestore.js';
+import placesConfig from '../src/config/administrations.json';
+
+const ADMINISTRATIONS = placesConfig.administrations;
 
 export { MeetingRoom } from './meetingRoom.js';
 
@@ -279,6 +282,53 @@ const locate = (request) => {
   return { country, area };
 };
 
+/**
+ * Public numbers of members by province or country, by city or town, and by
+ * independent administration. Only totals: never who is a member of which kind.
+ */
+const placeStats = async (env) => {
+  const cache = caches.default;
+  const key = new Request('https://cache.mashkhall/place-stats');
+  const hit = await cache.match(key);
+  if (hit) return hit;
+  const members = await queryDocs(env, 'members', { where: [['status', '==', 'active']] });
+  const byChapter = {};
+  const byCity = {};
+  const byAdministration = {};
+  const owner = new Map();
+  for (const a of ADMINISTRATIONS) for (const c of a.cities) owner.set(`${a.province}|${c.toLowerCase()}`, a.id);
+  for (const m of members) {
+    const ch = m.chapterId || '';
+    if (!ch) continue;
+    byChapter[ch] = (byChapter[ch] || 0) + 1;
+    const city = String(m.city || '').trim();
+    if (city) {
+      byCity[ch] = byCity[ch] || {};
+      byCity[ch][city] = (byCity[ch][city] || 0) + 1;
+      const adm = owner.get(`${ch}|${city.toLowerCase()}`);
+      if (adm) byAdministration[adm] = (byAdministration[adm] || 0) + 1;
+    }
+  }
+  const out = json({ total: members.filter((m) => m.chapterId).length, byChapter, byCity, byAdministration, updatedAt: new Date().toISOString() }, 200, { 'cache-control': 'public, max-age=120' });
+  await cache.put(key, out.clone());
+  return out;
+};
+
+/**
+ * Kinds of membership were briefly public on member profiles. Move any that
+ * remain to member_tiers (readable only by Pêşeng members and staff).
+ */
+const movePublicTiers = async (env) => {
+  const found = await queryDocs(env, 'public_profiles', { where: [['tier', 'in', ['peshang', 'pishtiwan', 'komar']]], limit: 200 });
+  if (!found.length) return;
+  const ops = [];
+  for (const p of found) {
+    ops.push({ merge: `member_tiers/${p.id}`, data: { id: p.id, tier: p.tier, chapterId: p.chapterId || '', updatedAt: new Date().toISOString() } });
+    ops.push({ update: `public_profiles/${p.id}`, data: {}, remove: ['tier'] });
+  }
+  await commit(env, ops);
+};
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -343,6 +393,7 @@ export default {
 
     if (url.pathname.startsWith('/api/meetings/')) return handleMeetings(request, env);
     if (url.pathname === '/api/logo') return logo(request, env);
+    if (url.pathname === '/api/place-stats') return placeStats(env);
     if (url.pathname.startsWith('/api/members/') || url.pathname.startsWith('/api/verify/')) return handleMembers(request, env);
     if (url.pathname.startsWith('/api/appreciation/')) return handleCertificates(request, env);
 
@@ -353,5 +404,6 @@ export default {
   /** Every five minutes: meeting reminders (see wrangler.jsonc "triggers"). */
   async scheduled(controller, env, ctx) {
     ctx.waitUntil(runSchedule(env).catch((e) => console.error('meeting schedule', e?.stack || e)));
+    ctx.waitUntil(movePublicTiers(env).catch((e) => console.error('tiers', e?.stack || e)));
   },
 };

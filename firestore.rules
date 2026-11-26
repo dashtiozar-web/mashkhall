@@ -388,6 +388,22 @@ service cloud.firestore {
     // Public profiles — the ONLY public view of a member (opt-in)
     // ------------------------------------------------------------------
 
+    // Kind of membership (Pêşeng, Piştîwan, Komar) of each member. Only
+    // Pêşeng members and membership staff may see it; never the public.
+    function isPeshang() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/members/$(uid()))
+        && get(/databases/$(database)/documents/members/$(uid())).data.get('tier', '') == 'peshang'
+        && get(/databases/$(database)/documents/members/$(uid())).data.get('status', '') == 'active';
+    }
+    match /member_tiers/{memberId} {
+      allow read: if isMembershipStaff() || isPeshang();
+      allow create, update: if isMembershipStaff()
+        && request.resource.data.tier in ['peshang', 'pishtiwan', 'komar']
+        && request.resource.data.keys().hasOnly(['id', 'tier', 'chapterId', 'updatedAt']);
+      allow delete: if isMembershipStaff();
+    }
+
     match /public_profiles/{profileId} {
       function selfFieldsOk() {
         return optStr('displayName', 120)

@@ -136,6 +136,10 @@ describe('Promotions and positions (test 2)', () => {
     await call('members/appoint', { seatId: 'production__video_editor', memberId: 'alice', keepOtherPositions: true });
     const leave = await call('members/update', { memberId: 'alice', changes: { tier: 'pishtiwan' } });
     expect(leave.status).toBe(409);
+    // Kinds of membership are private: kept in member_tiers, never on the public profile.
+    await call('members/resync', { memberIds: ['carol'] });
+    expect(fake.get('member_tiers/carol')).toMatchObject({ tier: 'komar' });
+    expect(fake.get('public_profiles/carol')?.tier).toBeUndefined();
   });
 
   it('a Photographer promoted to Media Supervisor leaves the Photographer seat and shows under Media Supervisor', async () => {

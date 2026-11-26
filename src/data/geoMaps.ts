@@ -14,5 +14,7 @@ export const WORLD_COUNTRIES: MapShape[] = [{"id":"NL","name":"Netherlands","d":
 
 /** Where each group sits on the world map, and where Kurdistan is. */
 export const WORLD_POINTS: Record<string, [number, number]> = {"kurdistan":[623.3,225.8],"britain":[495,158.6],"germany":[528.9,168.1],"usa":[227.8,214.2],"canada":[222.2,142.7],"australia":[872.2,407.1]};
+/** Where each independent administration's centre is on the Kurdistan map. */
+export const KURDISTAN_POINTS: Record<string, [number, number]> = {"raparin":[443.8,223.4],"garmiyan":[509.4,519.5],"zakho":[116.2,58],"soran":[394.7,149.3]};
 /** Country codes on the world map for each group abroad. */
 export const WORLD_CODES: Record<string, string> = { britain: 'GB', germany: 'DE', usa: 'US', canada: 'CA', australia: 'AU' };

@@ -224,8 +224,6 @@ export interface PublicProfile {
   photoUrl?: string;
   chapterId: string;
   chapterName: string;
-  /** Kind of membership (see lib/tiers), for the public counts. */
-  tier?: 'peshang' | 'pishtiwan' | 'komar';
   boardTitle?: string;
   isBoardMember?: boolean;
   hierarchyLevel?: MemberHierarchyLevel;

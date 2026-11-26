@@ -197,6 +197,7 @@ export const queryDocs = async (env, collection, { where = [], orderBy = [], lim
  *   { merge: path, data }                     – change these fields, creating the document if needed
  *   { increment: path, fields: { 'points.all': 30 }, data? } – add to numbers (document must exist)
  *   { delete: path }
+ *   merge/update may also carry remove: ['field'] to delete fields
  * Returns false if a `create` found the document already there.
  */
 export const commit = async (env, ops) => {
@@ -218,7 +219,8 @@ export const commit = async (env, ops) => {
       cur[parts[parts.length - 1]] = v;
     }
     const w = { update: { name: `${ROOT}/${path}`, fields: toFields(body) } };
-    if (op.update || op.merge || op.increment) w.updateMask = { fieldPaths: [...Object.keys(nested), ...Object.keys(flat)].map(fieldPath) };
+    // `remove` lists fields to delete: they are in the mask but not in the body.
+    if (op.update || op.merge || op.increment) w.updateMask = { fieldPaths: [...Object.keys(nested), ...Object.keys(flat), ...(op.remove || [])].map(fieldPath) };
     if (op.update || op.increment) w.currentDocument = { exists: true };
     if (op.create) w.currentDocument = { exists: false };
     if (op.increment) {

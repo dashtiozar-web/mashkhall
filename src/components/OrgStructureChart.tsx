@@ -3,6 +3,7 @@ import { Users } from 'lucide-react';
 import { CityChapter, NewsBanner, PublicProfile } from '../types';
 import { positionById } from '../lib/positions';
 import { TIERS, isTier } from '../lib/tiers';
+import { useTiers } from '../lib/useTiers';
 import { Assignment, boardSeats, byId, councilSeats, productionSeats, Seat, webadminSeats } from '../lib/orgStructure';
 import { SEAT_STATUS_LABEL } from '../lib/memberApi';
 import { activityPath } from '../lib/activities';
@@ -171,9 +172,9 @@ const CouncilTeam: React.FC<{ council: CityChapter; ctx: Ctx; activities: NewsBa
 };
 
 /** Every member, in three groups by kind of membership: Pêşeng, Piştîwan and Komar. */
-export const MembersByTier: React.FC<{ profiles: PublicProfile[]; councilName: (id?: string) => string; councilId?: string }> = ({ profiles, councilName, councilId }) => {
+export const MembersByTier: React.FC<{ profiles: PublicProfile[]; councilName: (id?: string) => string; councilId?: string; tierOf: (id: string) => string | undefined }> = ({ profiles, councilName, councilId, tierOf }) => {
   const shown = profiles.filter((p) => (p as { membershipStatus?: string }).membershipStatus !== 'suspended' && (!councilId || p.chapterId === councilId));
-  const groups = [...TIERS.map((t) => ({ t, people: shown.filter((p) => p.tier === t.id) })), { t: undefined, people: shown.filter((p) => !isTier(p.tier)) }]
+  const groups = [...TIERS.map((t) => ({ t, people: shown.filter((p) => tierOf(p.id) === t.id) })), { t: undefined, people: shown.filter((p) => !isTier(tierOf(p.id))) }]
     .filter((g) => g.t || g.people.length);
   return (
     <div className="grid gap-5 lg:grid-cols-3">
@@ -218,6 +219,7 @@ export const OrgStructureChart: React.FC<ChartProps> = ({ assignments, profiles,
   const profileMap = useMemo(() => new Map(profiles.map((p) => [p.id, p])), [profiles]);
   const councilName = (id?: string) => councils.find((c) => c.id === id)?.name || id || '';
   const ctx: Ctx = { seats: seatsMap, profile: (id) => profileMap.get(id), councilName, renderAction, admin };
+  const tierView = useTiers();
   const [selected, setSelected] = useState(initialCouncil || councils[0]?.id || '');
   const council = councils.find((c) => c.id === selected) || councils[0];
   const board = boardSeats();
@@ -275,11 +277,12 @@ export const OrgStructureChart: React.FC<ChartProps> = ({ assignments, profiles,
         )}
       </section>
 
-      {/* Part 3 */}
-      <section aria-labelledby="org-tiers">
+      {/* Part 3: only Pêşeng members and staff see who is of which kind */}
+      {tierView.canSee && <section aria-labelledby="org-tiers">
         <SectionHead n={3} id="org-tiers" title="Members by kind of membership" intro="Every member belongs to one of three groups: Pêşeng, who carry the movement’s work and take on positions; Piştîwan, who support it; and Komar, who give it their vote." />
-        <MembersByTier profiles={profiles} councilName={councilName} />
-      </section>
+        <MembersByTier profiles={profiles} councilName={councilName} tierOf={tierView.tierOf} />
+        <p className="mt-3 text-[0.875rem] text-muted">Only Pêşeng members and the membership team can see this part.</p>
+      </section>}
 
       {/* Part 4 */}
       <section aria-labelledby="org-production">

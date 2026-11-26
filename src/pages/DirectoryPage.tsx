@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { TIERS, isTier } from '../lib/tiers';
+import { useTiers } from '../lib/useTiers';
 import { Search } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { Button, Container, EmptyState, PageHeader, SectionHeading } from '../components/ui';
@@ -45,12 +46,15 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
     });
   }, [publicProfiles, chapterFilter, search]);
 
-  // Members are shown in three groups by kind of membership: Pêşeng, Piştîwan and Komar.
+  // Pêşeng members and staff see members in three groups: Pêşeng, Piştîwan and Komar.
+  const tierView = useTiers();
   const bySeniority = (a: PublicProfile, b: PublicProfile) => (a.displayRankOrder ?? 99) - (b.displayRankOrder ?? 99) || a.displayName.localeCompare(b.displayName);
-  const grouped = [
-    ...TIERS.map((t) => ({ level: t.id, title: t.name, ku: t.ku, colour: t.colour, description: t.description, people: filtered.filter((p) => p.tier === t.id).sort(bySeniority) })),
-    { level: 'unset', title: 'Kind of membership not yet set', ku: '', colour: '', description: '', people: filtered.filter((p) => !isTier(p.tier)).sort(bySeniority) },
-  ].filter((g) => g.people.length > 0);
+  const grouped = tierView.canSee ? [
+    ...TIERS.map((t) => ({ level: t.id, title: t.name, ku: t.ku, colour: t.colour, description: t.description, people: filtered.filter((p) => tierView.tierOf(p.id) === t.id).sort(bySeniority) })),
+    { level: 'unset', title: 'Kind of membership not yet set', ku: '', colour: '', description: '', people: filtered.filter((p) => !isTier(tierView.tierOf(p.id))).sort(bySeniority) },
+  ].filter((g) => g.people.length > 0)
+    // Visitors, Piştîwan and Komar see every member in one list: kinds of membership are private.
+    : [{ level: 'all', title: 'Members', ku: '', colour: '', description: '', people: [...filtered].sort(bySeniority) }].filter((g) => g.people.length > 0);
 
   return (
     <>
@@ -104,7 +108,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
         <Container className="py-16 sm:py-20">
           <SectionHeading
             title="Our people"
-            intro="Every approved member of Mashkhally Zhyanawa, in three groups by kind of membership: Pêşeng, Piştîwan and Komar."
+            intro="Every approved member of Mashkhally Zhyanawa."
           />
 
           {publicProfiles.length > 0 && (

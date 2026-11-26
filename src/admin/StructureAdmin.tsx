@@ -1,4 +1,5 @@
 import { canHoldPositions } from '../lib/tiers';
+import { useTiers } from '../lib/useTiers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Search, UserPlus, UserMinus, X } from 'lucide-react';
@@ -174,12 +175,13 @@ const Picker: React.FC<{
   onPick: (p: PublicProfile, opts: { keepOtherPositions: boolean; reason: string }) => void;
 }> = ({ seat, current, rows, profiles, wants, councilName, busy, onClose, onPick }) => {
   const [q, setQ] = useState('');
+  const { tierOf } = useTiers();
   const [keep, setKeep] = useState(false);
   const [reason, setReason] = useState('');
   const eligible = profiles
     .filter((p) => seat.unit !== 'council' || p.chapterId === seat.councilId)
     // Only Pêşeng members take on positions.
-    .filter((p) => canHoldPositions(p.tier))
+    .filter((p) => canHoldPositions(tierOf(p.id)))
     .filter((p) => !q.trim() || p.displayName.toLowerCase().includes(q.trim().toLowerCase()))
     .sort((a, b) => Number(wants.get(b.id) === seat.positionId) - Number(wants.get(a.id) === seat.positionId) || a.displayName.localeCompare(b.displayName));
 

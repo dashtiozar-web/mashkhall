@@ -207,7 +207,6 @@ export const syncOps = async (env, m, held, chapters, { previousNumber, strictTi
         photoUrl: m.photoUrl || '',
         chapterId: m.chapterId || '',
         chapterName: council?.name || m.chapterId || '',
-        ...(['peshang', 'pishtiwan', 'komar'].includes(m.tier) ? { tier: m.tier } : {}),
         bio: m.bio || '',
         expertise: m.expertise || '',
         positionId: pos.id,
@@ -218,9 +217,18 @@ export const syncOps = async (env, m, held, chapters, { previousNumber, strictTi
         ...(profile ? {} : { listedAt: t }),
         updatedAt: t,
       },
+      // The kind of membership is never public (see member_tiers).
+      remove: ['tier'],
     });
-  } else if (profile) {
-    ops.push({ delete: `public_profiles/${m.id}` });
+    // Kind of membership: readable only by Pêşeng members and staff.
+    if (['peshang', 'pishtiwan', 'komar'].includes(m.tier)) {
+      ops.push({ set: `member_tiers/${m.id}`, data: { id: m.id, tier: m.tier, chapterId: m.chapterId || '', updatedAt: t } });
+    } else {
+      ops.push({ delete: `member_tiers/${m.id}` });
+    }
+  } else {
+    if (profile) ops.push({ delete: `public_profiles/${m.id}` });
+    ops.push({ delete: `member_tiers/${m.id}` });
   }
 
   if (MEMBER_NUMBER.test(m.memberNumber || '') && m.credentialIssuedAt) {

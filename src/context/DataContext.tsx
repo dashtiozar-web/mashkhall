@@ -456,7 +456,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
               photoUrl: app.photoUrl || '',
               chapterId: app.chapterId,
               chapterName: chapter?.name || app.chapterId,
-              ...(app.tier ? { tier: app.tier } : {}),
               positionId: memberRecord.positionId,
               department: memberRecord.department,
               designation: memberRecord.designation,
@@ -466,6 +465,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
               updatedAt: now,
             };
             tx.set(doc(db, 'public_profiles', memberId), cleanFirestoreData(pubProfile), { merge: true });
+            // The kind of membership is private: only Pêşeng members and staff can read it.
+            if (app.tier) tx.set(doc(db, 'member_tiers', memberId), { id: memberId, tier: app.tier, chapterId: app.chapterId, updatedAt: new Date().toISOString() });
           }
         });
 
