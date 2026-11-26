@@ -13,9 +13,6 @@ import { useData } from '../context/DataContext';
 import { councilStats, CouncilStat, GROWTH_DAYS, HEAT_LEGEND } from '../lib/councilStats';
 import { ABROAD_IDS, COUNTRIES, PROVINCES, PROVINCE_IDS } from '../lib/places';
 import { TIERS } from '../lib/tiers';
-import {
-  KURDISTAN_NEIGHBOURS, KURDISTAN_POINTS, KURDISTAN_REGIONS, KURDISTAN_VIEWBOX, MapShape,
-} from '../data/geoMaps';
 
 /*
  * Two live maps of where our members are: the five provinces of Kurdistan,
@@ -26,14 +23,6 @@ import {
 interface Node { stat: CouncilStat; x: number; y: number }
 
 const kuName = (id: string) => PROVINCES.find((p) => p.id === id)?.ku || COUNTRIES.find((c) => c.id === id)?.ku || '';
-
-const curve = (a: { x: number; y: number }, b: { x: number; y: number }, bend = 0.12) => {
-  const mx = (a.x + b.x) / 2;
-  const my = (a.y + b.y) / 2;
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  return `M${a.x},${a.y} Q${mx - dy * bend},${my + dx * bend} ${b.x},${b.y}`;
-};
 
 const useGroupStats = (ids: string[]) => {
   const { chapters, publicProfiles } = useData();
@@ -124,50 +113,32 @@ const Legend: React.FC<{ note: React.ReactNode; dark?: boolean }> = ({ note, dar
   </figcaption>
 );
 
-/** A glossy round button with the number of members, and the place's name beside it. */
-const Marker: React.FC<{
-  n: Node; r: number; on: boolean; labelLeft: boolean; font: number; below?: boolean; delay?: number;
-  onHover: (id: string | null) => void; onPick: (id: string) => void; picked: boolean;
-}> = ({ n, r, on, labelLeft, font, below, delay = 0, onHover, onPick, picked }) => {
-  const id = n.stat.council.id;
-  return (
-    <g role="button" tabIndex={0} aria-label={`${n.stat.council.name}: ${n.stat.members} members, ranked ${n.stat.rank}`}
-      aria-pressed={picked} className="cursor-pointer focus:outline-none"
-      onMouseEnter={() => onHover(id)} onMouseLeave={() => onHover(null)} onFocus={() => onHover(id)} onBlur={() => onHover(null)}
-      onClick={() => onPick(id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(id); } }}>
-      <ellipse cx={n.x} cy={n.y + r * 1.0} rx={r * 1.05} ry={r * 0.34} fill="#000" opacity={0.5} filter="url(#mm-soft)" />
-      <g className="mm-bob" style={{ animationDelay: `${delay}s` }}>
-        <circle cx={n.x} cy={n.y} r={r * 1.55} fill={n.stat.colour} fillOpacity={on ? 0.45 : 0.22} className="map-pulse" style={{ animationDelay: `${delay}s` }} />
-        {/* Rim, face and shine, like a raised glass button */}
-        <circle cx={n.x} cy={n.y} r={r * 1.12} fill="url(#mm-rim)" filter="url(#mm-shadow)" />
-        <circle cx={n.x} cy={n.y} r={r * 0.9} fill={n.stat.colour} />
-        <circle cx={n.x} cy={n.y} r={r * 0.9} fill="url(#mm-pin)" />
-        <ellipse cx={n.x} cy={n.y - r * 0.45} rx={r * 0.6} ry={r * 0.3} fill="#fff" opacity={0.35} />
-        {on && <circle cx={n.x} cy={n.y} r={r * 1.14} fill="none" stroke="#FFE08A" strokeWidth={3} />}
-        <text x={n.x} y={n.y + font * 0.4} textAnchor="middle" className="pointer-events-none fill-white font-sans font-extrabold" style={{ fontSize: font * 1.15, paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.45)', strokeWidth: 2.5 }}>{n.stat.members}</text>
-        <text x={below ? n.x : labelLeft ? n.x - r * 1.2 - font * 0.35 : n.x + r * 1.2 + font * 0.35} y={below ? n.y + r * 1.2 + font * 1.35 : n.y + font * 0.45} textAnchor={below ? 'middle' : labelLeft ? 'end' : 'start'}
-          className="pointer-events-none fill-white font-sans font-extrabold"
-          style={{ fontSize: font * 1.35, paintOrder: 'stroke', stroke: 'rgba(10,8,4,0.9)', strokeWidth: font * 0.32, strokeLinejoin: 'round' }}>
-          {n.stat.council.name}
-        </text>
-      </g>
-    </g>
-  );
+/*
+ * The Kurdistan map is the designed picture itself (public/images/kurdistan-members-map.jpg).
+ * Live numbers are written into its buttons and diamonds at these points
+ * (in the picture's 1536 × 1024 pixels), and motion is laid over it.
+ */
+const KMAP = { w: 1536, h: 1024 };
+const KMAP_BUTTONS: Record<string, { x: number; y: number; r: number }> = {
+  duhok: { x: 393, y: 233, r: 40 },
+  erbil: { x: 727, y: 380, r: 38 },
+  sulaymaniyah: { x: 943, y: 567, r: 58 },
+  kirkuk: { x: 536, y: 623, r: 40 },
+  halabja: { x: 1278, y: 671, r: 37 },
 };
-
-/** Fixed points for the golden network drawn over the dark ground. */
-const NETWORK = (() => {
-  let seed = 7;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  const pts = Array.from({ length: 46 }, () => [rnd() * KURDISTAN_VIEWBOX.width, rnd() * KURDISTAN_VIEWBOX.height] as [number, number]);
-  const lines: [number, number][] = [];
-  pts.forEach((p, i) => {
-    pts.map((q, j) => [j, Math.hypot(p[0] - q[0], p[1] - q[1])] as [number, number])
-      .filter(([j]) => j !== i).sort((x, y) => x[1] - y[1]).slice(0, 2)
-      .forEach(([j]) => { if (!lines.some(([a, b]) => (a === j && b === i))) lines.push([i, j]); });
-  });
-  return { pts, lines };
-})();
+const KMAP_DIAMONDS: Record<string, { x: number; y: number; s: number }> = {
+  zakho: { x: 270, y: 208, s: 17 },
+  soran: { x: 776, y: 300, s: 19 },
+  raparin: { x: 948, y: 420, s: 18 },
+  garmiyan: { x: 1079, y: 817, s: 21 },
+};
+/** Golden lights of the network and along the map's edges, which twinkle. */
+const KMAP_LIGHTS: [number, number][] = [
+  [533, 862], [659, 935], [785, 905], [870, 858], [975, 945], [1470, 820], [598, 947], [466, 915], [393, 885], [1290, 905],
+  [706, 172], [905, 296], [1368, 552], [1408, 708], [1110, 893], [152, 236], [458, 555], [840, 505],
+];
+/** Specks of golden dust drifting up through the light. */
+const KMAP_DUST = Array.from({ length: 18 }, (_, i) => ({ x: 80 + ((i * 397) % 1400), y: 980 - ((i * 211) % 380), d: (i % 6) * 1.3, t: 9 + (i % 5) * 2 }));
 
 /** The side panel: a total, and the details of the place chosen on the map. */
 const Panel: React.FC<{
@@ -219,161 +190,109 @@ export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> 
   const [selected, setSelected] = useState<string | null>(null);
   const focusId = hover || selected;
   const byId = new Map(stats.map((s) => [s.council.id, s]));
-  const nodes: Node[] = KURDISTAN_REGIONS.filter((r) => r.province && byId.has(r.id))
-    .map((r) => ({ stat: byId.get(r.id)!, x: r.c![0], y: r.c![1] }));
-  // Halabja is small: its circle sits on the province itself, Sulaymaniyah's a little apart.
-  const place = (n: Node) => (n.stat.council.id === 'sulaymaniyah' ? { ...n, x: n.x - 40, y: n.y - 10 } : n);
-  const placed = nodes.map(place);
   const order = ['duhok', 'erbil', 'sulaymaniyah', 'halabja', 'kirkuk'];
-  const links: [string, string][] = [['duhok', 'erbil'], ['erbil', 'sulaymaniyah'], ['erbil', 'kirkuk'], ['kirkuk', 'sulaymaniyah'], ['sulaymaniyah', 'halabja']];
-  const at = (id: string) => placed.find((n) => n.stat.council.id === id);
-  const max = Math.max(1, ...stats.map((s) => s.members));
-  const radius = (n: number) => 20 + 14 * Math.sqrt(n / max);
   const total = stats.reduce((a, s) => a + s.members, 0);
-  const zoom = useSvgZoom(KURDISTAN_VIEWBOX.width, KURDISTAN_VIEWBOX.height);
-  const label = (s: MapShape) => s.name.replace(/[ʾʿ’‘]/g, '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const zoom = useSvgZoom(KMAP.w, KMAP.h);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
-      <figure className="relative m-0 overflow-hidden rounded-3xl border border-[#3a2a12] bg-[radial-gradient(ellipse_at_50%_35%,#2b2418_0%,#14110c_55%,#070605_100%)] p-2 text-white sm:p-4" style={{ perspective: '1300px' }}>
+      <figure className="relative m-0 overflow-hidden rounded-3xl border border-[#3a2a12] bg-[#0b0906] text-white">
         <ZoomControls {...zoom.controls} />
-        {/* The map stands like a golden relief model, swaying gently in the light. */}
-        <div className="mm-sway" style={{ transformOrigin: '50% 60%', transformStyle: 'preserve-3d' }}>
-        <svg viewBox={`0 0 ${KURDISTAN_VIEWBOX.width} ${KURDISTAN_VIEWBOX.height}`} role="group" aria-label="Map of the five provinces of Kurdistan showing our members"
-          className="mx-auto block h-auto max-h-[78vh] w-full select-none" style={zoom.style} {...zoom.handlers}>
+        <svg viewBox={`0 0 ${KMAP.w} ${KMAP.h}`} role="group" aria-label="Map of the five provinces of Kurdistan showing our members"
+          className="block h-auto w-full select-none" style={zoom.style} {...zoom.handlers}>
           <defs>
-            <filter id="mm-shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="4" stdDeviation="3.5" floodOpacity="0.6" /></filter>
-            <filter id="mm-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" /></filter>
-            <filter id="mm-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4" /></filter>
-            <clipPath id="mm-k-clip"><rect width={KURDISTAN_VIEWBOX.width} height={KURDISTAN_VIEWBOX.height} /></clipPath>
-            {/* Mountains and valleys, lit from the north-west */}
-            <filter id="mm-relief" x="0" y="0" width="100%" height="100%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="6" seed="11" result="n" />
-              <feDiffuseLighting in="n" surfaceScale="5.5" diffuseConstant="1.25" lightingColor="#ffffff" result="l">
-                <feDistantLight azimuth="225" elevation="35" />
-              </feDiffuseLighting>
-              <feComposite in="l" in2="SourceGraphic" operator="arithmetic" k1="1.35" k2="0" k3="0" k4="0" result="lit" />
-              <feComposite in="lit" in2="SourceGraphic" operator="in" />
-              <feColorMatrix type="saturate" values="1.5" />
-            </filter>
-            <filter id="mm-ground" x="0" y="0" width="100%" height="100%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="5" seed="4" result="n" />
-              <feDiffuseLighting in="n" surfaceScale="6" diffuseConstant="1" lightingColor="#d8c29a" result="l">
-                <feDistantLight azimuth="235" elevation="30" />
-              </feDiffuseLighting>
-              <feComposite in="l" in2="SourceGraphic" operator="arithmetic" k1="1.1" k2="0" k3="0" k4="0" result="lit" />
-              <feComposite in="lit" in2="SourceGraphic" operator="in" />
-            </filter>
-            <radialGradient id="mm-pin" cx="35%" cy="30%" r="70%">
-              <stop offset="0" stopColor="#ffffff" stopOpacity="0.6" />
-              <stop offset="0.4" stopColor="#ffffff" stopOpacity="0.05" />
+            <radialGradient id="km-face" cx="40%" cy="35%" r="70%">
+              <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
+              <stop offset="0.5" stopColor="#ffffff" stopOpacity="0" />
               <stop offset="1" stopColor="#000000" stopOpacity="0.45" />
             </radialGradient>
-            <linearGradient id="mm-rim" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#ffffff" />
-              <stop offset="0.5" stopColor="#d9d4c8" />
-              <stop offset="1" stopColor="#6d665a" />
+            <radialGradient id="km-sun" cx="78%" cy="8%" r="45%">
+              <stop offset="0" stopColor="#FFB347" stopOpacity="0.55" />
+              <stop offset="1" stopColor="#FFB347" stopOpacity="0" />
+            </radialGradient>
+            <radialGradient id="km-spark">
+              <stop offset="0" stopColor="#FFF4C2" />
+              <stop offset="0.35" stopColor="#FFD36B" stopOpacity="0.9" />
+              <stop offset="1" stopColor="#FFB000" stopOpacity="0" />
+            </radialGradient>
+            <linearGradient id="km-sheen" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#FFF1C8" stopOpacity="0" />
+              <stop offset="0.5" stopColor="#FFF1C8" stopOpacity="0.16" />
+              <stop offset="1" stopColor="#FFF1C8" stopOpacity="0" />
             </linearGradient>
-            <linearGradient id="mm-sheen" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#fff6d8" stopOpacity="0" />
-              <stop offset="0.5" stopColor="#fff6d8" stopOpacity="0.28" />
-              <stop offset="1" stopColor="#fff6d8" stopOpacity="0" />
-            </linearGradient>
-            <mask id="mm-land">
-              {KURDISTAN_REGIONS.filter((r) => r.province).map((r) => <path key={r.id} d={r.d} fill="#fff" />)}
-            </mask>
+            {/* The flags ripple in the wind */}
+            <filter id="km-wave" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.006 0.02" numOctaves="2" seed="3" result="t">
+                <animate attributeName="baseFrequency" dur="7s" values="0.006 0.02;0.009 0.026;0.006 0.02" repeatCount="indefinite" />
+              </feTurbulence>
+              <feDisplacementMap in="SourceGraphic" in2="t" scale="14" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <clipPath id="km-flag-top"><path d="M0 0 H215 Q245 120 235 205 L0 150 Z" /></clipPath>
+            <clipPath id="km-flag-bottom"><path d="M0 860 Q260 830 470 905 L520 1024 H0 Z" /></clipPath>
+            <clipPath id="km-frame"><rect width={KMAP.w} height={KMAP.h} /></clipPath>
           </defs>
-          <g clipPath="url(#mm-k-clip)">
+          <g clipPath="url(#km-frame)">
           <g transform={zoom.transform}>
-            {/* Dark ground around Kurdistan */}
-            <rect x={-200} y={-200} width={KURDISTAN_VIEWBOX.width + 400} height={KURDISTAN_VIEWBOX.height + 400} fill="#17130d" />
-            <g filter="url(#mm-ground)">
-              {KURDISTAN_NEIGHBOURS.map((r) => (
-                <path key={r.id} d={r.d} fill="#4a4033" stroke="#2a2219" strokeWidth={1}><title>{r.name}</title></path>
+          <g className="km-drift">
+            <image href="/images/kurdistan-members-map.jpg" width={KMAP.w} height={KMAP.h} preserveAspectRatio="none" />
+            <g className="km-flag" aria-hidden="true">
+              <image href="/images/kurdistan-members-map.jpg" width={KMAP.w} height={KMAP.h} clipPath="url(#km-flag-top)" filter="url(#km-wave)" />
+              <image href="/images/kurdistan-members-map.jpg" width={KMAP.w} height={KMAP.h} clipPath="url(#km-flag-bottom)" filter="url(#km-wave)" />
+            </g>
+            {/* The sunset breathing behind the citadel, and light passing over the land */}
+            <rect width={KMAP.w} height={KMAP.h} fill="url(#km-sun)" className="km-sunset" pointerEvents="none" style={{ mixBlendMode: 'screen' }} />
+            <g transform="skewX(-16)" pointerEvents="none" aria-hidden="true" style={{ mixBlendMode: 'screen' }}>
+              <rect x={-420} y={-60} width={300} height={KMAP.h + 120} fill="url(#km-sheen)" className="km-sheen" />
+            </g>
+            <g pointerEvents="none" aria-hidden="true">
+              {KMAP_LIGHTS.map(([x, y], i) => (
+                <circle key={i} cx={x} cy={y} r={14} fill="url(#km-spark)" className="mm-twinkle" style={{ animationDelay: `${(i % 7) * 0.55}s`, mixBlendMode: 'screen' }} />
               ))}
-              {KURDISTAN_REGIONS.filter((r) => !r.province).map((r) => <path key={r.id} d={r.d} fill="#4a4033" stroke="#2a2219" strokeWidth={1}><title>{label(r)}</title></path>)}
-            </g>
-            {/* A golden network across the ground, its lights twinkling */}
-            <g aria-hidden="true" pointerEvents="none">
-              {NETWORK.lines.map(([i, j]) => (
-                <line key={`${i}-${j}`} x1={NETWORK.pts[i][0]} y1={NETWORK.pts[i][1]} x2={NETWORK.pts[j][0]} y2={NETWORK.pts[j][1]} stroke="#E8B84A" strokeOpacity={0.22} strokeWidth={0.8} />
-              ))}
-              {NETWORK.pts.map(([x, y], i) => (
-                <circle key={i} cx={x} cy={y} r={2.2} fill="#FFD36B" className="mm-twinkle" style={{ animationDelay: `${(i % 9) * 0.45}s` }} />
+              {KMAP_DUST.map((d, i) => (
+                <circle key={`d${i}`} cx={d.x} cy={d.y} r={2.4} fill="#FFD36B" className="km-dust" style={{ animationDelay: `${d.d}s`, animationDuration: `${d.t}s` }} />
               ))}
             </g>
-            {/* The land's thickness: golden sides, the provinces standing up from the ground */}
-            {Array.from({ length: 12 }, (_, i) => 12 - i).map((dy) => (
-              <g key={dy} transform={`translate(0 ${dy * 1.6})`} aria-hidden="true">
-                {KURDISTAN_REGIONS.filter((r) => r.province).map((r) => (
-                  <path key={r.id} d={r.d} fill={dy > 9 ? '#2a1a06' : `hsl(40 ${60 + dy}% ${52 - dy * 3.2}%)`} stroke={dy > 9 ? 'none' : '#f6d27a'} strokeOpacity={0.25} strokeWidth={0.6} />
-                ))}
-              </g>
-            ))}
-            {/* A golden glow around the edges, breathing slowly */}
-            <g className="mm-glow" aria-hidden="true" pointerEvents="none" filter="url(#mm-glow)">
-              {KURDISTAN_REGIONS.filter((r) => r.province).map((r) => <path key={r.id} d={r.d} fill="none" stroke="#FFC94D" strokeWidth={6} />)}
-            </g>
-            <g filter="url(#mm-relief)">
-              {KURDISTAN_REGIONS.filter((r) => r.province).map((r) => {
-                const s = byId.get(r.id);
-                const on = s && focusId === s.council.id;
-                return (
-                  <path key={r.id} d={r.d}
-                    fill={s ? s.colour : '#5a7a3a'} fillOpacity={on ? 1 : 0.96}
-                    className="cursor-pointer"
-                    onMouseEnter={() => s && setHover(s.council.id)} onMouseLeave={() => setHover(null)}
-                    onClick={() => s && setSelected(s.council.id)}>
-                    <title>{s ? `${s.council.name}: ${s.members} members` : label(r)}</title>
-                  </path>
-                );
-              })}
-            </g>
-            {KURDISTAN_REGIONS.filter((r) => r.province).map((r) => {
-              const on = focusId === r.id;
-              return <path key={`edge-${r.id}`} d={r.d} fill="none" stroke={on ? '#FFF3C4' : '#FFD873'} strokeWidth={on ? 3.2 : 1.8} strokeLinejoin="round" pointerEvents="none" />;
-            })}
-            {/* Light passing slowly over the land */}
-            <g mask="url(#mm-land)" pointerEvents="none" aria-hidden="true">
-              <g transform="skewX(-18)"><rect x={-260} y={-100} width={220} height={KURDISTAN_VIEWBOX.height + 200} fill="url(#mm-sheen)" className="mm-sheen" /></g>
-            </g>
-            {/* The provinces joined together */}
-            {links.map(([a, b]) => {
-              const A = at(a); const B = at(b);
-              if (!A || !B) return null;
-              const lit = focusId === a || focusId === b;
-              return <path key={`${a}-${b}`} d={curve(A, B)} fill="none" stroke={lit ? '#FFF3C4' : '#FFD873'}
-                strokeOpacity={focusId && !lit ? 0.3 : 0.75} strokeWidth={lit ? 3.5 : 2} strokeLinecap="round" className="map-flow" />;
+            {/* The live number of members on each province's button */}
+            {order.map((id, i) => {
+              const b = KMAP_BUTTONS[id];
+              const st = byId.get(id);
+              if (!b || !st) return null;
+              const on = focusId === id;
+              return (
+                <g key={id} role="button" tabIndex={0} aria-label={`${st.council.name}: ${st.members} members, ranked ${st.rank}`} aria-pressed={selected === id}
+                  className="cursor-pointer focus:outline-none"
+                  onMouseEnter={() => setHover(id)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(id)} onBlur={() => setHover(null)}
+                  onClick={() => setSelected(id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(id); } }}>
+                  <circle cx={b.x} cy={b.y} r={b.r * 1.15} fill="none" stroke={st.colour} strokeWidth={5} className="km-ring" style={{ animationDelay: `${i * 0.5}s` }} />
+                  <circle cx={b.x} cy={b.y} r={b.r * 0.8} fill={st.colour} />
+                  <circle cx={b.x} cy={b.y} r={b.r * 0.8} fill="#001a05" fillOpacity={0.38} />
+                  <circle cx={b.x} cy={b.y} r={b.r * 0.8} fill="url(#km-face)" />
+                  {on && <circle cx={b.x} cy={b.y} r={b.r * 1.08} fill="none" stroke="#FFF3C4" strokeWidth={4} />}
+                  <text x={b.x} y={b.y + b.r * 0.33} textAnchor="middle" className="pointer-events-none fill-white font-sans font-bold"
+                    style={{ fontSize: b.r * (st.members > 99 ? 0.62 : st.members > 9 ? 0.78 : 0.95), paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.35)', strokeWidth: 3 }}>{st.members}</text>
+                </g>
+              );
             })}
             {/* Independent administrations: Raparin, Garmiyan, Zakho and Soran */}
-            {ADMINISTRATIONS.map((a, i) => {
-              const [x, y] = KURDISTAN_POINTS[a.id] || [0, 0];
+            {ADMINISTRATIONS.map((a) => {
+              const d = KMAP_DIAMONDS[a.id];
+              if (!d) return null;
               const n = placeStats?.byAdministration?.[a.id] || 0;
               const on = focusAdm === a.id;
               return (
                 <g key={a.id} role="button" tabIndex={0} className="cursor-pointer focus:outline-none" aria-label={`${a.name} independent administration: ${n} members`}
                   onMouseEnter={() => setFocusAdm(a.id)} onMouseLeave={() => setFocusAdm(null)} onFocus={() => setFocusAdm(a.id)} onBlur={() => setFocusAdm(null)}
                   onClick={() => setFocusAdm(a.id)}>
-                  <g className="mm-bob" style={{ animationDelay: `${0.6 + i * 0.7}s` }}>
-                    <rect x={x - 15} y={y - 15} width={30} height={30} rx={6} transform={`rotate(45 ${x} ${y})`} fill="#0b0906" stroke={on ? '#FFD873' : '#ffffff'} strokeWidth={on ? 4 : 3} filter="url(#mm-shadow)" />
-                    <text x={x} y={y + 6} textAnchor="middle" className="pointer-events-none fill-white font-sans font-bold" style={{ fontSize: 16 }}>{n}</text>
-                    <text x={a.id === 'raparin' ? x + 24 : x} y={a.id === 'raparin' ? y + 6 : a.id === 'zakho' ? y + 40 : y - 26} textAnchor={a.id === 'raparin' ? 'start' : 'middle'} className="pointer-events-none fill-white font-sans font-bold"
-                      style={{ fontSize: 18, paintOrder: 'stroke', stroke: 'rgba(10,8,4,0.9)', strokeWidth: 5, strokeLinejoin: 'round' }}>{a.name}</text>
-                  </g>
+                  <rect x={d.x - d.s} y={d.y - d.s} width={d.s * 2} height={d.s * 2} rx={3} transform={`rotate(45 ${d.x} ${d.y})`} fill="#050505" stroke={on ? '#FFD873' : 'none'} strokeWidth={4} />
+                  <text x={d.x} y={d.y + d.s * 0.45} textAnchor="middle" className="pointer-events-none fill-white font-sans font-bold" style={{ fontSize: d.s * 1.25 }}>{n}</text>
                 </g>
               );
             })}
-            {order.map((id, i) => {
-              const n = at(id);
-              if (!n) return null;
-              return <Marker key={id} n={n} r={radius(n.stat.members)} on={focusId === id} picked={selected === id} delay={i * 0.55}
-                labelLeft={id === 'kirkuk'} below={id === 'halabja'} font={22} onHover={setHover} onPick={setSelected} />;
-            })}
+          </g>
           </g>
           </g>
         </svg>
-        </div>
-        <Legend dark note={<>Circles show the members in each province; diamonds show the independent administrations of Raparin, Garmiyan, Zakho and Soran. Use + and − to zoom; drag to move the map when zoomed in. Map data: <a href="https://www.amcharts.com/" target="_blank" rel="noopener noreferrer" className="underline">amCharts</a>.</>} />
+        <p className="px-4 py-3 text-[0.75rem] text-white/70">Numbers are live: circles show the members in each province, diamonds the independent administrations of Raparin, Garmiyan, Zakho and Soran. Use + and − to zoom; drag to move the map when zoomed in.</p>
         {focusAdm && (() => {
           const a = ADMINISTRATIONS.find((x) => x.id === focusAdm)!;
           const n = placeStats?.byAdministration?.[a.id] || 0;
