@@ -1,7 +1,7 @@
 import React, { Suspense, lazy, useMemo } from 'react';
 import { HandHeart, Landmark, Scale, BookOpen, Users } from 'lucide-react';
 import { useData } from '../context/DataContext';
-import { Button, Container, EmptyState, SectionHeading, TextLink, categoryLabel, formatDate } from '../components/ui';
+import { Button, Container, EmptyState, Logo, SectionHeading, TextLink, categoryLabel, formatDate } from '../components/ui';
 import { Article } from '../types';
 import { CouncilRanking } from '../components/UKCouncilMap';
 
@@ -61,7 +61,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         .sort((a, b) => (b.publishedAt || b.createdAt || '').localeCompare(a.publishedAt || a.createdAt || '')),
     [articles],
   );
-  const [lead, ...more] = published;
+  /** The ten newest articles shown on the home page. */
+  const latest = published.slice(0, 10);
   const areas = siteSettings.areasOfWork || [];
 
   return (
@@ -203,42 +204,32 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             }
           />
 
-          {lead ? (
-            <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr]">
-              <article>
-                <a href={`/news/${encodeURIComponent(lead.slug || lead.id)}`} className="group block no-underline">
-                  {lead.coverImageUrl && (
-                    <MediaImage
-                      src={lead.coverImageUrl}
-                      alt={lead.coverImageAlt || ''}
-                      className="mb-6 aspect-[16/9] w-full rounded-2xl object-cover"
-                      loading="lazy"
-                    />
-                  )}
-                  <ArticleMeta article={lead} />
-                  <h3 dir="auto" className="mt-3 text-[1.75rem] leading-tight font-semibold group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4 sm:text-[2.125rem]">
-                    {lead.title}
-                  </h3>
-                  {lead.excerpt && <p dir="auto" className="mt-4 max-w-[60ch] text-[1.0625rem] text-ink-soft">{lead.excerpt}</p>}
-                  {lead.authorDisplayName && <p className="mt-4 text-[0.9375rem] text-muted">By {lead.authorDisplayName}</p>}
-                </a>
-              </article>
-
-              {more.length > 0 && (
-                <ul className="divide-y divide-line rounded-2xl border border-line bg-surface px-6">
-                  {more.slice(0, 4).map((a) => (
-                    <li key={a.id}>
-                      <a href={`/news/${encodeURIComponent(a.slug || a.id)}`} className="group block py-5 no-underline">
-                        <ArticleMeta article={a} />
-                        <h3 dir="auto" className="mt-1.5 text-[1.1875rem] leading-snug font-semibold group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
-                          {a.title}
-                        </h3>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+          {latest.length > 0 ? (
+            /* The newest ten, side by side, so earlier articles stay easy to find. */
+            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {latest.map((a) => (
+                <li key={a.id} className="min-w-0">
+                  <a href={`/news/${encodeURIComponent(a.slug || a.id)}`}
+                    className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface no-underline transition-shadow hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                    {a.coverImageUrl ? (
+                      <MediaImage src={a.coverImageUrl} alt={a.coverImageAlt || ''} className="aspect-[16/10] w-full object-cover" loading="lazy" />
+                    ) : (
+                      <div className="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-[#3A1A10] via-[#7A2414] to-[#B3261E]" aria-hidden="true">
+                        <Logo size={56} />
+                      </div>
+                    )}
+                    <div className="flex flex-1 flex-col p-4">
+                      <ArticleMeta article={a} />
+                      <h3 dir="auto" className="mt-2 line-clamp-3 text-[1.125rem] leading-snug font-semibold group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                        {a.title}
+                      </h3>
+                      {a.excerpt && <p dir="auto" className="mt-2 line-clamp-3 text-[0.9375rem] text-ink-soft">{a.excerpt}</p>}
+                      {a.authorDisplayName && <p className="mt-auto pt-3 text-[0.875rem] text-muted">By {a.authorDisplayName}</p>}
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
           ) : (
             <EmptyState
               title="Our first reports are on their way"
