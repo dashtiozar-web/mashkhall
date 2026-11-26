@@ -22,7 +22,7 @@ const call = async (path: string, body?: unknown, as = 'owner') => {
 
 const member = (id: string, extra: Record<string, unknown> = {}) => ({
   userId: id, fullName: `${id} Full`, displayName: id, email: `${id}@example.org`, chapterId: 'britain',
-  status: 'active', roles: ['member'], consentToDirectory: true, joinedAt: '2024-01-01', updatedAt: '2026-01-01T00:00:00.000Z', ...extra,
+  tier: 'peshang', status: 'active', roles: ['member'], consentToDirectory: true, joinedAt: '2024-01-01', updatedAt: '2026-01-01T00:00:00.000Z', ...extra,
 });
 
 beforeAll(async () => {
@@ -128,6 +128,16 @@ describe('Older titles', () => {
 });
 
 describe('Promotions and positions (test 2)', () => {
+  it('only Pêşeng members can be appointed, and holders cannot leave Pêşeng', async () => {
+    fake.set('members/carol', member('carol', { tier: 'komar' }));
+    const no = await call('members/appoint', { seatId: 'production__video_editor', memberId: 'carol' });
+    expect(no.status).toBe(409);
+    expect(no.data.error).toMatch(/Pêşeng/);
+    await call('members/appoint', { seatId: 'production__video_editor', memberId: 'alice', keepOtherPositions: true });
+    const leave = await call('members/update', { memberId: 'alice', changes: { tier: 'pishtiwan' } });
+    expect(leave.status).toBe(409);
+  });
+
   it('a Photographer promoted to Media Supervisor leaves the Photographer seat and shows under Media Supervisor', async () => {
     const r = await call('members/appoint', { seatId: 'council__britain__media_supervisor', memberId: 'alice', reason: 'Excellent coverage', effectiveDate: '2026-11-01' });
     expect(r.status).toBe(200);

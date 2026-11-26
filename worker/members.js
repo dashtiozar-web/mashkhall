@@ -206,6 +206,7 @@ export const syncOps = async (env, m, held, chapters, { previousNumber, strictTi
         photoUrl: m.photoUrl || '',
         chapterId: m.chapterId || '',
         chapterName: council?.name || m.chapterId || '',
+        ...(['peshang', 'pishtiwan', 'komar'].includes(m.tier) ? { tier: m.tier } : {}),
         bio: m.bio || '',
         expertise: m.expertise || '',
         positionId: pos.id,
@@ -284,9 +285,11 @@ const EDITABLE = {
   photoUrl: isPhoto,
   bio: (v) => typeof v === 'string' && v.length <= 2000,
   expertise: (v) => typeof v === 'string' && v.length <= 1000,
+  tier: (v) => ['peshang', 'pishtiwan', 'komar'].includes(v),
+  city: (v) => typeof v === 'string' && v.length <= 100,
 };
 
-const LABEL = { fullName: 'full name', displayName: 'display name', email: 'email', phone: 'phone', chapterId: 'council', joinedAt: 'membership start date', validFrom: 'card valid from', expiresAt: 'card expiry', photoUrl: 'photo', bio: 'biography', expertise: 'expertise' };
+const LABEL = { fullName: 'full name', displayName: 'display name', email: 'email', phone: 'phone', chapterId: 'council', joinedAt: 'membership start date', validFrom: 'card valid from', expiresAt: 'card expiry', photoUrl: 'photo', bio: 'biography', expertise: 'expertise', tier: 'kind of membership', city: 'city' };
 
 export const updateMember = async (env, staff, body) => {
   need(staff.canMembers);
@@ -309,6 +312,10 @@ export const updateMember = async (env, staff, body) => {
 
   // Moving council: positions in the old council no longer apply.
   let held = await seatsOf(env, m.id);
+  // Only Pêşeng members hold positions.
+  if (changes.some((c) => c.field === 'tier') && next.tier !== 'peshang' && held.length) {
+    throw new HttpError(409, `${next.fullName} holds ${held.length === 1 ? 'a position' : `${held.length} positions`}. Only Pêşeng members take on positions, so release ${held.length === 1 ? 'it' : 'them'} in Organisation structure first.`);
+  }
   const ops = [];
   const movedCouncil = changes.some((c) => c.field === 'chapterId');
   let lostSeats = 0;
@@ -329,6 +336,11 @@ export const updateMember = async (env, staff, body) => {
   }
   const { ops: sync, record } = await syncOps(env, next, held, chapters, { strictTitle: lostSeats > 0 });
   ops.push(...sync);
+  // Keep the application in step, so the counts by city and kind stay right.
+  if (changes.some((c) => c.field === 'tier' || c.field === 'city' || c.field === 'chapterId') && m.userId) {
+    const app = await getDoc(env, `applications/app-${m.userId}`);
+    if (app) ops.push({ update: `applications/app-${m.userId}`, data: { ...(next.tier ? { tier: next.tier } : {}), ...(next.city ? { city: next.city } : {}), chapterId: next.chapterId, updatedAt: now() } });
+  }
   ops.push(auditOp(staff, 'MEMBER_DETAILS_UPDATED', m.id, `${next.fullName}: ${changes.map((c) => LABEL[c.field]).join(', ')}${body.reason ? ` — ${str(body.reason, 500)}` : ''}`, changes));
   await run(env, ops);
   return { member: { ...record, id: m.id }, changed: changes.map((c) => c.field) };
@@ -477,6 +489,8 @@ export const appoint = async (env, staff, body) => {
   if (!seat) throw new HttpError(400, 'Unknown position.');
   let m = await loadMember(env, body.memberId);
   if (m.status === 'revoked' || m.status === 'archived') throw new HttpError(409, `${m.fullName}’s membership has been ended, so they cannot hold a position.`);
+  // Only Pêşeng members take on positions and responsibilities.
+  if (m.tier !== 'peshang') throw new HttpError(409, `Only Pêşeng (پێشەنگ) members take on positions. ${m.fullName} is ${m.tier === 'pishtiwan' ? 'a Piştîwan (supporter)' : m.tier === 'komar' ? 'a Komar (voter) member' : 'not yet given a kind of membership'}. Change their kind of membership to Pêşeng in Members first.`);
   const status = SEAT_STATUSES.includes(body.status) ? body.status : 'active';
   const effectiveDate = DATE.test(String(body.effectiveDate || '')) ? body.effectiveDate : now().slice(0, 10);
   const reason = str(body.reason, 1000);

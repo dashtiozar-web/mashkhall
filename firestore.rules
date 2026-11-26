@@ -315,6 +315,9 @@ service cloud.firestore {
           && optStr('skills', 1000)
           && photoOk()
           && positionOk(d)
+          && (!('tier' in d) || d.tier in ['peshang', 'pishtiwan', 'komar'])
+          // Only Pêşeng members take on positions.
+          && (!('tier' in d) || d.tier == 'peshang' || d.get('positionId', 'member') == 'member')
           && d.agreedToPolicies == true
           && d.consentToDirectory is bool
           && (!('involvement' in d)

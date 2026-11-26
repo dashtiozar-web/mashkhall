@@ -1,3 +1,4 @@
+import { TIERS, canHoldPositions, isTier, tierById, MembershipTier } from '../lib/tiers';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { authErrorMessage } from '../lib/authErrors';
 import { COUNTRIES, KURDISTAN, PROVINCES, ABROAD_IDS, countryName, groupLabel, isProvince, normaliseCity } from '../lib/places';
@@ -188,6 +189,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
   const [city, setCity] = useState('');
   const country = countryName(placeCountry);
   const [positionId, setPositionId] = useState('');
+  const [tier, setTier] = useState<MembershipTier | ''>('');
   const [reason, setReason] = useState('');
   const [skills, setSkills] = useState('');
   const [involvement, setInvolvement] = useState<InvolvementPeriod | ''>('');
@@ -232,6 +234,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
             setPlaceCountry((v) => v || (isProvince(app.chapterId) ? KURDISTAN : ABROAD_IDS.includes(app.chapterId) ? app.chapterId : ''));
             setCity((v) => v || app.city || '');
             setPositionId((v) => v || app.positionId || '');
+            if (isTier(app.tier)) setTier((v) => v || (app.tier as MembershipTier));
             setReason((v) => v || app.reason || '');
             setSkills((v) => v || app.skills || '');
             if (app.involvement) {
@@ -287,7 +290,9 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
     if (s === 2 && !placeCountry) e.council = 'Please choose the country you are joining from.';
     else if (s === 2 && (!councilId || (placeCountry === KURDISTAN ? !isProvince(councilId) : councilId !== placeCountry))) e.council = 'Please choose your province in Kurdistan.';
     if (s === 2 && normaliseCity(city).length < 2) e.city = 'Please tell us which city or town you are joining from.';
+    if (s === 2 && !tier) e.tier = 'Please choose your kind of membership.';
     if (s === 2 && !positionById(positionId)) e.position = 'Please choose one position.';
+    else if (s === 2 && tier && !canHoldPositions(tier) && positionId !== 'member') e.position = 'Only Pêşeng members take on positions. Please choose Member, or choose Pêşeng above.';
     if (s === 3 && reason.trim().length < 20) e.reason = 'Please write a sentence or two (at least 20 characters).';
     if (s === 3 && !involvement) e.involvement = 'Please tell us whether you are already a member of Mashkhally Zhyanawa.';
     if (s === 3 && involvement !== 'new' && involvement && !involvedSince) e.involvement = 'Please give the date you became a member.';
@@ -386,6 +391,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
         country,
         chapterId: councilId,
         city: normaliseCity(city).slice(0, 100),
+        ...(tier ? { tier } : {}),
         positionId,
         reason: reason.trim(),
         skills: skills.trim(),
@@ -611,6 +617,30 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                 </p>
                 {err('council')}
 
+                <fieldset className="border-t border-line pt-6">
+                  <legend className={labelCls}>Kind of membership</legend>
+                  <p className="mt-1 text-[0.9375rem] text-muted">We have three kinds of membership. Choose the one that fits how you will take part.</p>
+                  <div className="mt-3 grid gap-3">
+                    {TIERS.map((t) => (
+                      <label key={t.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 ${tier === t.id ? 'border-navy bg-navy-tint' : 'border-line hover:border-ink/30'}`}>
+                        <input type="radio" name="tier" value={t.id} checked={tier === t.id} className="sr-only"
+                          onChange={() => { setTier(t.id); if (!canHoldPositions(t.id)) setPositionId('member'); setErrors(({ tier: _t, position: _p, ...rest }) => rest); }} />
+                        <span className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${tier === t.id ? 'border-navy bg-navy text-white' : 'border-line'}`} aria-hidden="true">
+                          {tier === t.id && <Check className="h-3 w-3" />}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="flex flex-wrap items-baseline gap-x-2 font-semibold">
+                            <span className="font-kurdish text-[1.1875rem]" lang="ckb" dir="rtl" translate="no" style={{ color: t.colour }}>{t.ku}</span>
+                            <span className="ku-sub text-ink">{t.name}</span>
+                          </span>
+                          <span className="mt-1 block text-[0.9375rem] text-ink-soft">{t.description}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  {errors.tier && <p className="mt-2 text-[0.9375rem] font-semibold text-crimson">{errors.tier}</p>}
+                </fieldset>
+
                 <div className="border-t border-line pt-6">
                   <label className={labelCls} htmlFor="position">
                     Position you hold or would like to take on
@@ -618,6 +648,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                   <p className="mt-1 text-[0.9375rem] text-muted">
                     Choose one. If you don’t hold a specific role, choose <strong className="font-semibold text-ink-soft">Member</strong>.
                     Positions are appointed by the committee; group positions are in your own province or country.
+                    {tier && !canHoldPositions(tier) && <> Only <strong className="font-semibold text-ink-soft">Pêşeng</strong> members take on positions and responsibilities.</>}
                   </p>
                   <select
                     id="position"
@@ -630,7 +661,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                     <option value="" disabled>Select a position…</option>
                     {DEPARTMENTS.map((d) => (
                       <optgroup key={d.id} label={d.id === 'council' ? 'Your province or country' : d.name}>
-                        {positionsIn(d.id).map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
+                        {positionsIn(d.id).map((p) => <option key={p.id} value={p.id} disabled={Boolean(tier) && !canHoldPositions(tier) && p.id !== 'member'}>{p.title}</option>)}
                       </optgroup>
                     ))}
                   </select>
@@ -746,6 +777,7 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                     { label: 'Name', value: `${fullName}${displayName && displayName !== fullName ? ` (shown as ${displayName})` : ''}`, step: 0 as StepIndex },
                     { label: 'Contact', value: [email, phone].filter(Boolean).join(', '), step: 1 as StepIndex },
                     { label: 'Joining from', value: council ? [normaliseCity(city), groupLabel(council)].filter(Boolean).join(', ') : 'Not chosen', step: 2 as StepIndex },
+                    { label: 'Kind of membership', value: tierById(tier)?.name || 'Not chosen', step: 2 as StepIndex },
                     { label: 'Position', value: positionById(positionId) ? `${positionTitle(positionId)} (${departmentFor(positionId)?.name})` : 'Not chosen', step: 2 as StepIndex },
                     { label: 'About you', value: reason, step: 3 as StepIndex },
                     { label: 'Member since', value: involvement === 'new' ? 'New member (joining now)' : involvedSince ? formatDate(involvedSince) : 'Not answered', step: 3 as StepIndex },

@@ -1,3 +1,4 @@
+import { canHoldPositions } from '../lib/tiers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Search, UserPlus, UserMinus, X } from 'lucide-react';
@@ -177,6 +178,8 @@ const Picker: React.FC<{
   const [reason, setReason] = useState('');
   const eligible = profiles
     .filter((p) => seat.unit !== 'council' || p.chapterId === seat.councilId)
+    // Only Pêşeng members take on positions.
+    .filter((p) => canHoldPositions(p.tier))
     .filter((p) => !q.trim() || p.displayName.toLowerCase().includes(q.trim().toLowerCase()))
     .sort((a, b) => Number(wants.get(b.id) === seat.positionId) - Number(wants.get(a.id) === seat.positionId) || a.displayName.localeCompare(b.displayName));
 
@@ -186,7 +189,7 @@ const Picker: React.FC<{
         <div className="flex items-start justify-between gap-3 border-b border-line p-5">
           <div>
             <h3 id="pick-title" className="text-[1.25rem] font-semibold">{seatLabel(seat, councilName)}</h3>
-            <p className="text-[0.9375rem] text-muted">{current ? `Currently ${current.memberName}. Choose who should replace them.` : 'Vacant. Choose a member to appoint.'}{seat.unit === 'council' ? ` Only members of the ${councilName(seat.councilId)} Council are listed.` : ''}</p>
+            <p className="text-[0.9375rem] text-muted">{current ? `Currently ${current.memberName}. Choose who should replace them.` : 'Vacant. Choose a member to appoint.'}{seat.unit === 'council' ? ` Only members of the ${councilName(seat.councilId)} Council are listed.` : ''} Only Pêşeng (پێشەنگ) members can be appointed; set a member’s kind of membership in Members.</p>
           </div>
           <button type="button" onClick={onClose} className="cursor-pointer rounded-full p-1.5 hover:bg-stone" aria-label="Close"><X className="h-5 w-5" /></button>
         </div>
@@ -203,7 +206,7 @@ const Picker: React.FC<{
           <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional, kept in their position history)" className="mt-2 w-full rounded-lg border border-line bg-paper px-3 py-2 text-[0.9375rem]" />
         </div>
         <ul className="flex-1 divide-y divide-line overflow-y-auto px-2 pb-3">
-          {eligible.length === 0 && <li className="p-6 text-center text-muted">No members {seat.unit === 'council' ? 'in this council ' : ''}match.</li>}
+          {eligible.length === 0 && <li className="p-6 text-center text-muted">No Pêşeng members {seat.unit === 'council' ? 'in this council ' : ''}match.</li>}
           {eligible.map((p) => {
             const held = heldBy(rows, p.id);
             const isCurrent = current?.memberId === p.id;

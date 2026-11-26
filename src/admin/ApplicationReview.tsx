@@ -1,3 +1,4 @@
+import { TIERS, canHoldPositions, tierById } from '../lib/tiers';
 import React, { useState } from 'react';
 import { X, ArrowLeft, Pencil } from 'lucide-react';
 import { doc } from 'firebase/firestore';
@@ -43,7 +44,7 @@ export const ApplicationReview: React.FC<{
   const [corrected, setCorrected] = useState(false);
   const [form, setForm] = useState({
     fullName: app.fullName, displayName: app.displayName, email: app.email, phone: app.phone || '',
-    country: app.country || '', city: app.city || '', chapterId: app.chapterId, positionId: positionOf({ positionId: app.positionId }),
+    country: app.country || '', city: app.city || '', chapterId: app.chapterId, positionId: positionOf({ positionId: app.positionId }), tier: (app.tier || '') as string,
   });
   const [notes, setNotes] = useState(app.staffNotes || '');
   const [message, setMessage] = useState(app.applicantFeedback || '');
@@ -129,7 +130,12 @@ export const ApplicationReview: React.FC<{
       city: normaliseCity(form.city).slice(0, 100),
       chapterId: form.chapterId,
       positionId: form.positionId,
+      ...(form.tier ? { tier: form.tier as 'peshang' | 'pishtiwan' | 'komar' } : {}),
     };
+    if (patch.tier && !canHoldPositions(patch.tier) && patch.positionId !== 'member') {
+      setError('Only Pêşeng members take on positions. Choose Member as the position, or Pêşeng as the kind of membership.');
+      return;
+    }
     const changed = (Object.keys(patch) as (keyof typeof patch)[]).filter((k) => (app[k] || '') !== patch[k]);
     if (changed.length === 0) { setEditing(false); return; }
     setBusy(true);
@@ -184,6 +190,13 @@ export const ApplicationReview: React.FC<{
                 </select>
               </label>
               <label className="block text-[0.9375rem] font-semibold sm:col-span-2">
+                Kind of membership
+                <select value={form.tier} onChange={(e) => setForm({ ...form, tier: e.target.value })} className={`mt-1 ${box}`}>
+                  {!form.tier && <option value="">Not chosen</option>}
+                  {TIERS.map((t) => <option key={t.id} value={t.id}>{t.ku} — {t.name}</option>)}
+                </select>
+              </label>
+              <label className="block text-[0.9375rem] font-semibold sm:col-span-2">
                 Position applied for
                 <select value={form.positionId} onChange={(e) => setForm({ ...form, positionId: e.target.value as typeof form.positionId })} className={`mt-1 ${box}`}>
                   {DEPARTMENTS.map((d) => (
@@ -204,6 +217,10 @@ export const ApplicationReview: React.FC<{
               </button>
             </div>
             <dl className="mt-3 grid gap-4 text-[0.9375rem] sm:grid-cols-2">
+              <div className="sm:col-span-2 rounded-xl border-2 px-4 py-3" style={{ borderColor: tierById(app.tier)?.colour || 'var(--c-line)' }}>
+                <dt className="text-muted">Kind of membership</dt>
+                <dd className="font-semibold">{tierById(app.tier) ? <><span className="font-kurdish text-[1.125rem]" lang="ckb" dir="rtl" translate="no">{tierById(app.tier)!.ku}</span> <span className="font-normal text-ink-soft">· {tierById(app.tier)!.name}</span></> : 'Not chosen (applied before kinds of membership)'}</dd>
+              </div>
               <div className="sm:col-span-2 rounded-xl bg-navy-tint px-4 py-3">
                 <dt className="text-muted">Position applied for</dt>
                 <dd className="font-semibold">{positionTitle(pid)} <span className="font-normal text-ink-soft">· {departmentFor(pid)?.name}</span></dd>

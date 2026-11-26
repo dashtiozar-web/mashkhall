@@ -3,6 +3,7 @@ import { ArrowRight, Globe2, MapPin, Users } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { councilStats, CouncilStat, GROWTH_DAYS, HEAT_LEGEND } from '../lib/councilStats';
 import { ABROAD_IDS, COUNTRIES, PROVINCES, PROVINCE_IDS } from '../lib/places';
+import { TIERS, isTier } from '../lib/tiers';
 import {
   KURDISTAN_NEIGHBOURS, KURDISTAN_REGIONS, KURDISTAN_VIEWBOX, MapShape,
   WORLD_CODES, WORLD_COUNTRIES, WORLD_POINTS, WORLD_VIEWBOX,
@@ -33,6 +34,34 @@ const useGroupStats = (ids: string[]) => {
     return councilStats(groups, publicProfiles);
   }, [chapters, publicProfiles, ids]);
 };
+
+/** How many of each kind of membership, per province or country (public profiles). */
+type TierCount = Record<'peshang' | 'pishtiwan' | 'komar', number>;
+const useTierCounts = () => {
+  const { publicProfiles } = useData();
+  return useMemo(() => {
+    const m = new Map<string, TierCount>();
+    for (const p of publicProfiles) {
+      if ((p as { membershipStatus?: string }).membershipStatus === 'suspended' || !isTier(p.tier)) continue;
+      const row = m.get(p.chapterId) || { peshang: 0, pishtiwan: 0, komar: 0 };
+      row[p.tier] += 1;
+      m.set(p.chapterId, row);
+    }
+    return m;
+  }, [publicProfiles]);
+};
+const sumTiers = (rows: (TierCount | undefined)[]): TierCount => rows.reduce<TierCount>((t, r) => ({ peshang: t.peshang + (r?.peshang || 0), pishtiwan: t.pishtiwan + (r?.pishtiwan || 0), komar: t.komar + (r?.komar || 0) }), { peshang: 0, pishtiwan: 0, komar: 0 });
+
+const TierRow: React.FC<{ c: TierCount; dark?: boolean }> = ({ c, dark }) => (
+  <div className="mt-3 grid grid-cols-3 gap-2">
+    {TIERS.map((t) => (
+      <div key={t.id} className={`rounded-xl px-2 py-1.5 text-center ${dark ? 'bg-white/10' : 'bg-stone'}`} title={t.name}>
+        <div className="font-kurdish text-[0.9375rem] font-semibold" lang="ckb" dir="rtl" translate="no" style={{ color: dark ? '#F2C14E' : t.colour }}>{t.ku}</div>
+        <div className="text-[1.125rem] font-semibold tabular-nums">{c[t.id]}</div>
+      </div>
+    ))}
+  </div>
+);
 
 const Legend: React.FC<{ note: React.ReactNode }> = ({ note }) => (
   <figcaption className="mt-3 flex flex-col gap-3 px-2 pb-1 sm:flex-row sm:items-center sm:justify-between">
@@ -71,13 +100,14 @@ const Marker: React.FC<{
 /** The side panel: a total, and the details of the place chosen on the map. */
 const Panel: React.FC<{
   icon: React.ReactNode; label: string; total: number; of: string; focus?: CouncilStat; count: number;
-  hint: string; onOpen?: (slug: string) => void;
-}> = ({ icon, label, total, of, focus, count, hint, onOpen }) => (
+  hint: string; onOpen?: (slug: string) => void; tiers?: TierCount; focusTiers?: TierCount;
+}> = ({ icon, label, total, of, focus, count, hint, onOpen, tiers, focusTiers }) => (
   <aside className="space-y-5" aria-live="polite">
     <div className="rounded-3xl bg-navy p-5 text-white">
       <p className="flex items-center gap-2 text-[0.9375rem] font-semibold text-white/85">{icon} {label}</p>
       <p className="mt-1 font-serif text-[3rem] leading-none font-semibold tabular-nums">{total.toLocaleString('en-GB')}</p>
       <p className="mt-1 text-white/85">{of}</p>
+      {tiers && <TierRow c={tiers} dark />}
     </div>
     {focus ? (
       <div className="rounded-3xl border border-line bg-surface p-5">
@@ -90,6 +120,7 @@ const Panel: React.FC<{
           <div><dt className="text-muted">Members</dt><dd className="text-[1.375rem] font-semibold tabular-nums">{focus.members}</dd></div>
           <div><dt className="text-muted">Last {GROWTH_DAYS} days</dt><dd className="text-[1.375rem] font-semibold tabular-nums">{focus.growth ? `+${focus.growth}` : '0'}</dd></div>
         </dl>
+        {focusTiers && <TierRow c={focusTiers} />}
         <a href={`/councils/${encodeURIComponent(focus.council.slug || focus.council.id)}`}
           onClick={(e) => { if (onOpen) { e.preventDefault(); onOpen(focus.council.slug || focus.council.id); } }}
           className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-navy px-4 py-2 font-semibold text-white no-underline hover:bg-navy-deep">
@@ -105,6 +136,7 @@ const Panel: React.FC<{
 /** The five provinces of Kurdistan, coloured by members, with their numbers. */
 export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({ onOpen }) => {
   const stats = useGroupStats(PROVINCE_IDS);
+  const tierCounts = useTierCounts();
   const [hover, setHover] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const focusId = hover || selected;
@@ -168,6 +200,7 @@ export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> 
       </figure>
       <Panel icon={<Users className="h-4 w-4" aria-hidden="true" />} label="Members in Kurdistan" total={total} of="approved members in five provinces"
         focus={focusId ? byId.get(focusId) : undefined} count={stats.length} onOpen={onOpen}
+        tiers={sumTiers(PROVINCE_IDS.map((id) => tierCounts.get(id)))} focusTiers={focusId ? (tierCounts.get(focusId) || sumTiers([])) : undefined}
         hint="Choose a province on the map to see its members." />
     </div>
   );
@@ -176,6 +209,7 @@ export const KurdistanMembersMap: React.FC<{ onOpen?: (slug: string) => void }> 
 /** The world, with our five countries abroad joined to Kurdistan. */
 export const WorldMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({ onOpen }) => {
   const stats = useGroupStats(ABROAD_IDS);
+  const tierCounts = useTierCounts();
   const kurdistanTotal = useGroupStats(PROVINCE_IDS).reduce((a, s) => a + s.members, 0);
   const [hover, setHover] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -242,6 +276,7 @@ export const WorldMembersMap: React.FC<{ onOpen?: (slug: string) => void }> = ({
       </figure>
       <Panel icon={<Globe2 className="h-4 w-4" aria-hidden="true" />} label="Members abroad" total={total} of="approved members in five countries"
         focus={focusId ? byId.get(focusId) : undefined} count={stats.length} onOpen={onOpen}
+        tiers={sumTiers(ABROAD_IDS.map((id) => tierCounts.get(id)))} focusTiers={focusId ? (tierCounts.get(focusId) || sumTiers([])) : undefined}
         hint="Choose a country on the map to see its members." />
     </div>
   );

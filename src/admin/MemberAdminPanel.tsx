@@ -1,3 +1,4 @@
+import { TIERS, tierById } from '../lib/tiers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowUpCircle, Building2, Camera, GitBranch, History, IdCard, Pencil, Shuffle, ToggleLeft, X } from 'lucide-react';
 import { useData } from '../context/DataContext';
@@ -107,7 +108,7 @@ export const MemberAdminPanel: React.FC<Props> = ({ member: initial, onClose, on
           {m.photoUrl ? <MediaImage src={m.photoUrl} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" /> : <Initials name={m.fullName} />}
           <div className="min-w-0 flex-1">
             <h2 id="member-admin-title" className="truncate text-[1.375rem] font-semibold">{m.fullName}</h2>
-            <p className="text-[0.9375rem] text-ink-soft">{positionTitle(positionOf(m))}{m.chapterId ? ` · ${councilName(m.chapterId)} Council` : ''}</p>
+            <p className="text-[0.9375rem] text-ink-soft">{positionTitle(positionOf(m))}{m.chapterId ? ` · ${councilName(m.chapterId)} Council` : ''}{tierById(m.tier) ? ` · ${tierById(m.tier)!.ku}` : ''}</p>
             <p className="text-[0.8438rem] text-muted tabular-nums">
               {m.memberNumber || 'No card yet'}
               {state && ` · Card ${STATE_LABEL[state].toLowerCase()}, valid to ${cardDate(m.expiresAt)}`}
@@ -149,6 +150,7 @@ const DetailsForm: React.FC<{ m: MemberRecord; busy: boolean; run: Run; councilN
     fullName: m.fullName || '', displayName: m.displayName || '', email: m.email || '', phone: m.phone || '', chapterId: m.chapterId || '',
     joinedAt: (m.joinedAt || '').slice(0, 10), validFrom: (m.validFrom || '').slice(0, 10), expiresAt: (m.expiresAt || '').slice(0, 10),
     photoUrl: m.photoUrl || '', bio: m.bio || '', expertise: m.expertise || '', reason: '',
+    tier: m.tier || '', city: m.city || '',
   });
   const [f, setF] = useState(initialForm);
   const [photoError, setPhotoError] = useState('');
@@ -160,13 +162,14 @@ const DetailsForm: React.FC<{ m: MemberRecord; busy: boolean; run: Run; councilN
 
   const save = async () => {
     const changes: Record<string, string> = {};
-    (['fullName', 'displayName', 'email', 'phone', 'chapterId', 'joinedAt', 'photoUrl', 'bio', 'expertise'] as const).forEach((k) => {
+    (['fullName', 'displayName', 'email', 'phone', 'chapterId', 'joinedAt', 'photoUrl', 'bio', 'expertise', 'tier', 'city'] as const).forEach((k) => {
       if ((f[k] || '') !== ((m[k] as string | undefined) || '').slice(0, k === 'joinedAt' ? 10 : undefined)) changes[k] = f[k];
     });
     if (hasCard) {
       if (f.validFrom !== (m.validFrom || '').slice(0, 10)) changes.validFrom = f.validFrom;
       if (f.expiresAt !== (m.expiresAt || '').slice(0, 10)) changes.expiresAt = f.expiresAt;
     }
+    if (changes.tier === '') delete changes.tier;
     if (!Object.keys(changes).length) return;
     if (councilSeatsLost.length && !window.confirm(`Moving ${m.fullName} to the ${councilName(f.chapterId)} Council makes these positions vacant: ${councilSeatsLost.map((a) => seatLabel(a, councilName)).join(', ')}. Continue?`)) return;
     await run(() => updateMember(m.id, changes, { expectUpdatedAt: m.updatedAt, reason: f.reason }), `Saved. ${m.fullName}’s profile, membership card, the directory and the organisation chart now show the new details.`);
@@ -207,6 +210,14 @@ const DetailsForm: React.FC<{ m: MemberRecord; busy: boolean; run: Run; councilN
           </select>
           {councilChanged && <span className="mt-1 block text-[0.8125rem] font-normal text-ink-soft">This transfers them to the {councilName(f.chapterId)} Council.{councilSeatsLost.length ? ` Their positions in the ${councilName(m.chapterId)} Council become vacant.` : ''} Board, Production Team and Website Administration positions are kept.</span>}
         </label>
+        <label className={label}>Kind of membership
+          <select value={f.tier} onChange={(e) => set({ tier: e.target.value })} className={field}>
+            {!f.tier && <option value="">Not chosen yet</option>}
+            {TIERS.map((t) => <option key={t.id} value={t.id}>{t.ku} — {t.name}</option>)}
+          </select>
+          <span className="mt-1 block text-[0.8125rem] font-normal text-ink-soft">Only Pêşeng members take on positions and responsibilities.</span>
+        </label>
+        <label className={label}>City or town<input value={f.city} onChange={(e) => set({ city: e.target.value })} className={field} dir="auto" /></label>
         <label className={label}>Expertise<input value={f.expertise} onChange={(e) => set({ expertise: e.target.value })} className={field} dir="auto" /></label>
         <label className={`${label} sm:col-span-2`}>Biography<textarea value={f.bio} onChange={(e) => set({ bio: e.target.value })} rows={3} className={field} dir="auto" /></label>
       </fieldset>

@@ -129,6 +129,8 @@ export interface MemberApplication {
   chapterId: string;
   /** The city or town the applicant is joining from. */
   city?: string;
+  /** Kind of membership: pêşeng, piştîwan or komar (see lib/tiers). */
+  tier?: 'peshang' | 'pishtiwan' | 'komar';
   reason: string;
   skills?: string;
   photoUrl?: string;
@@ -154,6 +156,10 @@ export interface MemberRecord {
   email: string;
   phone?: string;
   chapterId: string;
+  /** The city or town the member joined from. */
+  city?: string;
+  /** Kind of membership: pêşeng, piştîwan or komar (see lib/tiers). */
+  tier?: 'peshang' | 'pishtiwan' | 'komar';
   status: MemberStatus;
   roles: Role[];
   isBoardMember?: boolean;
@@ -210,6 +216,8 @@ export interface PublicProfile {
   photoUrl?: string;
   chapterId: string;
   chapterName: string;
+  /** Kind of membership (see lib/tiers), for the public counts. */
+  tier?: 'peshang' | 'pishtiwan' | 'komar';
   boardTitle?: string;
   isBoardMember?: boolean;
   hierarchyLevel?: MemberHierarchyLevel;

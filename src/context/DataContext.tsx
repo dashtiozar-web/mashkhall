@@ -415,6 +415,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             email: app.email,
             phone: app.phone || '',
             chapterId: app.chapterId,
+            ...(app.city ? { city: app.city } : {}),
+            ...(app.tier ? { tier: app.tier } : {}),
             status: 'active',
             roles: ['member'],
             // Every approved member is shown publicly (organisation policy).
@@ -452,6 +454,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
               photoUrl: app.photoUrl || '',
               chapterId: app.chapterId,
               chapterName: chapter?.name || app.chapterId,
+              ...(app.tier ? { tier: app.tier } : {}),
               positionId: memberRecord.positionId,
               department: memberRecord.department,
               designation: memberRecord.designation,
