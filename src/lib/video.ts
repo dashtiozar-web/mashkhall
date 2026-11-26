@@ -39,6 +39,18 @@ export const videoEmbed = (raw?: string): VideoEmbed | null => {
   return null;
 };
 
+/** Short links from Facebook's Share button (facebook.com/share/v/…). */
+export const isFacebookShareLink = (raw?: string) => /facebook\.com\/share\/(v|r)\//i.test(raw || '');
+
+export const FACEBOOK_SHARE_HELP = 'This is a Facebook share link, which Facebook does not allow to play on other websites. Open it in your browser, wait for the video to load, then copy the full address from the address bar (it contains /videos/ or /reel/ and a long number) and paste that here. The video must be Public.';
+
+/** Why a pasted video link cannot be used, or '' when it can. */
+export const videoLinkProblem = (raw?: string) => {
+  if (!(raw || '').trim()) return '';
+  if (isFacebookShareLink(raw)) return FACEBOOK_SHARE_HELP;
+  return videoEmbed(raw) ? '' : VIDEO_HELP;
+};
+
 export const VIDEO_HELP = 'Paste a link from YouTube, Vimeo or a Facebook video. It plays on our website; nothing is uploaded here.';
 
 /** A still image for a video: our uploaded thumbnail, else YouTube's own. */

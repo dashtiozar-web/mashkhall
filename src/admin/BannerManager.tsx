@@ -5,7 +5,7 @@ import { useData } from '../context/DataContext';
 import { BreakingNewsStrip } from '../components/BreakingNewsBanner';
 import { ActivityAttendees } from './ActivityAttendees';
 import { VideoPlayer } from '../components/VideoEmbed';
-import { VIDEO_HELP, videoEmbed } from '../lib/video';
+import { VIDEO_HELP, videoEmbed, isFacebookShareLink, FACEBOOK_SHARE_HELP } from '../lib/video';
 import {
   bannerPhase, BannerPhase, currentBanners, DEFAULT_BANNER_MESSAGE, deleteNewsBanner, formatEventDate,
   saveNewsBanner, setNewsBannerStatus, useNewsBanners,
@@ -77,6 +77,7 @@ export const BannerManager: React.FC = () => {
     if (!draft) return;
     setError(null);
     if (!draft.message?.trim()) { setError('Write the message that will scroll across the banner.'); return; }
+    if (isFacebookShareLink(draft.videoUrl)) { setError(FACEBOOK_SHARE_HELP); return; }
     if (draft.videoUrl?.trim() && !videoEmbed(draft.videoUrl)) { setError('The video link isn’t a YouTube, Vimeo or Facebook video link.'); return; }
     if (draft.startAt && draft.endAt && draft.endAt <= draft.startAt) { setError('“Stop showing” must be after “Start showing”.'); return; }
     let endAt = draft.endAt;

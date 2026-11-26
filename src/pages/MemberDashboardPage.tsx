@@ -7,7 +7,7 @@ import { levelFor } from '../lib/levels';
 import { MediaImage } from '../components/MediaImage';
 import { VideoPlayer } from '../components/VideoEmbed';
 import { uploadImage } from '../lib/media';
-import { VIDEO_HELP, videoEmbed } from '../lib/video';
+import { VIDEO_HELP, videoEmbed, isFacebookShareLink, FACEBOOK_SHARE_HELP } from '../lib/video';
 import React, { useState, useEffect } from 'react';
 import { 
   User, 
@@ -343,6 +343,10 @@ export const MemberDashboardPage: React.FC<MemberDashboardPageProps> = ({
     }
     if (!postTitle.trim() || !postContent.trim()) {
       setPostMsg({ type: 'error', text: 'Please provide both a title and article body.' });
+      return;
+    }
+    if (isFacebookShareLink(postVideoUrl)) {
+      setPostMsg({ type: 'error', text: FACEBOOK_SHARE_HELP });
       return;
     }
     if (postVideoUrl.trim() && !videoEmbed(postVideoUrl)) {

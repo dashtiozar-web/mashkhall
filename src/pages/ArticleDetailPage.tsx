@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Heart, Link2, Check } from 'lucide-react';
 import { db } from '../firebase';
 import { useData } from '../context/DataContext';
@@ -10,7 +10,7 @@ import { SharePanel } from '../components/SharePanel';
 import { Comments } from '../components/Comments';
 import { Initials } from '../components/PersonCard';
 import { VideoPlayer } from '../components/VideoEmbed';
-import { videoEmbed, subtitlesOf, SUBTITLE_LANGUAGES, visibleTags } from '../lib/video';
+import { videoEmbed, videoLinkProblem, subtitlesOf, SUBTITLE_LANGUAGES, visibleTags } from '../lib/video';
 
 interface ArticleDetailPageProps {
   slug: string;
@@ -80,7 +80,7 @@ const ArticleBody: React.FC<{ content: string; dir?: 'ltr' | 'rtl'; lang?: strin
 
 export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ slug, onNavigate, onOpenAuth }) => {
   const { articles, incrementArticleView, toggleArticleLike, incrementArticleShare, publicProfiles } = useData();
-  const { currentUser } = useAuth();
+  const { currentUser, isPublisher } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -236,6 +236,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ slug, onNa
       {videoEmbed(article.videoUrl) && (
         <Container className="max-w-[1000px] pt-10">
           <VideoPlayer url={article.videoUrl} title={`Video: ${article.title}`} />
+          {isPublisher && <VideoLinkEditor articleId={article.id} current={article.videoUrl || ''} />}
         </Container>
       )}
 
@@ -311,5 +312,36 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ slug, onNa
         </section>
       )}
     </article>
+  );
+};
+
+/** Lets publishers replace a published video's link, e.g. a share link with the video's full address. */
+const VideoLinkEditor: React.FC<{ articleId: string; current: string }> = ({ articleId, current }) => {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(current);
+  const [msg, setMsg] = useState('');
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    const problem = videoLinkProblem(value);
+    if (!value.trim() || problem) { setMsg(problem || 'Paste the video link.'); return; }
+    setBusy(true); setMsg('');
+    try {
+      await updateDoc(doc(db, 'articles', articleId), { videoUrl: value.trim(), updatedAt: new Date().toISOString() });
+      setMsg('Saved. Refresh the page to see the video.');
+    } catch { setMsg('The link could not be saved.'); }
+    finally { setBusy(false); }
+  };
+  if (!open) return <button type="button" onClick={() => setOpen(true)} className="mt-2 cursor-pointer text-[0.875rem] text-muted underline">Change video link (editors)</button>;
+  return (
+    <div className="mt-3 rounded-xl border border-line bg-surface p-4">
+      <label className="block text-[0.9375rem] font-semibold" htmlFor="video-link-edit">Video link</label>
+      <input id="video-link-edit" value={value} onChange={(e) => setValue(e.target.value)} inputMode="url" dir="ltr"
+        className="mt-1.5 w-full rounded-lg border border-line bg-stone px-3 py-2" />
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button type="button" disabled={busy} onClick={save} className="cursor-pointer rounded-lg bg-navy px-4 py-2 font-semibold text-white disabled:opacity-50">{busy ? 'Saving…' : 'Save link'}</button>
+        <button type="button" onClick={() => setOpen(false)} className="cursor-pointer rounded-lg px-3 py-2 text-ink-soft">Cancel</button>
+      </div>
+      {msg && <p className="mt-2 text-[0.875rem] text-ink-soft" role="status">{msg}</p>}
+    </div>
   );
 };

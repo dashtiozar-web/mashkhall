@@ -8,7 +8,7 @@ import { Button, Container, PageHeader } from '../components/ui';
 import { BankTransferDetails, VoluntaryContribution } from '../components/BankTransferDetails';
 import { SECTION_CHOICES } from '../lib/sections';
 import { uploadImage } from '../lib/media';
-import { videoEmbed, videoTags, VIDEO_HELP, SUBTITLE_LANGUAGES } from '../lib/video';
+import { videoEmbed, videoTags, VIDEO_HELP, SUBTITLE_LANGUAGES, isFacebookShareLink, FACEBOOK_SHARE_HELP } from '../lib/video';
 import {
   categoryOf, claimPayment, DISCOUNT_AFTER, DISCOUNT_PERCENT, FEES, feeFor, FREE_AFTER,
   PAYMENT_STATUS_LABEL, pounds, SUBMISSION_STATUS_LABEL, SubmissionPayment, useMySubmissions,
@@ -165,6 +165,7 @@ const ContributeForm: React.FC<{ onNavigate: (tab: string, param?: string) => vo
 
   const validate = () => {
     if (title.trim().length < 5) return 'Please give your work a title (at least 5 characters).';
+    if (isFacebookShareLink(videoUrl)) return FACEBOOK_SHARE_HELP;
     if (isVideo && !videoEmbed(videoUrl)) return 'Please add the link to your video on YouTube, Vimeo or Facebook.';
     if (isVideo && content.trim().length < 20) return 'Please describe the video in a few sentences: what it shows, where and when.';
     if (!isVideo && content.trim().length < 200) return 'Please write at least a few paragraphs (200 characters or more).';
