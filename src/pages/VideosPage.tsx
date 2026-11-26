@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Captions, PlayCircle, Search, Upload } from 'lucide-react';
+import { PlayBadge } from '../components/PlayBadge';
 import { useData } from '../context/DataContext';
 import { Container, EmptyState, PageHeader, categoryLabel, formatDate } from '../components/ui';
 import { MediaImage } from '../components/MediaImage';
@@ -82,7 +83,7 @@ export const VideosPage: React.FC<{ onNavigate: (tab: string, param?: string) =>
                       <a href={`/news/${encodeURIComponent(v.slug || v.id)}`} className="group block no-underline">
                         <div className="relative aspect-video overflow-hidden rounded-xl bg-ink">
                           {thumb ? <MediaImage src={thumb} alt="" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none" /> : null}
-                          <span className="absolute inset-0 flex items-center justify-center bg-ink/20"><PlayCircle className="h-14 w-14 text-white drop-shadow" aria-hidden="true" /></span>
+                          <PlayBadge />
                         </div>
                         <p className="mt-3 text-[0.8125rem] text-muted">
                           <span className="font-semibold text-navy">{categoryLabel(v.category)}</span>

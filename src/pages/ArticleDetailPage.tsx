@@ -224,7 +224,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ slug, onNa
         </Container>
       </header>
 
-      {article.coverImageUrl && (
+      {article.coverImageUrl && !videoEmbed(article.videoUrl) && (
         <Container className="max-w-[1000px] pt-10">
           <figure>
             <MediaImage src={article.coverImageUrl} alt={article.coverImageAlt || ''} className="w-full object-cover" />
@@ -235,7 +235,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ slug, onNa
 
       {videoEmbed(article.videoUrl) && (
         <Container className="max-w-[1000px] pt-10">
-          <VideoPlayer url={article.videoUrl} title={`Video: ${article.title}`} />
+          <VideoPlayer url={article.videoUrl} title={`Video: ${article.title}`} poster={article.coverImageUrl} />
           {isPublisher && <VideoLinkEditor articleId={article.id} current={article.videoUrl || ''} />}
         </Container>
       )}

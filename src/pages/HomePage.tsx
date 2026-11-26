@@ -1,6 +1,8 @@
 import React, { Suspense, lazy, useMemo } from 'react';
 import { HandHeart, Landmark, Scale, BookOpen, Users } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { PlayBadge } from '../components/PlayBadge';
+import { videoEmbed, videoThumbnail } from '../lib/video';
 import { Button, Container, EmptyState, Logo, SectionHeading, TextLink, categoryLabel, formatDate } from '../components/ui';
 import { Article } from '../types';
 import { CouncilRanking } from '../components/UKCouncilMap';
@@ -61,8 +63,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         .sort((a, b) => (b.publishedAt || b.createdAt || '').localeCompare(a.publishedAt || a.createdAt || '')),
     [articles],
   );
-  /** The ten newest articles shown on the home page. */
-  const latest = published.slice(0, 10);
+  /** The ten newest written pieces, and separately the ten newest videos, on the home page. */
+  const latest = published.filter((a) => a.contentType !== 'video_speech').slice(0, 10);
+  const latestVideos = published.filter((a) => a.contentType === 'video_speech' && videoEmbed(a.videoUrl)).slice(0, 10);
   const areas = siteSettings.areasOfWork || [];
 
   return (
@@ -239,6 +242,46 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           )}
         </Container>
       </section>
+
+      {/* Latest videos, apart from the articles */}
+      {latestVideos.length > 0 && (
+        <section className="border-t border-line bg-[#1F100B] text-white">
+          <Container className="py-12 sm:py-16">
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <span className="block h-0.5 w-10 bg-[#F2C14E]" aria-hidden="true" />
+                <h2 className="mt-4 text-[1.75rem] font-semibold text-white sm:text-[2rem]">Videos</h2>
+                <p className="mt-2 max-w-[60ch] text-white/75">Talks, statements and reports on video. Press play to watch here on our website.</p>
+              </div>
+              <button type="button" onClick={() => onNavigate('videos')} className="shrink-0 cursor-pointer self-start rounded-lg border border-white/40 px-4 py-2 font-semibold text-white hover:bg-white/10 sm:self-auto">All videos</button>
+            </div>
+            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {latestVideos.map((v) => {
+                const thumb = v.coverImageUrl || videoThumbnail(v.videoUrl);
+                return (
+                  <li key={v.id} className="min-w-0">
+                    <a href={`/news/${encodeURIComponent(v.slug || v.id)}`} className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white/[0.06] text-white no-underline ring-1 ring-white/10 hover:ring-[#F2C14E]/60">
+                      <span className="relative block aspect-video w-full overflow-hidden bg-black">
+                        {thumb ? (
+                          <MediaImage src={thumb} alt="" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#3A1A10] via-[#7A2414] to-[#B3261E]"><Logo size={48} /></span>
+                        )}
+                        <PlayBadge />
+                      </span>
+                      <span className="flex flex-1 flex-col p-4">
+                        <span className="text-[0.8125rem] text-[#F2C14E]">{formatDate(v.publishedAt || v.createdAt)}</span>
+                        <span dir="auto" className="mt-1.5 line-clamp-3 text-[1.0625rem] leading-snug font-semibold group-hover:underline group-hover:underline-offset-4">{v.title}</span>
+                        {v.authorDisplayName && <span className="mt-auto pt-3 text-[0.875rem] text-white/60">By {v.authorDisplayName}</span>}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </Container>
+        </section>
+      )}
 
       {/* Members: the five provinces of Kurdistan and the countries abroad */}
       <section className="border-y border-line bg-stone">

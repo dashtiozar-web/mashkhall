@@ -3505,5 +3505,8 @@
  "The card could not be downloaded. Please try again.": "کارتەکە دانەگیرا. تکایە دووبارە هەوڵ بدەرەوە.",
  "Watch on Facebook": "لە فەیسبووک سەیری بکە",
  "This is a Facebook share link, which Facebook does not allow to play on other websites. Open it in your browser, wait for the video to load, then copy the full address from the address bar (it contains /videos/ or /reel/ and a long number) and paste that here. The video must be Public.": "ئەمە بەستەری هاوبەشکردنی فەیسبووکە، کە فەیسبووک ڕێگە نادات لە ماڵپەڕی تر پەخش بکرێت. لە وێبگەڕەکەتدا بیکەرەوە، چاوەڕێ بکە تا ڤیدیۆکە بار دەبێت، پاشان ناونیشانی تەواو لە شریتی ناونیشان کۆپی بکە (/videos/ یان /reel/ و ژمارەیەکی درێژی تێدایە) و لێرە دایبنێ. ڤیدیۆکە دەبێت گشتی (Public) بێت.",
- "Watch this video on Facebook": "سەیری ئەم ڤیدیۆیە لە فەیسبووک بکە"
+ "Watch this video on Facebook": "سەیری ئەم ڤیدیۆیە لە فەیسبووک بکە",
+ "All videos": "هەموو ڤیدیۆکان",
+ "Talks, statements and reports on video. Press play to watch here on our website.": "وتار، ڕاگەیاندراو و ڕاپۆرت بە ڤیدیۆ. دوگمەی پەخش دابگرە بۆ سەیرکردن لێرە لە ماڵپەڕەکەمان.",
+ "Play: {0}": "پەخشکردن: {0}"
 }

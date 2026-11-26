@@ -3,6 +3,8 @@ import { Search } from 'lucide-react';
 import { Article, ContentType } from '../types';
 import { EmptyState, categoryLabel, formatDate } from './ui';
 import { MediaImage } from './MediaImage';
+import { PlayBadge } from './PlayBadge';
+import { videoThumbnail } from '../lib/video';
 import { VIDEOS_ONLY_TAG, visibleTags } from '../lib/video';
 
 export const viewsLabel = (n?: number) => `${(n || 0).toLocaleString('en-GB')} ${n === 1 ? 'view' : 'views'}`;
@@ -140,8 +142,11 @@ export const PublicationList: React.FC<PublicationListProps> = ({ articles, show
                     {(a.likesCount || 0) > 0 && <span className="tabular-nums">{'  ·  '}{a.likesCount} support</span>}
                   </p>
                 </div>
-                {a.coverImageUrl && (
-                  <MediaImage src={a.coverImageUrl} alt="" loading="lazy" className="hidden aspect-[4/3] w-52 object-cover sm:block" />
+                {(a.coverImageUrl || (a.contentType === 'video_speech' && videoThumbnail(a.videoUrl))) && (
+                  <span className="relative hidden w-52 shrink-0 overflow-hidden sm:block">
+                    <MediaImage src={a.coverImageUrl || videoThumbnail(a.videoUrl)} alt="" loading="lazy" className="aspect-[4/3] w-52 object-cover" />
+                    {a.contentType === 'video_speech' && <PlayBadge size="sm" />}
+                  </span>
                 )}
               </a>
             </li>

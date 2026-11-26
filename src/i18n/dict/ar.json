@@ -3505,5 +3505,8 @@
  "The card could not be downloaded. Please try again.": "تعذّر تنزيل البطاقة. يُرجى المحاولة مرة أخرى.",
  "Watch on Facebook": "شاهد على فيسبوك",
  "This is a Facebook share link, which Facebook does not allow to play on other websites. Open it in your browser, wait for the video to load, then copy the full address from the address bar (it contains /videos/ or /reel/ and a long number) and paste that here. The video must be Public.": "هذا رابط مشاركة من فيسبوك، ولا يسمح فيسبوك بتشغيله على مواقع أخرى. افتحه في متصفحك، وانتظر حتى يُحمَّل الفيديو، ثم انسخ العنوان الكامل من شريط العنوان (يحتوي على /videos/ أو /reel/ ورقم طويل) والصقه هنا. يجب أن يكون الفيديو عاماً (Public).",
- "Watch this video on Facebook": "شاهد هذا الفيديو على فيسبوك"
+ "Watch this video on Facebook": "شاهد هذا الفيديو على فيسبوك",
+ "All videos": "كل الفيديوهات",
+ "Talks, statements and reports on video. Press play to watch here on our website.": "كلمات وبيانات وتقارير بالفيديو. اضغط على زر التشغيل للمشاهدة هنا على موقعنا.",
+ "Play: {0}": "تشغيل: {0}"
 }
