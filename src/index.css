@@ -407,3 +407,23 @@ html:not([lang^="en"]) .ku-sub { display: none; }
 @keyframes map-pulse { 0%, 100% { transform: scale(1); opacity: 0.55; } 50% { transform: scale(1.5); opacity: 0.15; } }
 .map-pulse { transform-box: fill-box; transform-origin: center; animation: map-pulse 2.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .map-pulse { animation: none; } }
+
+/* The Kurdistan members map: a golden relief that sways, glows and twinkles. */
+.mm-sway { transform: rotateX(24deg) scale(1.03); animation: mm-sway 16s ease-in-out infinite alternate; }
+@keyframes mm-sway {
+  0% { transform: rotateX(26deg) rotateZ(-1.2deg) scale(1.03); }
+  50% { transform: rotateX(21deg) rotateZ(0deg) scale(1.05); }
+  100% { transform: rotateX(25deg) rotateZ(1.2deg) scale(1.03); }
+}
+.mm-bob { transform-box: fill-box; animation: mm-bob 3.4s ease-in-out infinite; }
+@keyframes mm-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.mm-twinkle { transform-box: fill-box; transform-origin: center; animation: mm-twinkle 3.6s ease-in-out infinite; }
+@keyframes mm-twinkle { 0%, 100% { opacity: 0.25; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1.3); } }
+.mm-glow { animation: mm-glow 4s ease-in-out infinite; }
+@keyframes mm-glow { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.95; } }
+.mm-sheen { animation: mm-sheen 9s ease-in-out infinite; }
+@keyframes mm-sheen { 0% { transform: translateX(0); } 60%, 100% { transform: translateX(1250px); } }
+@media (prefers-reduced-motion: reduce) {
+  .mm-sway { animation: none; }
+  .mm-bob, .mm-twinkle, .mm-glow, .mm-sheen { animation: none; }
+}

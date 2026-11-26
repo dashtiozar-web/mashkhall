@@ -32,7 +32,9 @@ export const Globe3D: React.FC<{
   focusId: string | null;
   onHover: (id: string | null) => void;
   onPick: (id: string) => void;
-}> = ({ places, home, focusId, onHover, onPick }) => {
+  /** 1 shows the whole globe; larger numbers bring it closer. */
+  zoom?: number;
+}> = ({ places, home, focusId, onHover, onPick, zoom = 1 }) => {
   const countries = useMemo(() => {
     const topo = world as unknown as Topology<{ countries: GeometryCollection }>;
     return (feature(topo, topo.objects.countries) as unknown as { features: { id: string; properties: { name: string } }[] }).features;
@@ -65,10 +67,14 @@ export const Globe3D: React.FC<{
     if (p) setRot([-p.lng, Math.max(-50, Math.min(50, -p.lat * 0.8))]);
   }, [focusId, places, home]);
 
-  const projection = useMemo(() => geoOrthographic().scale(R).translate([W / 2, H / 2]).rotate([rot[0], rot[1], 0]).clipAngle(90), [rot]);
+  const projection = useMemo(() => geoOrthographic().scale(R * zoom).translate([W / 2, H / 2]).rotate([rot[0], rot[1], 0]).clipAngle(90), [rot, zoom]);
   const path = useMemo(() => geoPath(projection), [projection]);
   const centre: [number, number] = [-rot[0], -rot[1]];
-  const visible = (lng: number, lat: number) => geoDistance([lng, lat], centre) < Math.PI / 2 - 0.08;
+  const visible = (lng: number, lat: number) => {
+    if (geoDistance([lng, lat], centre) >= Math.PI / 2 - 0.08) return false;
+    const [x, y] = projection([lng, lat]) || [-1, -1];
+    return x > -20 && x < W + 20 && y > -20 && y < H + 20;
+  };
   const byIso = new Map(places.filter((p) => p.iso).map((p) => [p.iso!, p]));
   const max = Math.max(1, ...places.map((p) => p.members));
 
@@ -79,7 +85,7 @@ export const Globe3D: React.FC<{
   };
   const onMove = (e: React.PointerEvent) => {
     if (!drag.current) return;
-    const k = 0.35;
+    const k = 0.35 / zoom;
     const d = drag.current;
     setRot([d.r[0] + (e.clientX - d.x) * k, Math.max(-70, Math.min(70, d.r[1] - (e.clientY - d.y) * k))]);
   };
@@ -87,7 +93,7 @@ export const Globe3D: React.FC<{
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} role="group" aria-label="Globe showing our members abroad, joined to Kurdistan. Drag to turn it."
-      className="mx-auto block h-auto w-full max-w-[640px] touch-none select-none" style={{ cursor: held ? 'grabbing' : 'grab' }}
+      className="mx-auto block h-auto w-full max-w-[640px] touch-none select-none" style={{ cursor: held ? 'grabbing' : 'grab', ...(zoom > 1 ? { maskImage: 'radial-gradient(ellipse at center, #000 62%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse at center, #000 62%, transparent 100%)' } : {}) }}
       onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onPointerLeave={onUp}>
       <defs>
         <radialGradient id="g-ocean" cx="38%" cy="32%" r="75%">
@@ -122,7 +128,7 @@ export const Globe3D: React.FC<{
         <filter id="g-shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2.2" floodOpacity="0.5" /></filter>
       </defs>
 
-      <circle cx={W / 2} cy={H / 2} r={R + 22} fill="url(#g-glow)" />
+      <circle cx={W / 2} cy={H / 2} r={(R + 22) * zoom} fill="url(#g-glow)" />
       <path d={path({ type: 'Sphere' } as GeoPermissibleObjects) || ''} fill="url(#g-ocean)" />
       <path d={path(geoGraticule10()) || ''} fill="none" stroke="#ffffff" strokeOpacity={0.08} strokeWidth={0.6} />
 
