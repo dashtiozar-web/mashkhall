@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { MediaImage } from './MediaImage';
 import { PlayBadge } from './PlayBadge';
 import { ExternalLink, Play } from 'lucide-react';
@@ -12,11 +12,43 @@ const withAutoplay = (src: string, on: boolean) => {
   return u.toString();
 };
 
+/**
+ * Facebook draws its player at the width it is given and cuts off whatever
+ * does not fit the frame, so tell it the frame's exact size: the whole video
+ * is then shown, letterboxed when its shape differs.
+ */
+const withFrameSize = (src: string, size: { w: number; h: number } | null) => {
+  if (!size) return src;
+  const u = new URL(src);
+  if (!u.hostname.includes('facebook')) return src;
+  u.searchParams.set('width', String(size.w));
+  u.searchParams.set('height', String(size.h));
+  return u.toString();
+};
+
 /** Plays a YouTube, Vimeo or Facebook video inside our page. */
 export const VideoPlayer: React.FC<{ url?: string; title: string; className?: string; poster?: string }> = ({ url, title, className, poster }) => {
   const v = videoEmbed(url);
   const picture = poster || videoThumbnail(url);
   const [playing, setPlaying] = useState(!picture);
+  const frame = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null);
+  const isFacebook = v?.provider === 'facebook';
+  useLayoutEffect(() => {
+    const el = frame.current;
+    if (!el || !isFacebook) return;
+    const measure = () => {
+      const w = Math.round(el.clientWidth), h = Math.round(el.clientHeight);
+      if (!w || !h) return;
+      // Only reload the player for a real change (e.g. turning the phone),
+      // not for a pixel or two.
+      setSize((old) => (old && Math.abs(old.w - w) < 24 && Math.abs(old.h - h) < 24 ? old : { w, h }));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isFacebook]);
   if (!v || !url) return null;
   // Facebook will not play its short share links on other websites:
   // offer the video on Facebook instead of a broken player.
@@ -35,7 +67,7 @@ export const VideoPlayer: React.FC<{ url?: string; title: string; className?: st
   }
   return (
     <div className={className || ''}>
-      <div className={`${v.vertical ? 'mx-auto aspect-[9/16] max-w-[360px]' : 'aspect-video'} relative w-full overflow-hidden rounded-xl bg-black`}>
+      <div ref={frame} className={`${v.vertical ? 'mx-auto aspect-[9/16] max-w-[360px]' : 'aspect-video'} relative w-full overflow-hidden rounded-xl bg-black`}>
         {!playing ? (
           // The video's picture, large, with a play button; the player starts when pressed.
           <button type="button" onClick={() => setPlaying(true)} className="group absolute inset-0 block h-full w-full cursor-pointer" aria-label={`Play: ${title}`}>
@@ -43,8 +75,9 @@ export const VideoPlayer: React.FC<{ url?: string; title: string; className?: st
             <PlayBadge />
           </button>
         ) : (
-        <iframe
-          src={withAutoplay(v.src, Boolean(picture))}
+        (isFacebook && !size) ? null : <iframe
+          key={size ? `${size.w}x${size.h}` : 'v'}
+          src={withFrameSize(withAutoplay(v.src, Boolean(picture)), size)}
           title={title}
           className="absolute inset-0 h-full w-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"

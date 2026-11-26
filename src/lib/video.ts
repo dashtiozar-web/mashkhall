@@ -42,8 +42,9 @@ export const videoEmbed = (raw?: string): VideoEmbed | null => {
   if (/^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|fb\.watch)\//i.test(url) && /\/(videos?|reel|watch)\b|\/share\/(v|r)\/|fb\.watch/i.test(url)) {
     return {
       provider: 'facebook',
-      src: `https://www.facebook.com/plugins/video.php?${new URLSearchParams({ href: facebookHref(url), show_text: 'false', width: '1280' })}`,
-      // Shown wide and large, like its picture; Facebook fits the video inside.
+      src: `https://www.facebook.com/plugins/video.php?${new URLSearchParams({ href: facebookHref(url), show_text: 'false', allowfullscreen: 'true' })}`,
+      // Shown wide and large, like its picture. The player adds the frame's
+      // exact size (see VideoPlayer) so Facebook fits the whole video inside.
       vertical: false,
     };
   }
