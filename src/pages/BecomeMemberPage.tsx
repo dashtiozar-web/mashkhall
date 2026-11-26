@@ -1,4 +1,4 @@
-import { TIERS, canHoldPositions, isTier, tierById, MembershipTier } from '../lib/tiers';
+import { TIERS, canHoldPositions, isTier, tierById, MembershipTier, SUPPORT_TYPES, FUTURE_INTENTS, supportLabel, futureLabel } from '../lib/tiers';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { authErrorMessage } from '../lib/authErrors';
 import { COUNTRIES, KURDISTAN, PROVINCES, ABROAD_IDS, countryName, groupLabel, isProvince, normaliseCity } from '../lib/places';
@@ -190,6 +190,8 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
   const country = countryName(placeCountry);
   const [positionId, setPositionId] = useState('');
   const [tier, setTier] = useState<MembershipTier | ''>('');
+  const [supportTypes, setSupportTypes] = useState<string[]>([]);
+  const [futureIntent, setFutureIntent] = useState('');
   const [reason, setReason] = useState('');
   const [skills, setSkills] = useState('');
   const [involvement, setInvolvement] = useState<InvolvementPeriod | ''>('');
@@ -235,6 +237,8 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
             setCity((v) => v || app.city || '');
             setPositionId((v) => v || app.positionId || '');
             if (isTier(app.tier)) setTier((v) => v || (app.tier as MembershipTier));
+            if (app.supportTypes?.length) setSupportTypes((v) => (v.length ? v : app.supportTypes!));
+            if (app.futureIntent) setFutureIntent((v) => v || app.futureIntent!);
             setReason((v) => v || app.reason || '');
             setSkills((v) => v || app.skills || '');
             if (app.involvement) {
@@ -291,6 +295,8 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
     else if (s === 2 && (!councilId || (placeCountry === KURDISTAN ? !isProvince(councilId) : councilId !== placeCountry))) e.council = 'Please choose your province in Kurdistan.';
     if (s === 2 && normaliseCity(city).length < 2) e.city = 'Please tell us which city or town you are joining from.';
     if (s === 2 && !tier) e.tier = 'Please choose your kind of membership.';
+    if (s === 2 && tier === 'pishtiwan' && !supportTypes.length) e.support = 'Please choose how you would like to support us.';
+    if (s === 2 && tier === 'komar' && !futureIntent) e.future = 'Please choose one answer.';
     if (s === 2 && !positionById(positionId)) e.position = 'Please choose one position.';
     else if (s === 2 && tier && !canHoldPositions(tier) && positionId !== 'member') e.position = 'Only Pêşeng members take on positions. Please choose Member, or choose Pêşeng above.';
     if (s === 3 && reason.trim().length < 20) e.reason = 'Please write a sentence or two (at least 20 characters).';
@@ -392,6 +398,8 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
         chapterId: councilId,
         city: normaliseCity(city).slice(0, 100),
         ...(tier ? { tier } : {}),
+        ...(tier === 'pishtiwan' ? { supportTypes: SUPPORT_TYPES.map((o) => o.id).filter((id) => supportTypes.includes(id)) } : {}),
+        ...(tier === 'komar' && futureIntent ? { futureIntent } : {}),
         positionId,
         reason: reason.trim(),
         skills: skills.trim(),
@@ -641,9 +649,10 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                   {errors.tier && <p className="mt-2 text-[0.9375rem] font-semibold text-crimson">{errors.tier}</p>}
                 </fieldset>
 
+                {tier === 'peshang' && (
                 <div className="border-t border-line pt-6">
                   <label className={labelCls} htmlFor="position">
-                    Position you hold or would like to take on
+                    As a Pêşeng: the position you hold or would like to take on
                   </label>
                   <p className="mt-1 text-[0.9375rem] text-muted">
                     Choose one. If you don’t hold a specific role, choose <strong className="font-semibold text-ink-soft">Member</strong>.
@@ -659,8 +668,8 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                     aria-describedby={errors.position ? 'position-error' : undefined}
                   >
                     <option value="" disabled>Select a position…</option>
-                    {DEPARTMENTS.map((d) => (
-                      <optgroup key={d.id} label={d.id === 'council' ? 'Your province or country' : d.name}>
+                    {DEPARTMENTS.filter((d) => d.id === 'board' || d.id === 'council' || d.id === 'membership').map((d) => (
+                      <optgroup key={d.id} label={d.id === 'council' ? 'Your group (province or country)' : d.id === 'membership' ? 'No position for now' : d.name}>
                         {positionsIn(d.id).map((p) => <option key={p.id} value={p.id} disabled={Boolean(tier) && !canHoldPositions(tier) && p.id !== 'member'}>{p.title}</option>)}
                       </optgroup>
                     ))}
@@ -670,6 +679,49 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                   )}
                   {errors.position && <p id="position-error" className="mt-2 text-[0.9375rem] font-semibold text-crimson">{errors.position}</p>}
                 </div>
+                )}
+
+                {tier === 'pishtiwan' && (
+                  <fieldset className="border-t border-line pt-6">
+                    <legend className={labelCls}>How would you like to support us?</legend>
+                    <p className="mt-1 text-[0.9375rem] text-muted">Choose one or more.</p>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {SUPPORT_TYPES.map((o) => {
+                        const on = supportTypes.includes(o.id);
+                        return (
+                          <label key={o.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-3 ${on ? 'border-navy bg-navy-tint' : 'border-line hover:border-ink/30'}`}>
+                            <input type="checkbox" checked={on} className="mt-1 h-4 w-4"
+                              onChange={() => { setSupportTypes((v) => (on ? v.filter((x) => x !== o.id) : [...v, o.id])); setErrors(({ support: _s, ...rest }) => rest); }} />
+                            <span><span className="block font-semibold">{o.name}</span><span className="block text-[0.875rem] text-ink-soft">{o.description}</span></span>
+                          </label>
+                        );
+                      })}
+                      <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-3 sm:col-span-2 ${supportTypes.length === SUPPORT_TYPES.length ? 'border-navy bg-navy-tint' : 'border-line hover:border-ink/30'}`}>
+                        <input type="checkbox" checked={supportTypes.length === SUPPORT_TYPES.length} className="h-4 w-4"
+                          onChange={(e) => { setSupportTypes(e.target.checked ? SUPPORT_TYPES.map((o) => o.id) : []); setErrors(({ support: _s, ...rest }) => rest); }} />
+                        <span className="font-semibold">All of them</span>
+                      </label>
+                    </div>
+                    {errors.support && <p className="mt-2 text-[0.9375rem] font-semibold text-crimson">{errors.support}</p>}
+                  </fieldset>
+                )}
+
+                {tier === 'komar' && (
+                  <fieldset className="border-t border-line pt-6">
+                    <legend className={labelCls}>Would you like to do more later?</legend>
+                    <p className="mt-1 text-[0.9375rem] text-muted">Do you think that, in the near or more distant future, you would like to become a Piştîwan or a Pêşeng?</p>
+                    <div className="mt-3 grid gap-2">
+                      {FUTURE_INTENTS.map((o) => (
+                        <label key={o.id} className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-3 ${futureIntent === o.id ? 'border-navy bg-navy-tint' : 'border-line hover:border-ink/30'}`}>
+                          <input type="radio" name="future" checked={futureIntent === o.id} className="h-4 w-4"
+                            onChange={() => { setFutureIntent(o.id); setErrors(({ future: _f, ...rest }) => rest); }} />
+                          <span className="font-semibold">{o.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {errors.future && <p className="mt-2 text-[0.9375rem] font-semibold text-crimson">{errors.future}</p>}
+                  </fieldset>
+                )}
               </div>
             )}
 
@@ -778,6 +830,8 @@ export const BecomeMemberPage: React.FC<BecomeMemberPageProps> = ({ initialChapt
                     { label: 'Contact', value: [email, phone].filter(Boolean).join(', '), step: 1 as StepIndex },
                     { label: 'Joining from', value: council ? [normaliseCity(city), groupLabel(council)].filter(Boolean).join(', ') : 'Not chosen', step: 2 as StepIndex },
                     { label: 'Kind of membership', value: tierById(tier)?.name || 'Not chosen', step: 2 as StepIndex },
+                    ...(tier === 'pishtiwan' ? [{ label: 'Support', value: supportLabel(supportTypes), step: 2 as StepIndex }] : []),
+                    ...(tier === 'komar' ? [{ label: 'Later', value: futureLabel(futureIntent), step: 2 as StepIndex }] : []),
                     { label: 'Position', value: positionById(positionId) ? `${positionTitle(positionId)} (${departmentFor(positionId)?.name})` : 'Not chosen', step: 2 as StepIndex },
                     { label: 'About you', value: reason, step: 3 as StepIndex },
                     { label: 'Member since', value: involvement === 'new' ? 'New member (joining now)' : involvedSince ? formatDate(involvedSince) : 'Not answered', step: 3 as StepIndex },

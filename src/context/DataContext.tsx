@@ -417,6 +417,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             chapterId: app.chapterId,
             ...(app.city ? { city: app.city } : {}),
             ...(app.tier ? { tier: app.tier } : {}),
+            ...(app.supportTypes?.length ? { supportTypes: app.supportTypes } : {}),
+            ...(app.futureIntent ? { futureIntent: app.futureIntent } : {}),
             status: 'active',
             roles: ['member'],
             // Every approved member is shown publicly (organisation policy).

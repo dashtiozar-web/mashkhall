@@ -21,7 +21,7 @@ export const StructurePage: React.FC<StructurePageProps> = ({ onNavigate }) => {
     <>
       <PageHeader
         title="Our structure"
-        intro="How Mashkhally Zhyanawa Organisation is organised: the Board of Directors, six councils with their own teams, and an organisation-wide Production Team."
+        intro="How Mashkhally Zhyanawa Organisation is organised: the Board of Directors with its eight centres, the groups in cities and countries with their Lobby Supervisors and four corners, our members by kind of membership, and the Production Team."
       />
       <Container className="py-12 sm:py-16">
         {assignments === null ? (

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { TIERS, isTier } from '../lib/tiers';
 import { Search } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { Button, Container, EmptyState, PageHeader, SectionHeading } from '../components/ui';
@@ -44,12 +45,12 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
     });
   }, [publicProfiles, chapterFilter, search]);
 
-  const grouped = GROUPS.map((g) => ({
-    ...g,
-    people: filtered
-      .filter((p) => resolveLevel(p) === g.level)
-      .sort((a, b) => (a.displayRankOrder ?? 99) - (b.displayRankOrder ?? 99) || a.displayName.localeCompare(b.displayName)),
-  })).filter((g) => g.people.length > 0);
+  // Members are shown in three groups by kind of membership: Pêşeng, Piştîwan and Komar.
+  const bySeniority = (a: PublicProfile, b: PublicProfile) => (a.displayRankOrder ?? 99) - (b.displayRankOrder ?? 99) || a.displayName.localeCompare(b.displayName);
+  const grouped = [
+    ...TIERS.map((t) => ({ level: t.id, title: t.name, ku: t.ku, colour: t.colour, description: t.description, people: filtered.filter((p) => p.tier === t.id).sort(bySeniority) })),
+    { level: 'unset', title: 'Kind of membership not yet set', ku: '', colour: '', description: '', people: filtered.filter((p) => !isTier(p.tier)).sort(bySeniority) },
+  ].filter((g) => g.people.length > 0);
 
   return (
     <>
@@ -103,7 +104,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
         <Container className="py-16 sm:py-20">
           <SectionHeading
             title="Our people"
-            intro="Every approved member of Mashkhally Zhyanawa, by role."
+            intro="Every approved member of Mashkhally Zhyanawa, in three groups by kind of membership: Pêşeng, Piştîwan and Komar."
           />
 
           {publicProfiles.length > 0 && (
@@ -144,8 +145,13 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({ onNavigate }) => {
           ) : (
             <div className="space-y-14">
               {grouped.map((g) => (
-                <div key={g.level}>
-                  <h3 className="mb-6 text-[1.5rem] font-semibold">{g.title}</h3>
+                <div key={g.level} className={g.colour ? 'rounded-3xl border-2 bg-surface p-5 sm:p-7' : ''} style={g.colour ? { borderColor: `${g.colour}55` } : undefined}>
+                  <h3 className="text-[1.5rem] font-semibold">
+                    {g.ku && <span className="font-kurdish me-2 text-[1.75rem]" lang="ckb" dir="rtl" translate="no" style={{ color: g.colour }}>{g.ku}</span>}
+                    <span className={g.ku ? 'ku-sub text-ink-soft' : ''}>{g.title}</span>
+                    <span className="ms-3 text-[1.125rem] font-normal text-muted tabular-nums">{g.people.length}</span>
+                  </h3>
+                  {g.description && <p className="mt-1 mb-6 max-w-[70ch] text-ink-soft">{g.description}</p>}
                   <div className="grid gap-x-10 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
                     {g.people.map((p) => <PersonCard key={p.id} profile={p} />)}
                   </div>

@@ -1,46 +1,334 @@
 {
   "_comment": "The official structure of Mashkhally Zhyanawa Organisation. Used by the website, the server and (through scripts/sync-pricing.ts) the database rules. 'number' is seniority: lower is more senior. Run `npx tsx scripts/sync-pricing.ts` after changing it.",
   "units": [
-    { "id": "board", "number": 1, "name": "Board of Directors" },
-    { "id": "council", "number": 2, "name": "Council Structure" },
-    { "id": "production", "number": 3, "name": "Production Team" },
-    { "id": "webadmin", "number": 4, "name": "Website Administration" },
-    { "id": "membership", "number": 5, "name": "General Membership" }
+    {
+      "id": "board",
+      "number": 1,
+      "name": "Board of Directors"
+    },
+    {
+      "id": "council",
+      "number": 2,
+      "name": "Groups in cities and countries"
+    },
+    {
+      "id": "production",
+      "number": 3,
+      "name": "Production Team"
+    },
+    {
+      "id": "webadmin",
+      "number": 4,
+      "name": "Website Administration"
+    },
+    {
+      "id": "membership",
+      "number": 5,
+      "name": "General Membership"
+    }
   ],
   "positions": [
-    { "id": "president", "number": 1, "title": "President", "department": "board", "head": true, "seats": 1 },
-    { "id": "deputy_president", "number": 2, "title": "Deputy President", "department": "board", "head": true, "seats": 1, "reportsTo": "president" },
-    { "id": "head_of_media", "number": 3, "title": "Head of Media", "department": "board", "head": true, "seats": 1, "reportsTo": "deputy_president" },
-    { "id": "research_manager", "number": 4, "title": "Head of Research and Investigation", "department": "board", "head": true, "seats": 1, "reportsTo": "deputy_president" },
-    { "id": "head_of_public_relations", "number": 5, "title": "Head of Public Relations", "department": "board", "head": true, "seats": 1, "reportsTo": "deputy_president" },
-    { "id": "councils_representative", "number": 6, "title": "Representative of Council Leaders", "department": "board", "head": true, "seats": 1, "reportsTo": "deputy_president" },
-    { "id": "administrator", "number": 7, "title": "Head of Administration", "department": "board", "head": true, "seats": 1, "reportsTo": "deputy_president" },
-    { "id": "head_of_finance", "number": 8, "title": "Head of Finance", "department": "board", "head": true, "seats": 1, "reportsTo": "deputy_president" },
-
-    { "id": "council_leader", "number": 9, "title": "Council Leader", "department": "council", "head": true, "seats": 1 },
-    { "id": "head_of_security", "number": 10, "title": "Head of Security Team", "department": "council", "head": true, "seats": 1, "reportsTo": "council_leader" },
-    { "id": "head_of_online_meetings", "number": 11, "title": "Head of Online Meeting Management", "department": "council", "head": true, "seats": 1, "reportsTo": "council_leader" },
-    { "id": "media_supervisor", "number": 12, "title": "Media Supervisor", "department": "council", "head": true, "seats": 1, "reportsTo": "council_leader" },
-    { "id": "security", "number": 13, "title": "Security Member", "department": "council", "head": false, "seats": 5, "reportsTo": "head_of_security" },
-    { "id": "council_photographer", "number": 14, "title": "Photographer", "department": "council", "head": false, "seats": 1, "reportsTo": "media_supervisor" },
-    { "id": "council_reporter", "number": 15, "title": "Reporter", "department": "council", "head": false, "seats": 1, "reportsTo": "media_supervisor" },
-    { "id": "printer", "number": 16, "title": "Printer", "department": "council", "head": false, "seats": 1, "reportsTo": "media_supervisor" },
-
-    { "id": "head_of_production", "number": 17, "title": "Head of Production Team", "department": "production", "head": true, "seats": 1 },
-    { "id": "graphic_designer", "number": 18, "title": "Graphic Designer", "department": "production", "head": false, "seats": 1, "reportsTo": "head_of_production" },
-    { "id": "reporter", "number": 19, "title": "Reporter", "department": "production", "head": false, "seats": 1, "reportsTo": "head_of_production" },
-    { "id": "photographer", "number": 20, "title": "Photographer", "department": "production", "head": false, "seats": 1, "reportsTo": "head_of_production" },
-    { "id": "video_editor", "number": 21, "title": "Video Editor", "department": "production", "head": false, "seats": 1, "reportsTo": "head_of_production" },
-    { "id": "content_creator", "number": 22, "title": "Content Creator", "department": "production", "head": false, "seats": 1, "reportsTo": "head_of_production" },
-
-    { "id": "web_admin", "number": 23, "title": "Admin — Head of Website Administration", "department": "webadmin", "head": true, "seats": 1 },
-    { "id": "web_deputy", "number": 24, "title": "Deputy Website Administrator", "department": "webadmin", "head": true, "seats": 1, "reportsTo": "web_admin" },
-    { "id": "web_security", "number": 25, "title": "Website Security and Technical Manager", "department": "webadmin", "head": false, "seats": 1, "reportsTo": "web_admin" },
-    { "id": "web_content", "number": 26, "title": "Website Content and Translation Manager", "department": "webadmin", "head": false, "seats": 1, "reportsTo": "web_admin" },
-    { "id": "web_support", "number": 27, "title": "Website Support and Membership Systems Officer", "department": "webadmin", "head": false, "seats": 1, "reportsTo": "web_admin" },
-
-    { "id": "member", "number": 28, "title": "Member", "department": "membership", "head": false, "seats": 0 }
+    {
+      "id": "president",
+      "number": 1,
+      "title": "President",
+      "department": "board",
+      "head": true,
+      "seats": 1
+    },
+    {
+      "id": "deputy_president",
+      "number": 2,
+      "title": "Deputy President",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "president"
+    },
+    {
+      "id": "head_of_education",
+      "number": 3,
+      "title": "Head of the Education Centre",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "head_of_finance",
+      "number": 4,
+      "title": "Head of the Finance Centre",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "head_of_media",
+      "number": 5,
+      "title": "Head of the Media and Communications Centre",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "research_manager",
+      "number": 6,
+      "title": "Head of the Research and Investigation Centre",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "head_of_public_relations",
+      "number": 7,
+      "title": "Head of the Public Relations Centre",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "administrator",
+      "number": 8,
+      "title": "Head of the Administration Centre",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "head_of_organising",
+      "number": 9,
+      "title": "Head of the Organising Centre",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "head_of_diaspora",
+      "number": 10,
+      "title": "Head of the Kurdish Diaspora Centre",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "councils_representative",
+      "number": 11,
+      "title": "Representative of the Lobby Supervisors",
+      "department": "board",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "deputy_president"
+    },
+    {
+      "id": "council_leader",
+      "number": 12,
+      "title": "Lobby Supervisor",
+      "department": "council",
+      "head": true,
+      "seats": 1
+    },
+    {
+      "id": "head_of_education_corner",
+      "number": 13,
+      "title": "Head of the Education Corner",
+      "department": "council",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "council_leader"
+    },
+    {
+      "id": "head_of_organising_corner",
+      "number": 14,
+      "title": "Head of the Organising Corner",
+      "department": "council",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "council_leader"
+    },
+    {
+      "id": "media_supervisor",
+      "number": 15,
+      "title": "Head of the Media and Communications Corner",
+      "department": "council",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "council_leader"
+    },
+    {
+      "id": "head_of_finance_corner",
+      "number": 16,
+      "title": "Head of the Finance Corner",
+      "department": "council",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "council_leader"
+    },
+    {
+      "id": "education_corner_member",
+      "number": 17,
+      "title": "Education Corner Member",
+      "department": "council",
+      "head": false,
+      "seats": 5,
+      "reportsTo": "head_of_education_corner"
+    },
+    {
+      "id": "organising_corner_member",
+      "number": 18,
+      "title": "Organising Corner Member",
+      "department": "council",
+      "head": false,
+      "seats": 5,
+      "reportsTo": "head_of_organising_corner"
+    },
+    {
+      "id": "media_corner_member",
+      "number": 19,
+      "title": "Media and Communications Corner Member",
+      "department": "council",
+      "head": false,
+      "seats": 5,
+      "reportsTo": "media_supervisor"
+    },
+    {
+      "id": "finance_corner_member",
+      "number": 20,
+      "title": "Finance Corner Member",
+      "department": "council",
+      "head": false,
+      "seats": 5,
+      "reportsTo": "head_of_finance_corner"
+    },
+    {
+      "id": "head_of_production",
+      "number": 21,
+      "title": "Head of Production Team",
+      "department": "production",
+      "head": true,
+      "seats": 1
+    },
+    {
+      "id": "graphic_designer",
+      "number": 22,
+      "title": "Graphic Designer",
+      "department": "production",
+      "head": false,
+      "seats": 1,
+      "reportsTo": "head_of_production"
+    },
+    {
+      "id": "reporter",
+      "number": 23,
+      "title": "Reporter",
+      "department": "production",
+      "head": false,
+      "seats": 1,
+      "reportsTo": "head_of_production"
+    },
+    {
+      "id": "photographer",
+      "number": 24,
+      "title": "Photographer",
+      "department": "production",
+      "head": false,
+      "seats": 1,
+      "reportsTo": "head_of_production"
+    },
+    {
+      "id": "video_editor",
+      "number": 25,
+      "title": "Video Editor",
+      "department": "production",
+      "head": false,
+      "seats": 1,
+      "reportsTo": "head_of_production"
+    },
+    {
+      "id": "content_creator",
+      "number": 26,
+      "title": "Content Creator",
+      "department": "production",
+      "head": false,
+      "seats": 1,
+      "reportsTo": "head_of_production"
+    },
+    {
+      "id": "web_admin",
+      "number": 27,
+      "title": "Admin — Head of Website Administration",
+      "department": "webadmin",
+      "head": true,
+      "seats": 1
+    },
+    {
+      "id": "web_deputy",
+      "number": 28,
+      "title": "Deputy Website Administrator",
+      "department": "webadmin",
+      "head": true,
+      "seats": 1,
+      "reportsTo": "web_admin"
+    },
+    {
+      "id": "web_security",
+      "number": 29,
+      "title": "Website Security and Technical Manager",
+      "department": "webadmin",
+      "head": false,
+      "seats": 1,
+      "reportsTo": "web_admin"
+    },
+    {
+      "id": "web_content",
+      "number": 30,
+      "title": "Website Content and Translation Manager",
+      "department": "webadmin",
+      "head": false,
+      "seats": 1,
+      "reportsTo": "web_admin"
+    },
+    {
+      "id": "web_support",
+      "number": 31,
+      "title": "Website Support and Membership Systems Officer",
+      "department": "webadmin",
+      "head": false,
+      "seats": 1,
+      "reportsTo": "web_admin"
+    },
+    {
+      "id": "member",
+      "number": 32,
+      "title": "Member",
+      "department": "membership",
+      "head": false,
+      "seats": 0
+    }
   ],
-  "legacyPositions": { "head_of_activities": "member" },
-  "legacyDepartments": ["executive", "councils", "security", "activities", "finance", "public_relations", "media", "research"]
+  "legacyPositions": {
+    "head_of_activities": "member",
+    "head_of_security": "head_of_organising_corner",
+    "security": "organising_corner_member",
+    "head_of_online_meetings": "member",
+    "council_photographer": "media_corner_member",
+    "council_reporter": "media_corner_member",
+    "printer": "media_corner_member"
+  },
+  "legacyDepartments": [
+    "executive",
+    "councils",
+    "security",
+    "activities",
+    "finance",
+    "public_relations",
+    "media",
+    "research"
+  ]
 }

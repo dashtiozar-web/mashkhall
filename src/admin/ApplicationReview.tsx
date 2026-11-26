@@ -1,4 +1,4 @@
-import { TIERS, canHoldPositions, tierById } from '../lib/tiers';
+import { TIERS, canHoldPositions, tierById, supportLabel, futureLabel } from '../lib/tiers';
 import React, { useState } from 'react';
 import { X, ArrowLeft, Pencil } from 'lucide-react';
 import { doc } from 'firebase/firestore';
@@ -221,6 +221,8 @@ export const ApplicationReview: React.FC<{
                 <dt className="text-muted">Kind of membership</dt>
                 <dd className="font-semibold">{tierById(app.tier) ? <><span className="font-kurdish text-[1.125rem]" lang="ckb" dir="rtl" translate="no">{tierById(app.tier)!.ku}</span> <span className="font-normal text-ink-soft">· {tierById(app.tier)!.name}</span></> : 'Not chosen (applied before kinds of membership)'}</dd>
               </div>
+              {app.tier === 'pishtiwan' && <div className="sm:col-span-2"><dt className="text-muted">Support offered</dt><dd className="font-semibold">{supportLabel(app.supportTypes)}</dd></div>}
+              {app.tier === 'komar' && <div className="sm:col-span-2"><dt className="text-muted">Would like to do more later</dt><dd className="font-semibold">{futureLabel(app.futureIntent)}</dd></div>}
               <div className="sm:col-span-2 rounded-xl bg-navy-tint px-4 py-3">
                 <dt className="text-muted">Position applied for</dt>
                 <dd className="font-semibold">{positionTitle(pid)} <span className="font-normal text-ink-soft">· {departmentFor(pid)?.name}</span></dd>

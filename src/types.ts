@@ -131,6 +131,10 @@ export interface MemberApplication {
   city?: string;
   /** Kind of membership: pêşeng, piştîwan or komar (see lib/tiers). */
   tier?: 'peshang' | 'pishtiwan' | 'komar';
+  /** Piştîwan: the support offered (financial, komar, logistics). */
+  supportTypes?: string[];
+  /** Komar: whether they may become Piştîwan or Pêşeng later. */
+  futureIntent?: string;
   reason: string;
   skills?: string;
   photoUrl?: string;
@@ -160,6 +164,10 @@ export interface MemberRecord {
   city?: string;
   /** Kind of membership: pêşeng, piştîwan or komar (see lib/tiers). */
   tier?: 'peshang' | 'pishtiwan' | 'komar';
+  /** Piştîwan: the support offered (financial, komar, logistics). */
+  supportTypes?: string[];
+  /** Komar: whether they may become Piştîwan or Pêşeng later. */
+  futureIntent?: string;
   status: MemberStatus;
   roles: Role[];
   isBoardMember?: boolean;

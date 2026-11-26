@@ -60,9 +60,10 @@ export const parseSeat = (seatId, chapters) => {
     const p = POSITIONS.get(positionId);
     if (!p || p.department !== 'council') return null;
     if (!chapters.some((c) => c.id === councilId && !c.isArchived)) return null;
-    if (positionId === 'security') {
-      if (parts.length !== 4 || !/^[1-5]$/.test(seat || '')) return null;
-      return { id: seatId, unit, positionId, councilId, seat: Number(seat) };
+    if ((p.seats || 1) > 1) {
+      const n = Number(seat);
+      if (parts.length !== 4 || !/^\d+$/.test(seat || '') || n < 1 || n > p.seats) return null;
+      return { id: seatId, unit, positionId, councilId, seat: n };
     }
     return parts.length === 3 ? { id: seatId, unit, positionId, councilId } : null;
   }
@@ -70,7 +71,7 @@ export const parseSeat = (seatId, chapters) => {
 };
 
 const unitLabel = (s, chapters) => (s.unit === 'council'
-  ? `${chapters.find((c) => c.id === s.councilId)?.name || s.councilId} Council`
+  ? `${chapters.find((c) => c.id === s.councilId)?.name || s.councilId}`
   : UNIT_NAMES[s.unit]);
 
 export const seatLabel = (s, chapters) => {
@@ -509,8 +510,8 @@ export const appoint = async (env, staff, body) => {
 
   const [existing, mine] = await Promise.all([getDoc(env, `org_assignments/${seat.id}`), seatsOf(env, m.id)]);
   if (existing?.memberId === m.id) throw new HttpError(409, `${m.fullName} already holds this position. To mark it acting, on leave or suspended, use “Position status”.`);
-  if (seat.positionId === 'security' && mine.some((a) => a.positionId === 'security' && a.councilId === seat.councilId && a.id !== seat.id)) {
-    throw new HttpError(409, `${m.fullName} is already a Security Member of this council.`);
+  if ((POSITIONS.get(seat.positionId)?.seats || 1) > 1 && mine.some((a) => a.positionId === seat.positionId && a.councilId === seat.councilId && a.id !== seat.id)) {
+    throw new HttpError(409, `${m.fullName} already holds a ${POSITIONS.get(seat.positionId).title} seat in this group.`);
   }
 
   const beforeMain = mainPosition(mine);

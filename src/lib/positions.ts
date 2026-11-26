@@ -2,11 +2,15 @@
  * The official structure of Mashkhally Zhyanawa Organisation.
  *
  * Four parts:
- *  1. Board of Directors: eight central positions, one person each.
- *  2. Council Structure: each of the six councils has a Council Leader, a
- *     Head of Security Team with five Security Members, a Head of Online
- *     Meeting Management, and a Media Supervisor with a Photographer,
- *     Reporter and Printer.
+ *  1. Board of Directors: the President, the Deputy President, the heads of
+ *     the eight centres (Education, Finance, Media and Communications,
+ *     Research and Investigation, Public Relations, Administration,
+ *     Organising, Kurdish Diaspora) and the Representative of the Lobby
+ *     Supervisors.
+ *  2. Groups in cities and countries: each has a Lobby Supervisor and four
+ *     corners (Education, Organising, Media and Communications, Finance),
+ *     each with a head and several members.
+ * Only Pêşeng members hold positions.
  *  3. Production Team: one organisation-wide team (not per council).
  *  4. Website Administration: five positions led by the Admin. Holding one
  *     gives no website permissions by itself; those are granted separately.
@@ -24,24 +28,28 @@ export type UnitId = 'board' | 'council' | 'production' | 'webadmin' | 'membersh
 export type DepartmentId = UnitId;
 
 export type PositionId =
-  // Board of Directors
+  // Board of Directors: the President, the Deputy, and the heads of the eight centres
   | 'president'
   | 'deputy_president'
+  | 'head_of_education'
+  | 'head_of_finance'
   | 'head_of_media'
   | 'research_manager'
   | 'head_of_public_relations'
-  | 'councils_representative'
   | 'administrator'
-  | 'head_of_finance'
-  // Each council
+  | 'head_of_organising'
+  | 'head_of_diaspora'
+  | 'councils_representative'
+  // Each group (province or country): a Lobby Supervisor and four corners
   | 'council_leader'
-  | 'head_of_security'
-  | 'security'
-  | 'head_of_online_meetings'
+  | 'head_of_education_corner'
+  | 'head_of_organising_corner'
   | 'media_supervisor'
-  | 'council_photographer'
-  | 'council_reporter'
-  | 'printer'
+  | 'head_of_finance_corner'
+  | 'education_corner_member'
+  | 'organising_corner_member'
+  | 'media_corner_member'
+  | 'finance_corner_member'
   // Production Team
   | 'head_of_production'
   | 'graphic_designer'
@@ -72,7 +80,7 @@ export interface Position {
   department: UnitId;
   /** Leads others (shown highlighted in the chart). */
   head: boolean;
-  /** Seats per unit: 1, or 5 for Security Members. */
+  /** Seats per unit: 1, or several for corner members. */
   seats: number;
   /** The position this one reports to, within the same unit. */
   reportsTo?: PositionId;
@@ -109,7 +117,7 @@ export const positionLabel = (id?: string, councilName?: string) => {
   if (!p) return 'Member';
   if (p.department === 'production' && !p.head) return `${p.title}, Production Team`;
   if (p.department === 'webadmin' && p.id !== 'web_admin') return `${p.title}, Website Administration`;
-  if (p.department === 'council' && councilName) return `${p.title}, ${councilName} Council`;
+  if (p.department === 'council' && councilName) return `${p.title}, ${councilName}`;
   return p.title;
 };
 
@@ -122,8 +130,8 @@ export const positionFromTitle = (title?: string): PositionId | undefined => {
     'representative of councils': 'councils_representative',
     'head of financial management': 'head_of_finance',
     'manager of research and investigation': 'research_manager',
-    'head of security': 'head_of_security',
-    security: 'security',
+    'head of security': 'head_of_organising_corner',
+    security: 'organising_corner_member',
   };
   return map[t] || POSITIONS.find((p) => p.title.toLowerCase() === t)?.id;
 };

@@ -36,3 +36,23 @@ export const tierById = (id?: string) => TIERS.find((t) => t.id === id);
 export const isTier = (id?: string): id is MembershipTier => Boolean(tierById(id));
 /** Only Pêşeng members take on positions and responsibilities. */
 export const canHoldPositions = (tier?: string) => tier === 'peshang';
+
+/** What a Piştîwan member offers. */
+export const SUPPORT_TYPES = [
+  { id: 'financial', name: 'Financial support', description: 'Helping the movement with money when it is needed.' },
+  { id: 'komar', name: 'Gathering Komar', description: 'Bringing together voters and supporters for the movement.' },
+  { id: 'logistics', name: 'Logistical support', description: 'Transport, places, equipment and practical help.' },
+];
+export const supportLabel = (ids?: string[]) => (ids || []).length === SUPPORT_TYPES.length
+  ? 'All of them'
+  : SUPPORT_TYPES.filter((o) => (ids || []).includes(o.id)).map((o) => o.name).join(', ') || 'Not chosen';
+
+/** Whether a Komar member may do more later. */
+export const FUTURE_INTENTS = [
+  { id: 'near_pishtiwan', name: 'Yes, in the near future, as a Piştîwan' },
+  { id: 'near_peshang', name: 'Yes, in the near future, as a Pêşeng' },
+  { id: 'later_pishtiwan', name: 'Perhaps in the more distant future, as a Piştîwan' },
+  { id: 'later_peshang', name: 'Perhaps in the more distant future, as a Pêşeng' },
+  { id: 'stay', name: 'No, I would like to stay a Komar' },
+];
+export const futureLabel = (id?: string) => FUTURE_INTENTS.find((o) => o.id === id)?.name || 'Not answered';

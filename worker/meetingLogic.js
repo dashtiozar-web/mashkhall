@@ -14,7 +14,7 @@
 export const SENIOR_POSITIONS = ['president', 'deputy_president'];
 
 /** Board of Directors positions (src/config/structure.json). */
-export const BOARD_POSITIONS = ['president', 'deputy_president', 'head_of_media', 'research_manager', 'head_of_public_relations', 'councils_representative', 'administrator', 'head_of_finance'];
+export const BOARD_POSITIONS = ['president', 'deputy_president', 'head_of_education', 'head_of_finance', 'head_of_media', 'research_manager', 'head_of_public_relations', 'administrator', 'head_of_organising', 'head_of_diaspora', 'councils_representative'];
 export const PRODUCTION_POSITIONS = ['head_of_production', 'graphic_designer', 'reporter', 'photographer', 'video_editor', 'content_creator'];
 export const WEBADMIN_POSITIONS = ['web_admin', 'web_deputy', 'web_security', 'web_content', 'web_support'];
 

@@ -45,10 +45,10 @@ beforeEach(() => {
   fake.set('users/carol', { uid: 'carol', roles: ['member'] });
   fake.set('members/carol', member('carol'));
   fake.set('users/alice', { uid: 'alice', roles: ['member'], displayName: 'alice', permissions: [] });
-  fake.set('members/alice', member('alice', { positionId: 'council_photographer', designation: 'Photographer', memberNumber: 'M0000005', credentialIssuedAt: '2025-01-01', validFrom: '2025-01-01', expiresAt: '2099-01-01', verifyUrl: 'https://mashkhall.com/#/people/M0000005' }));
-  fake.set('public_profiles/alice', { id: 'alice', userId: 'alice', displayName: 'alice', chapterId: 'britain', chapterName: 'Britain', positionId: 'council_photographer', designation: 'Photographer' });
-  fake.set('verifications/M0000005', { id: 'M0000005', memberNumber: 'M0000005', name: 'alice Full', designation: 'Photographer', status: 'active' });
-  fake.set('org_assignments/council__britain__council_photographer', { id: 'council__britain__council_photographer', unit: 'council', positionId: 'council_photographer', councilId: 'britain', memberId: 'alice', memberName: 'alice' });
+  fake.set('members/alice', member('alice', { positionId: 'media_corner_member', designation: 'Media and Communications Corner Member', memberNumber: 'M0000005', credentialIssuedAt: '2025-01-01', validFrom: '2025-01-01', expiresAt: '2099-01-01', verifyUrl: 'https://mashkhall.com/#/people/M0000005' }));
+  fake.set('public_profiles/alice', { id: 'alice', userId: 'alice', displayName: 'alice', chapterId: 'britain', chapterName: 'Britain', positionId: 'media_corner_member', designation: 'Media and Communications Corner Member' });
+  fake.set('verifications/M0000005', { id: 'M0000005', memberNumber: 'M0000005', name: 'alice Full', designation: 'Media and Communications Corner Member', status: 'active' });
+  fake.set('org_assignments/council__britain__media_corner_member__1', { id: 'council__britain__media_corner_member__1', unit: 'council', positionId: 'media_corner_member', councilId: 'britain', seat: 1, memberId: 'alice', memberName: 'alice' });
 });
 
 describe('Editing a member updates every place they appear (tests 1, 10, 13)', () => {
@@ -57,9 +57,9 @@ describe('Editing a member updates every place they appear (tests 1, 10, 13)', (
     expect(r.status).toBe(200);
     expect(r.data.changed.sort()).toEqual(['displayName', 'fullName', 'photoUrl']);
     expect(fake.get('members/alice')).toMatchObject({ fullName: 'Alice Kareem', displayName: 'Alice K.', photoUrl: 'data:image/jpeg;base64,AAAA' });
-    expect(fake.get('public_profiles/alice')).toMatchObject({ displayName: 'Alice K.', photoUrl: 'data:image/jpeg;base64,AAAA', designation: 'Photographer' });
-    expect(fake.get('verifications/M0000005')).toMatchObject({ name: 'Alice Kareem', designation: 'Photographer', status: 'active' });
-    expect(fake.get('org_assignments/council__britain__council_photographer')).toMatchObject({ memberName: 'Alice K.' });
+    expect(fake.get('public_profiles/alice')).toMatchObject({ displayName: 'Alice K.', photoUrl: 'data:image/jpeg;base64,AAAA', designation: 'Media and Communications Corner Member' });
+    expect(fake.get('verifications/M0000005')).toMatchObject({ name: 'Alice Kareem', designation: 'Media and Communications Corner Member', status: 'active' });
+    expect(fake.get('org_assignments/council__britain__media_corner_member__1')).toMatchObject({ memberName: 'Alice K.' });
     expect(fake.get('users/alice')).toMatchObject({ displayName: 'Alice K.' });
   });
 
@@ -102,7 +102,7 @@ describe('Editing a member updates every place they appear (tests 1, 10, 13)', (
   it('moving a member to another council frees their old council positions and records it', async () => {
     const r = await call('members/update', { memberId: 'alice', changes: { chapterId: 'erbil' } });
     expect(r.status).toBe(200);
-    expect(fake.get('org_assignments/council__britain__council_photographer')).toBeUndefined();
+    expect(fake.get('org_assignments/council__britain__media_corner_member__1')).toBeUndefined();
     expect(fake.get('members/alice')).toMatchObject({ chapterId: 'erbil', positionId: 'member', designation: 'Member' });
     expect(fake.get('public_profiles/alice')).toMatchObject({ chapterId: 'erbil', chapterName: 'Erbil', designation: 'Member' });
     expect(fake.list('position_history')[0]).toMatchObject({ memberId: 'alice', action: 'transferred', to: 'Erbil Council' });
@@ -111,7 +111,7 @@ describe('Editing a member updates every place they appear (tests 1, 10, 13)', (
   it('a member can edit their own profile text and photo, and nothing official', async () => {
     const r = await call('members/self', { displayName: 'Ali', bio: 'Hello', fullName: 'Hacked', positionId: 'president' }, 'alice');
     expect(r.status).toBe(200);
-    expect(fake.get('members/alice')).toMatchObject({ displayName: 'Ali', bio: 'Hello', fullName: 'alice Full', positionId: 'council_photographer' });
+    expect(fake.get('members/alice')).toMatchObject({ displayName: 'Ali', bio: 'Hello', fullName: 'alice Full', positionId: 'media_corner_member' });
     expect(fake.get('public_profiles/alice')).toMatchObject({ displayName: 'Ali', bio: 'Hello' });
   });
 });
@@ -120,10 +120,10 @@ describe('Older titles', () => {
   it('a title given before positions were appointed is kept when other details change', async () => {
     fake.set('members/dina', member('dina', { positionId: 'head_of_public_relations', designation: 'Head of Public Relations' }));
     await call('members/update', { memberId: 'dina', changes: { phone: '1' } });
-    expect(fake.get('members/dina')).toMatchObject({ positionId: 'head_of_public_relations', designation: 'Head of Public Relations' });
+    expect(fake.get('members/dina')).toMatchObject({ positionId: 'head_of_public_relations', designation: 'Head of the Public Relations Centre' });
     await call('members/resync', { memberIds: ['dina'] });
     expect(fake.get('members/dina')).toMatchObject({ positionId: 'head_of_public_relations' });
-    expect(fake.get('public_profiles/dina')).toMatchObject({ designation: 'Head of Public Relations', displayName: 'dina' });
+    expect(fake.get('public_profiles/dina')).toMatchObject({ designation: 'Head of the Public Relations Centre', displayName: 'dina' });
   });
 });
 
@@ -142,22 +142,22 @@ describe('Promotions and positions (test 2)', () => {
     const r = await call('members/appoint', { seatId: 'council__britain__media_supervisor', memberId: 'alice', reason: 'Excellent coverage', effectiveDate: '2026-11-01' });
     expect(r.status).toBe(200);
     expect(r.data.action).toBe('promoted');
-    expect(fake.get('org_assignments/council__britain__council_photographer')).toBeUndefined();
+    expect(fake.get('org_assignments/council__britain__media_corner_member__1')).toBeUndefined();
     expect(fake.get('org_assignments/council__britain__media_supervisor')).toMatchObject({ memberId: 'alice', positionId: 'media_supervisor', councilId: 'britain', status: 'active', effectiveDate: '2026-11-01' });
-    expect(fake.get('members/alice')).toMatchObject({ positionId: 'media_supervisor', designation: 'Media Supervisor', department: 'council' });
-    expect(fake.get('public_profiles/alice')).toMatchObject({ positionId: 'media_supervisor', designation: 'Media Supervisor' });
-    expect(fake.get('verifications/M0000005')).toMatchObject({ designation: 'Media Supervisor' });
+    expect(fake.get('members/alice')).toMatchObject({ positionId: 'media_supervisor', designation: 'Head of the Media and Communications Corner', department: 'council' });
+    expect(fake.get('public_profiles/alice')).toMatchObject({ positionId: 'media_supervisor', designation: 'Head of the Media and Communications Corner' });
+    expect(fake.get('verifications/M0000005')).toMatchObject({ designation: 'Head of the Media and Communications Corner' });
     const h = fake.list('position_history')[0] as any;
-    expect(h).toMatchObject({ memberId: 'alice', action: 'promoted', from: 'Photographer, Britain Council', to: 'Media Supervisor, Britain Council', effectiveDate: '2026-11-01', byUid: OWNER_UID, reason: 'Excellent coverage' });
-    expect(fake.list('user_notifications').some((n: any) => n.userId === 'alice' && /Media Supervisor/.test(n.title))).toBe(true);
+    expect(h).toMatchObject({ memberId: 'alice', action: 'promoted', from: 'Media and Communications Corner Member 1, Britain', to: 'Head of the Media and Communications Corner, Britain', effectiveDate: '2026-11-01', byUid: OWNER_UID, reason: 'Excellent coverage' });
+    expect(fake.list('user_notifications').some((n: any) => n.userId === 'alice' && /Media and Communications Corner/.test(n.title))).toBe(true);
   });
 
   it('can keep other positions when more than one is allowed, without duplicating the member', async () => {
     await call('members/appoint', { seatId: 'production__video_editor', memberId: 'alice', keepOtherPositions: true });
-    expect(fake.get('org_assignments/council__britain__council_photographer')).toBeTruthy();
+    expect(fake.get('org_assignments/council__britain__media_corner_member__1')).toBeTruthy();
     expect(fake.get('org_assignments/production__video_editor')).toMatchObject({ memberId: 'alice' });
     expect(fake.list('members').filter((m) => m.id === 'alice')).toHaveLength(1);
-    expect(fake.get('members/alice')?.positionId).toBe('council_photographer');
+    expect(fake.get('members/alice')?.positionId).toBe('media_corner_member');
   });
 
   it('a council position needs a member of that council, unless they are transferred with it', async () => {
@@ -167,26 +167,26 @@ describe('Promotions and positions (test 2)', () => {
     const yes = await call('members/appoint', { seatId: 'council__erbil__council_leader', memberId: 'alice', moveToCouncil: true });
     expect(yes.status).toBe(200);
     expect(fake.get('members/alice')).toMatchObject({ chapterId: 'erbil', positionId: 'council_leader' });
-    expect(fake.get('org_assignments/council__britain__council_photographer')).toBeUndefined();
+    expect(fake.get('org_assignments/council__britain__media_corner_member__1')).toBeUndefined();
   });
 
   it('the person who held the seat before is told and goes back to their remaining title', async () => {
-    await call('members/appoint', { seatId: 'council__britain__council_photographer', memberId: 'carol' });
-    expect(fake.get('org_assignments/council__britain__council_photographer')).toMatchObject({ memberId: 'carol' });
+    await call('members/appoint', { seatId: 'council__britain__media_corner_member__1', memberId: 'carol' });
+    expect(fake.get('org_assignments/council__britain__media_corner_member__1')).toMatchObject({ memberId: 'carol' });
     expect(fake.get('members/alice')).toMatchObject({ positionId: 'member', designation: 'Member' });
     expect(fake.list('position_history').some((h: any) => h.memberId === 'alice' && h.action === 'replaced')).toBe(true);
   });
 
   it('position status and reporting line can be changed and are recorded', async () => {
-    const r = await call('members/seat', { seatId: 'council__britain__council_photographer', status: 'on_leave', reportsTo: 'council__britain__council_leader', reason: 'Studying' });
+    const r = await call('members/seat', { seatId: 'council__britain__media_corner_member__1', status: 'on_leave', reportsTo: 'council__britain__council_leader', reason: 'Studying' });
     expect(r.status).toBe(200);
-    expect(fake.get('org_assignments/council__britain__council_photographer')).toMatchObject({ status: 'on_leave', reportsTo: 'council__britain__council_leader' });
+    expect(fake.get('org_assignments/council__britain__media_corner_member__1')).toMatchObject({ status: 'on_leave', reportsTo: 'council__britain__council_leader' });
     expect(fake.list('position_history')[0]).toMatchObject({ action: 'status_changed', reason: 'Studying' });
   });
 
   it('vacating a position records it; the history can be reviewed', async () => {
-    await call('members/vacate', { seatId: 'council__britain__council_photographer', reason: 'Stepped down' });
-    expect(fake.get('org_assignments/council__britain__council_photographer')).toBeUndefined();
+    await call('members/vacate', { seatId: 'council__britain__media_corner_member__1', reason: 'Stepped down' });
+    expect(fake.get('org_assignments/council__britain__media_corner_member__1')).toBeUndefined();
     const h = await call('members/history?id=alice');
     expect(h.status).toBe(200);
     expect(h.data.positions[0]).toMatchObject({ action: 'removed', reason: 'Stepped down' });
@@ -240,7 +240,7 @@ describe('Digital membership ID and QR verification', () => {
     // Edits show at once on the same QR code.
     await call('members/update', { memberId: 'carol', changes: { fullName: 'Carol New' } });
     await call('members/appoint', { seatId: 'board__head_of_finance', memberId: 'carol' });
-    expect((await call(`verify/id/${m.verifyToken}`, undefined, 'none')).data).toMatchObject({ name: 'Carol New', position: 'Head of Finance', state: 'valid' });
+    expect((await call(`verify/id/${m.verifyToken}`, undefined, 'none')).data).toMatchObject({ name: 'Carol New', position: 'Head of the Finance Centre', state: 'valid' });
 
     // Suspension shows immediately; a position change does not end membership.
     await call('members/status', { memberId: 'carol', status: 'suspended', reason: 'Review' });
@@ -278,11 +278,11 @@ describe('Built-in councils that were never saved in the database', () => {
   it('positions in them can be given, as the website shows them (Britain Council Leader)', async () => {
     fake.docs.delete('chapters/britain');
     fake.docs.delete('chapters/erbil');
-    fake.set('members/adil', member('adil', { fullName: 'Adil Mohammed Qadir', positionId: 'council_leader', designation: 'Council Leader' }));
+    fake.set('members/adil', member('adil', { fullName: 'Adil Mohammed Qadir', positionId: 'council_leader', designation: 'Lobby Supervisor' }));
     const r = await call('members/appoint', { seatId: 'council__britain__council_leader', memberId: 'adil', effectiveDate: '2026-11-03' });
     expect(r.status).toBe(200);
     expect(fake.get('org_assignments/council__britain__council_leader')).toMatchObject({ memberId: 'adil', positionId: 'council_leader', councilId: 'britain' });
-    expect(fake.get('members/adil')).toMatchObject({ positionId: 'council_leader', designation: 'Council Leader' });
+    expect(fake.get('members/adil')).toMatchObject({ positionId: 'council_leader', designation: 'Lobby Supervisor' });
     // Kirkuk is built in too; a council that does not exist is still refused.
     expect((await call('members/appoint', { seatId: 'council__kirkuk__media_supervisor', memberId: 'carol', moveToCouncil: true })).status).toBe(200);
     expect((await call('members/appoint', { seatId: 'council__atlantis__council_leader', memberId: 'carol', moveToCouncil: true })).status).toBe(400);

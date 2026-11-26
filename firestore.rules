@@ -89,12 +89,12 @@ service cloud.firestore {
 
     // The official positions (src/config/structure.json).
     // BEGIN GENERATED STRUCTURE — from src/config/structure.json by scripts/sync-pricing.ts. Do not edit by hand.
-    function boardPositions() { return ['president', 'deputy_president', 'head_of_media', 'research_manager', 'head_of_public_relations', 'councils_representative', 'administrator', 'head_of_finance']; }
-    function councilPositions() { return ['council_leader', 'head_of_security', 'head_of_online_meetings', 'media_supervisor', 'security', 'council_photographer', 'council_reporter', 'printer']; }
+    function boardPositions() { return ['president', 'deputy_president', 'head_of_education', 'head_of_finance', 'head_of_media', 'research_manager', 'head_of_public_relations', 'administrator', 'head_of_organising', 'head_of_diaspora', 'councils_representative']; }
+    function councilPositions() { return ['council_leader', 'head_of_education_corner', 'head_of_organising_corner', 'media_supervisor', 'head_of_finance_corner', 'education_corner_member', 'organising_corner_member', 'media_corner_member', 'finance_corner_member']; }
     function productionPositions() { return ['head_of_production', 'graphic_designer', 'reporter', 'photographer', 'video_editor', 'content_creator']; }
     function webadminPositions() { return ['web_admin', 'web_deputy', 'web_security', 'web_content', 'web_support']; }
     // Older position and department names remain valid on records made before the structure changed.
-    function positionIds() { return ['president', 'deputy_president', 'head_of_media', 'research_manager', 'head_of_public_relations', 'councils_representative', 'administrator', 'head_of_finance', 'council_leader', 'head_of_security', 'head_of_online_meetings', 'media_supervisor', 'security', 'council_photographer', 'council_reporter', 'printer', 'head_of_production', 'graphic_designer', 'reporter', 'photographer', 'video_editor', 'content_creator', 'web_admin', 'web_deputy', 'web_security', 'web_content', 'web_support', 'member', 'head_of_activities']; }
+    function positionIds() { return ['president', 'deputy_president', 'head_of_education', 'head_of_finance', 'head_of_media', 'research_manager', 'head_of_public_relations', 'administrator', 'head_of_organising', 'head_of_diaspora', 'councils_representative', 'council_leader', 'head_of_education_corner', 'head_of_organising_corner', 'media_supervisor', 'head_of_finance_corner', 'education_corner_member', 'organising_corner_member', 'media_corner_member', 'finance_corner_member', 'head_of_production', 'graphic_designer', 'reporter', 'photographer', 'video_editor', 'content_creator', 'web_admin', 'web_deputy', 'web_security', 'web_content', 'web_support', 'member', 'head_of_activities', 'head_of_security', 'security', 'head_of_online_meetings', 'council_photographer', 'council_reporter', 'printer']; }
     function departmentIds() { return ['board', 'council', 'production', 'webadmin', 'membership', 'executive', 'councils', 'security', 'activities', 'finance', 'public_relations', 'media', 'research']; }
     // END GENERATED STRUCTURE
 
@@ -316,6 +316,8 @@ service cloud.firestore {
           && photoOk()
           && positionOk(d)
           && (!('tier' in d) || d.tier in ['peshang', 'pishtiwan', 'komar'])
+          && (!('supportTypes' in d) || (d.supportTypes is list && d.supportTypes.size() <= 3 && d.supportTypes.hasOnly(['financial', 'komar', 'logistics'])))
+          && (!('futureIntent' in d) || d.futureIntent in ['near_pishtiwan', 'near_peshang', 'later_pishtiwan', 'later_peshang', 'stay'])
           // Only Pêşeng members take on positions.
           && (!('tier' in d) || d.tier == 'peshang' || d.get('positionId', 'member') == 'member')
           && d.agreedToPolicies == true

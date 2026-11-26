@@ -40,11 +40,12 @@ export interface Assignment extends Seat {
   reportsTo?: string;
 }
 
-export const SECURITY_SEATS = 5;
+/** How many seats a council position has (corner members have several). */
+export const seatCount = (positionId: string) => positionById(positionId)?.seats || 1;
 
 export const seatId = (unit: Seat['unit'], positionId: PositionId, councilId?: string, seat?: number) =>
   unit === 'council'
-    ? `council__${councilId}__${positionId}${positionId === 'security' ? `__${seat}` : ''}`
+    ? `council__${councilId}__${positionId}${seatCount(positionId) > 1 ? `__${seat}` : ''}`
     : `${unit}__${positionId}`;
 
 const mk = (unit: Seat['unit'], p: Position, councilId?: string, seat?: number): Seat => ({
@@ -64,8 +65,8 @@ export const seatsOf = (unit: Seat['unit'], councilId?: string): Seat[] =>
   unit === 'board' ? boardSeats() : unit === 'production' ? productionSeats() : unit === 'webadmin' ? webadminSeats() : councilId ? councilSeats(councilId) : [];
 export const councilSeats = (councilId: string): Seat[] =>
   COUNCIL_POSITIONS.flatMap((p) =>
-    p.id === 'security'
-      ? Array.from({ length: SECURITY_SEATS }, (_, i) => mk('council', p, councilId, i + 1))
+    p.seats > 1
+      ? Array.from({ length: p.seats }, (_, i) => mk('council', p, councilId, i + 1))
       : [mk('council', p, councilId)]);
 
 /** Live list of every appointment (public). */

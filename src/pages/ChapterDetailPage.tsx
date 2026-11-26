@@ -10,7 +10,7 @@ import { useNewsBanners } from '../lib/newsBanner';
 import { activityPath, responseOf } from '../lib/activities';
 import { ActivityRegistration } from '../types';
 import { Button, Container, TextLink } from '../components/ui';
-import { PersonCard } from '../components/PersonCard';
+import { MembersByTier } from '../components/OrgStructureChart';
 
 interface ChapterDetailPageProps {
   slug: string;
@@ -137,9 +137,9 @@ export const ChapterDetailPage: React.FC<ChapterDetailPageProps> = ({ slug, onNa
         <section className="border-t border-line">
           <Container className="py-14">
             <h2 className="text-[1.75rem] font-semibold">Members in {chapter.name} ({people.length})</h2>
-            <p className="mt-2 text-ink-soft">Every approved member in {chapter.name}.</p>
-            <div className="mt-8 grid gap-x-10 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
-              {people.map((p) => <PersonCard key={p.id} profile={p} />)}
+            <p className="mt-2 text-ink-soft">Every approved member in {chapter.name}, by kind of membership: Pêşeng, Piştîwan and Komar.</p>
+            <div className="mt-8">
+              <MembersByTier profiles={people} councilName={() => chapter.name} />
             </div>
           </Container>
         </section>
